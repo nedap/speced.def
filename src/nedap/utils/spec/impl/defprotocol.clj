@@ -55,7 +55,10 @@
 
     `(do
        ~@declares
-       (clojure.core/defprotocol ~name ~docstring ~@methods)
+       (clojure.core/defprotocol ~name
+         ~docstring
+         :extend-via-metadata true
+         ~@methods)
        ~@impls
        ;; matches the clojure.core behavior:
        ~(list 'quote name))))

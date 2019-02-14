@@ -8,8 +8,6 @@
 
 (spec/def ::age ::int)
 
-(spec/def ::this some?)
-
 (spec/def ::x boolean?)
 
 (spec/def ::this (spec/keys :req-un [::age]))
