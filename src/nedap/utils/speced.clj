@@ -21,7 +21,11 @@
     * it is namespace-qualified;
     * and if there's only one ns-qualified metadata entry (e.g. `^::foo ^::bar would emit no spec`)
 
-  The implementation is backed by Clojure's `:pre`/`:post`, therefore runtime-checking behavior is controlled with `*assert*``."
+  The implementation is backed by Clojure's `:pre`/`:post`, therefore runtime-checking behavior is controlled with `*assert*``.
+
+  When implementing the protocol, each method must be prefixed with `--`.
+
+  When invoking a protocol method, use the original names, without `--` prefix."
   {:style/indent [1 :defn]
    :style.cljfmt/indent [[:block 1] [:inner 1]]}
   [name docstring & methods]

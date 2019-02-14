@@ -23,7 +23,7 @@
 
 (defrecord Sut [age]
   ExampleProtocol
-  (-do-it [this x]
+  (--do-it [this x]
     (if x
       42
       :fail)))
