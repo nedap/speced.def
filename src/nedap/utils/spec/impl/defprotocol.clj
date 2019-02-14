@@ -32,7 +32,7 @@
                         vector)
         _ (check! #{0 1} (count ret-spec))
         prepost {:pre args-specs :post ret-spec}
-        impl (->> method-name (str "-") symbol)]
+        impl (->> method-name (str "--") symbol)]
     {:declare `(declare ~impl)
      :impl `(defn ~method-name ~docstring ~args ~prepost (~impl ~@args))
      :method `(~impl ~args ~docstring)}))
