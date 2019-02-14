@@ -2,6 +2,12 @@
 
 Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 
+## installation
+
+```clojure
+[com.nedap.staffing-solutions/utils.spec "0.1.0"]
+````
+
 ## ns organisation
 
 There are exactly 2 namespaces meant for public consumption:

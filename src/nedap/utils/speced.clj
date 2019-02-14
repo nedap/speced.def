@@ -6,6 +6,8 @@
   That way, you will invoke e.g. `speced/defprotocol` which is clean and clear."
   (:refer-clojure :exclude [defprotocol])
   (:require
+   [clojure.spec.alpha :as spec]
+   [nedap.utils.spec.api :refer [check!]]
    [nedap.utils.spec.impl.defprotocol]))
 
 (defmacro defprotocol
@@ -30,3 +32,12 @@
    :style.cljfmt/indent [[:block 1] [:inner 1]]}
   [name docstring & methods]
   `(nedap.utils.spec.impl.defprotocol/defprotocol ~name ~docstring ~@methods))
+
+(defmacro def-with-doc
+  "Performs a plain `clojure.spec.alpha/def` with the given arguments.
+  The docstring argument is omitted. Its purpose is to show up for both human readers, and tooling."
+  [spec-name docstring spec]
+  {:pre [(check! qualified-keyword? spec-name
+                 string? docstring
+                 some? spec)]}
+  `(spec/def ~spec-name ~spec))
