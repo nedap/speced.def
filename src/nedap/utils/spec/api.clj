@@ -1,6 +1,7 @@
 (ns nedap.utils.spec.api
   (:require
    [clojure.spec.alpha :as spec]
+   [nedap.utils.spec.impl.check]
    [spec-coerce.core :as coerce]))
 
 (defmacro check!
