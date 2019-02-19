@@ -1,4 +1,4 @@
-(defproject com.nedap.staffing-solutions/utils.spec "0.1.1"
+(defproject com.nedap.staffing-solutions/utils.spec "0.2.0"
   :description "clojure.spec utilities"
   :url "https://github.com/nedap/utils.spec"
   :license {:name "Eclipse Public License"
