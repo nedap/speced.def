@@ -9,6 +9,7 @@
 
   `args` is a sequence of spec-val pairs."
   [& args]
+  {:pre [(-> args count even?)]}
   `(nedap.utils.spec.impl.check/check! ~@args))
 
 (defn coerce-map-indicating-invalidity
