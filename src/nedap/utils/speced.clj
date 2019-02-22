@@ -16,12 +16,11 @@
 
   Has the exact same signature as `clojure.core/defprotocol`, with the constraint that docstrings are mandatory.
 
-  Each method name, and each argument, observes spec metadata in the form `^::foo`:
+  Each method name, and each argument, observes spec metadata in any of these three spec formats:
 
-  * Spec medatata is expressed as with `^::foo` reader syntax, not `^{...}`.
-  * The metadata is only inferred to be of spec type, if:
-    * it is namespace-qualified;
-    * and if there's only one ns-qualified metadata entry (e.g. `^::foo ^::bar would emit no spec`)
+  * ^::foo            (namespace-qualified spec name with a `true` value)
+  * ^{::spec ::foo}   (using a namespace-qualified ::spec, with a spec as a value)
+  * ^Int              (a regular Clojure type hint, from which a spec and efficient code will be emmited)
 
   The implementation is backed by Clojure's `:pre`/`:post`, therefore runtime-checking behavior is controlled with `*assert*``.
 

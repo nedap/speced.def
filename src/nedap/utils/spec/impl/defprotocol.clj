@@ -15,24 +15,47 @@
   (and (qualified-keyword? k)
        (true? v)))
 
+(defn extract-specs-from-metadata [metadata-map]
+  {:post [(check! #{0 1} (count %))]}
+  (->> metadata-map
+       (map (fn [[k v]]
+              (cond
+                (and (qualified-keyword? k)
+                     (true? v))
+                {:spec k
+                 :type-annotation nil}
+
+                (and (qualified-keyword? k)
+                     (-> k name #{"spec"}))
+                {:spec v
+                 :type-annotation nil}
+
+                (and (#{:tag} k)
+                     (symbol? v))
+                {:spec (list 'fn ['x]
+                             (list `instance? v 'x))
+                 :type-annotation (resolve v)})))
+       (filter some?)))
+
 (defn emit-method [[method-name args docstring :as method]]
   {:pre [(check! ::method method)]}
-  (let [ret-spec (->> method-name meta (filter spec-metadata?) (mapv (fn [[k v]]
-                                                                       (list `check! k '%))))
-        args-specs (->> (map (fn [arg arg-meta]
-                               (let [s-m (->> arg-meta (filter spec-metadata?))
-                                     _ (assert (check! #{0 1} (count s-m)))]
-                                 (when-let [[k v] (first s-m)]
-                                   [k arg])))
-                             args
-                             (map meta args))
-                        (filter some?)
+  (let [{ret-spec :spec
+         ret-ann :type-annotation} (->> method-name meta extract-specs-from-metadata first)
+        args-sigs (map (fn [arg arg-meta]
+                         (merge {:arg arg}
+                                (->> arg-meta extract-specs-from-metadata first)))
+                       args
+                       (map meta args))
+        args-specs (->> args-sigs
+                        (filter :spec)
+                        (map (fn [{:keys [spec arg]}]
+                               [spec arg]))
                         (apply concat)
                         (apply list `check!)
                         vector)
-        _ (check! #{0 1} (count ret-spec))
-        prepost {:pre args-specs :post ret-spec}
-        impl (->> method-name (str "--") symbol)]
+        prepost {:pre args-specs :post [(list `check! ret-spec '%)]}
+        impl (with-meta (->> method-name (str "--") symbol)
+               {:tag ret-ann})]
     {:declare `(declare ~impl)
      :impl `(defn ~method-name ~docstring ~args ~prepost (~impl ~@args))
      :method `(~impl ~args ~docstring)}))
