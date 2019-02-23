@@ -8,9 +8,14 @@
 (speced/defprotocol ExampleProtocol
   "Docstring"
   (^Integer do-it
-   [this
-    ^Boolean boolean]
-   "Docstring"))
+    [this
+     ^Boolean boolean]
+    "Docstring"))
+
+(clojure.core/defprotocol PlainProtocol
+  (^Integer plain-do-it
+    [this
+     ^Boolean boolean]))
 
 (defrecord Sut []
   ExampleProtocol
@@ -27,19 +32,24 @@
       :fail)))
 
 (deftest defprotocol
-  ;; Integer is a class, which matches Clojure's behavior for ret vals
-  (are [x] (-> x meta :tag #{Integer})
-    #'do-it
-    #'--do-it)
-  ;; Boolean is a symbol, which matches Clojure's behavior for args
-  (are [x] (-> x meta :arglists first second meta :tag #{'Boolean})
-    #'do-it
-    #'--do-it)
+  (testing "Emitted type hints match clojure.core/defprotocol's behavior"
+    (are [x] (-> x meta :tag #{'Integer 'java.lang.Integer})
+      #'do-it
+      #'--do-it
+      #'plain-do-it)
+    (are [x] (-> x meta :arglists first second meta :tag #{'Boolean})
+      #'do-it
+      #'--do-it
+      #'plain-do-it))
+
   (is (= 42 (do-it (Sut.) true)))
+
   (is (thrown? Exception (with-out-str
                            (do-it (Bad.) true))))
+
   (is (thrown? Exception (with-out-str
                            (-> (Sut.) (do-it :not-a-boolean)))))
+
   (is (thrown? Exception (with-out-str
                            (-> (Sut.) (do-it false))))
       "`false` will cause the method not to return an int"))
