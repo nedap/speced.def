@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [defprotocol])
   (:require
    [clojure.spec.alpha :as spec]
-   [nedap.utils.spec.impl.check :refer [check!]]))
+   [nedap.utils.spec.impl.check :refer [check!]]
+   [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata]]))
 
 (spec/def ::args (spec/coll-of symbol? :kind vector :min-count 1))
 
@@ -10,32 +11,6 @@
                              (spec/cat :name symbol?
                                        :args ::args
                                        :docstring string?)))
-
-(defn spec-metadata? [[k v]]
-  (and (qualified-keyword? k)
-       (true? v)))
-
-(defn extract-specs-from-metadata [metadata-map]
-  {:post [(check! #{0 1} (count %))]}
-  (->> metadata-map
-       (map (fn [[k v]]
-              (cond
-                (and (qualified-keyword? k)
-                     (true? v))
-                {:spec k
-                 :type-annotation nil}
-
-                (and (qualified-keyword? k)
-                     (-> k name #{"spec"}))
-                {:spec v
-                 :type-annotation nil}
-
-                (and (#{:tag} k)
-                     (symbol? v))
-                {:spec (list 'fn ['x]
-                             (list `instance? v 'x))
-                 :type-annotation (resolve v)})))
-       (filter some?)))
 
 (defn emit-method [[method-name args docstring :as method]]
   {:pre [(check! ::method method)]}
@@ -54,8 +29,11 @@
                         (apply list `check!)
                         vector)
         prepost {:pre args-specs :post [(list `check! ret-spec '%)]}
-        impl (with-meta (->> method-name (str "--") symbol)
-               {:tag ret-ann})]
+        tag (some->> ret-ann .getName symbol)
+        impl (cond-> (->> method-name (str "--") symbol)
+               tag (vary-meta assoc :tag tag))
+        method-name (cond-> method-name
+                      tag (vary-meta assoc :tag (list 'quote tag)))]
     {:declare `(declare ~impl)
      :impl `(defn ~method-name ~docstring ~args ~prepost (~impl ~@args))
      :method `(~impl ~args ~docstring)}))
