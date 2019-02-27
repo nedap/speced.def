@@ -29,14 +29,14 @@
       :fail)))
 
 (deftest defprotocol
-  (is (= 42 (do-it (Sut. 42) true)))
+  (is (= 42 (do-it (->Sut 42) true)))
   (is (thrown? Exception (with-out-str
-                           (-> (Sut. 42) (do-it :not-a-boolean)))))
+                           (-> (->Sut 42) (do-it :not-a-boolean)))))
   (is (thrown? Exception (with-out-str
-                           (-> (Sut. 42) (do-it false))))
+                           (-> (->Sut 42) (do-it false))))
       "`false` will cause the method not to return an int")
   (is (thrown? Exception (with-out-str
-                           (-> (Sut. :not-an-int) (do-it true))))))
+                           (-> (->Sut :not-an-int) (do-it true))))))
 
 (speced/def-with-doc ::email "An email" string?)
 

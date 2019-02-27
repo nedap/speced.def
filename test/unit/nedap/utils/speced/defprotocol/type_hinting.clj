@@ -42,14 +42,14 @@
       #'--do-it
       #'plain-do-it))
 
-  (is (= 42 (do-it (Sut.) true)))
+  (is (= 42 (do-it (->Sut) true)))
 
   (is (thrown? Exception (with-out-str
                            (do-it (Bad.) true))))
 
   (is (thrown? Exception (with-out-str
-                           (-> (Sut.) (do-it :not-a-boolean)))))
+                           (-> (->Sut) (do-it :not-a-boolean)))))
 
   (is (thrown? Exception (with-out-str
-                           (-> (Sut.) (do-it false))))
+                           (-> (->Sut) (do-it false))))
       "`false` will cause the method not to return an int"))
