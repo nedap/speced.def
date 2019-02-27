@@ -1,5 +1,5 @@
 (ns unit.nedap.utils.speced.defn
-  "NOTE: all these demonstrate the following aspect documented in `:nedap.utils.specs/spec-metadata`:
+  "NOTE: all these demonstrate the following aspect documented in `:nedap.utils.spec.specs/spec-metadata`:
 
   > A defn with return value metadata for both its name and argument vector will emit spec checking for both.
 

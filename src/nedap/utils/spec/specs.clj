@@ -1,4 +1,4 @@
-(ns nedap.utils.specs
+(ns nedap.utils.spec.specs
   "Specs for this library."
   (:require
    [clojure.spec.alpha :as spec]

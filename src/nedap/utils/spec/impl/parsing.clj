@@ -1,7 +1,7 @@
 (ns nedap.utils.spec.impl.parsing
   (:require
    [nedap.utils.spec.impl.check :refer [check!]]
-   [nedap.utils.specs :as specs]))
+   [nedap.utils.spec.specs :as specs]))
 
 (defn proper-spec-metadata? [metadata-map extracted-specs]
   (if (-> extracted-specs count #{1})

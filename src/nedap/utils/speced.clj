@@ -27,7 +27,7 @@
 
   Has the exact same signature as `clojure.core/defprotocol`, with the constraint that docstrings are mandatory.
 
-  Each method name, and each argument, observes spec metadata as per the `:nedap.utils.specs/spec-metadata` spec.
+  Each method name, and each argument, observes spec metadata as per the `:nedap.utils.spec.specs/spec-metadata` spec.
 
   The implementation is backed by Clojure's `:pre`/`:post`, therefore runtime-checking behavior is controlled with `*assert*``.
 
@@ -45,7 +45,7 @@
 
   Has the exact same signature as `clojure.core/defn`, with full support for all its variations.
 
-  Each return value position, and each argument, observes spec metadata as per the `:nedap.utils.specs/spec-metadata`` spec.
+  Each return value position, and each argument, observes spec metadata as per the `:nedap.utils.spec.specs/spec-metadata`` spec.
 
   The implementation is backed by Clojure's `:pre`/`:post`, therefore runtime-checking behavior is controlled with `*assert*``."
   {:style/indent :defn
