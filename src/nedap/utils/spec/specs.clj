@@ -13,12 +13,11 @@
                                  (true? v))))))
 
 (def-with-doc ::explicit-format
-  "Example: ^{::spec ::foo}
-(i.e. using a namespace-qualified ::spec key, with an arbitrary spec as a value)"
+  "Example: ^{::speced/spec ::foo}
+(i.e. using a :nedap.utils.speced/spec key, with an arbitrary spec as a value)"
   (spec/and map?
             (partial some (fn [[k v]]
-                            (qualified-keyword? k)
-                            (-> k name #{"spec"})))))
+                            (= k :nedap.utils.speced/spec)))))
 
 (def-with-doc ::type-hint
   "Example: ^Int

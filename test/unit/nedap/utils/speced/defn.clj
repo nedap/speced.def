@@ -42,20 +42,20 @@
                                        [^::age x ^::temperature y]
                                        (-> x (* y) str)))
 
-               :explicit-metadata '(sut/defn ^{::spec ::present?}
+               :explicit-metadata '(sut/defn ^{::sut/spec ::present?}
                                      explicit-metadata
-                                     ^{::spec ::name}
-                                     [^{::spec ::age} x]
+                                     ^{::sut/spec ::name}
+                                     [^{::sut/spec ::age} x]
                                      (-> x (* x) str))
 
-               :explicit-metadata-n '(sut/defn ^{::spec ::present?}
+               :explicit-metadata-n '(sut/defn ^{::sut/spec ::present?}
                                        explicit-metadata-n
-                                       (^{::spec ::name}
-                                        [^{::spec ::age} x]
+                                       (^{::sut/spec ::name}
+                                        [^{::sut/spec ::age} x]
                                         (-> x (* x) str))
-                                       (^{::spec ::name}
-                                        [^{::spec ::age} x
-                                         ^{::spec ::temperature} y]
+                                       (^{::sut/spec ::name}
+                                        [^{::sut/spec ::age} x
+                                         ^{::sut/spec ::temperature} y]
                                         (-> x (* y) str)))
 
                :type-hinted-metadata '(sut/defn ^Object

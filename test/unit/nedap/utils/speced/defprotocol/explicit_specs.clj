@@ -16,9 +16,9 @@
 
 (speced/defprotocol ExampleProtocol
   "Docstring"
-  (^{::spec ::int}
-    do-it [^{::spec ::this} this
-           ^{::spec ::x} boolean]
+  (^{::speced/spec ::int}
+    do-it [^{::speced/spec ::this} this
+           ^{::speced/spec ::x} boolean]
     "Docstring"))
 
 (defrecord Sut [age]
