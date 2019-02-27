@@ -24,7 +24,7 @@
 (defrecord Sut [age]
   ExampleProtocol
   (--do-it [this x]
-    (if x
+    (if (true? x)
       42
       :fail)))
 

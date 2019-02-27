@@ -20,14 +20,14 @@
 (defrecord Sut []
   ExampleProtocol
   (--do-it [this x]
-    (if x
+    (if (true? x)
       (Integer. 42)
       :fail)))
 
 (defrecord Bad []
   ExampleProtocol
   (--do-it [this x]
-    (if x
+    (if (true? x)
       2.0
       :fail)))
 
