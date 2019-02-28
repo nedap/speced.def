@@ -16,7 +16,10 @@
 (spec/def ::name (spec/and string? (fn [x]
                                      (-> x count (< 10)))))
 
-(spec/def ::present? some?)
+(defn present? [x]
+  some?)
+
+(spec/def ::present? present?)
 
 (doseq [[k v] {:no-metadata '(sut/defn no-metadata [x]
                                (-> x (* x) str))
@@ -73,7 +76,24 @@
 
                                           (^String [^Long x ^Long y]
                                            (when (< 0 x 100)
-                                             (-> x (* y) str))))}]
+                                             (-> x (* y) str))))
+
+               :inline-function '(sut/defn ^present?
+                                   inline-function
+                                   ^string?
+                                   [^int? x]
+                                   (when (< 0 x 100)
+                                     (-> x (* x) str)))
+
+               :inline-function-n '(sut/defn ^present?
+                                     inline-function-n
+                                     (^string? [^int? x]
+                                      (when (< 0 x 100)
+                                        (-> x (* x) str)))
+
+                                     (^string? [^int? x ^int? y]
+                                      (when (< 0 x 100)
+                                        (-> x (* y) str))))}]
   (eval v)
   (eval `(def ~(-> k
                    name
@@ -95,6 +115,7 @@
                                         ([x y]
                                          {:pre [], :post []}
                                          (-> x (* y) str))))
+
       concise-metadata-macroexpansion '(def concise-metadata
                                          (clojure.core/fn
                                            ([x]
@@ -104,6 +125,7 @@
                                              [(nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/present? %)
                                               (nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/name %)]}
                                             (-> x (* x) str))))
+
       concise-metadata-n-macroexpansion '(def concise-metadata-n
                                            (clojure.core/fn
                                              ([x]
@@ -121,6 +143,7 @@
                                                [(nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/present? %)
                                                 (nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/name  %)]}
                                               (-> x (* y) str))))
+
       explicit-metadata-macroexpansion '(def explicit-metadata
                                           (clojure.core/fn
                                             ([x]
@@ -130,6 +153,7 @@
                                               [(nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/present? %)
                                                (nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/name %)]}
                                              (-> x (* x) str))))
+
       explicit-metadata-n-macroexpansion '(def explicit-metadata-n
                                             (clojure.core/fn
                                               ([x]
@@ -147,6 +171,7 @@
                                                 [(nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/present? %)
                                                  (nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/name  %)]}
                                                (-> x (* y) str))))
+
       type-hinted-metadata-macroexpansion '(def type-hinted-metadata
                                              (clojure.core/fn
                                                ([x]
@@ -157,6 +182,7 @@
                                                   (nedap.utils.spec.api/check! (fn [x] (clojure.core/instance? String x)) %)]}
                                                 (when (< 0 x 100)
                                                   (-> x (* x) str)))))
+
       type-hinted-metadata-n-macroexpansion '(def type-hinted-metadata-n
                                                (clojure.core/fn
                                                  ([x]
@@ -171,7 +197,8 @@
                                                     (nedap.utils.spec.api/check!
                                                      (fn [x] (clojure.core/instance? String x))
                                                      %)]}
-                                                  (when (< 0 x 100) (-> x (* x) str)))
+                                                  (when (< 0 x 100)
+                                                    (-> x (* x) str)))
                                                  ([x y]
                                                   {:pre
                                                    [(nedap.utils.spec.api/check!
@@ -186,7 +213,35 @@
                                                     (nedap.utils.spec.api/check!
                                                      (fn [x] (clojure.core/instance? String x))
                                                      %)]}
-                                                  (when (< 0 x 100) (-> x (* y) str))))))))
+                                                  (when (< 0 x 100)
+                                                    (-> x (* y) str)))))
+
+      inline-function-macroexpansion '(def inline-function
+                                        (clojure.core/fn
+                                          ([x]
+                                           {:pre [(nedap.utils.spec.api/check! int? x)],
+                                            :post
+                                            [(nedap.utils.spec.api/check! present? %)
+                                             (nedap.utils.spec.api/check! string? %)]}
+                                           (when (< 0 x 100)
+                                             (-> x (* x) str)))))
+      inline-function-n-macroexpansion '(def
+                                          inline-function-n
+                                          (clojure.core/fn
+                                            ([x]
+                                             {:pre [(nedap.utils.spec.api/check! int? x)],
+                                              :post
+                                              [(nedap.utils.spec.api/check! present? %)
+                                               (nedap.utils.spec.api/check! string? %)]}
+                                             (when (< 0 x 100)
+                                               (-> x (* x) str)))
+                                            ([x y]
+                                             {:pre [(nedap.utils.spec.api/check! int? x int? y)],
+                                              :post
+                                              [(nedap.utils.spec.api/check! present? %)
+                                               (nedap.utils.spec.api/check! string? %)]}
+                                             (when (< 0 x 100)
+                                               (-> x (* y) str))))))))
 
 (deftest correct-execution
   (testing "Arity 1"
@@ -198,32 +253,21 @@
       explicit-metadata
       explicit-metadata-n
       type-hinted-metadata
-      type-hinted-metadata-n))
+      type-hinted-metadata-n
+      inline-function
+      inline-function-n))
 
   (testing "Arity 2"
     (are [f] (= "16" (f 8 2))
       no-metadata-n
       concise-metadata-n
       explicit-metadata-n
-      type-hinted-metadata-n)))
+      type-hinted-metadata-n
+      inline-function-n)))
 
 (deftest preconditions-are-checked
-  (testing "Arity 1"
-    (with-out-str
-      (let [arg 0]
-        (are [expectation f] (case expectation
-                               :not-thrown (= "0" (f arg))
-                               :thrown (try
-                                         (f arg 1)
-                                         false
-                                         (catch Exception e
-                                           (-> e ex-data :spec))))
-          :not-thrown no-metadata-n
-          :thrown     concise-metadata-n
-          :thrown     explicit-metadata-n
-          :thrown     type-hinted-metadata-n))))
 
-  (testing "Arity 2"
+  (testing "Arity 1"
     (with-out-str
       (let [arg 0]
         (are [expectation f] (case expectation
@@ -240,7 +284,25 @@
           :thrown     explicit-metadata
           :thrown     explicit-metadata-n
           :thrown     type-hinted-metadata
-          :thrown     type-hinted-metadata-n)))))
+          :thrown     type-hinted-metadata-n
+          :thrown     inline-function
+          :thrown     inline-function-n))))
+
+  (testing "Arity 2"
+    (with-out-str
+      (let [arg 0]
+        (are [expectation f] (case expectation
+                               :not-thrown (= "0" (f arg))
+                               :thrown (try
+                                         (f arg 1)
+                                         false
+                                         (catch Exception e
+                                           (-> e ex-data :spec))))
+          :not-thrown no-metadata-n
+          :thrown     concise-metadata-n
+          :thrown     explicit-metadata-n
+          :thrown     type-hinted-metadata-n
+          :thrown     inline-function-n)))))
 
 (deftest postconditions-are-checked
   (testing "Arity 1"
@@ -260,7 +322,9 @@
           :thrown     explicit-metadata
           :thrown     explicit-metadata-n
           :thrown     type-hinted-metadata
-          :thrown     type-hinted-metadata-n))))
+          :thrown     type-hinted-metadata-n
+          :thrown     inline-function
+          :thrown     inline-function-n))))
 
   (testing "Arity 2"
     (with-out-str
@@ -276,7 +340,8 @@
           :not-thrown no-metadata-n
           :thrown     concise-metadata-n
           :thrown     explicit-metadata-n
-          :thrown     type-hinted-metadata-n)))))
+          :thrown     type-hinted-metadata-n
+          :thrown     inline-function-n)))))
 
 ;; Plain defn, not sut/defn
 (defn plain-defn-arity-1 ^String [s])

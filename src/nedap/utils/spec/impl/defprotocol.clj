@@ -3,7 +3,8 @@
   (:require
    [clojure.spec.alpha :as spec]
    [nedap.utils.spec.impl.check :refer [check!]]
-   [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata]]))
+   [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata]]
+   [nedap.utils.spec.impl.type-hinting :refer :all]))
 
 (spec/def ::args (spec/coll-of symbol? :kind vector :min-count 1))
 
@@ -15,6 +16,7 @@
 (defn emit-method [[method-name args docstring :as method]]
   {:pre [(check! ::method method)]}
   (let [{ret-spec :spec
+         ^Class
          ret-ann :type-annotation} (->> method-name meta extract-specs-from-metadata first)
         args-sigs (map (fn [arg arg-meta]
                          (merge {:arg arg}
@@ -30,13 +32,16 @@
                         vector)
         prepost {:pre args-specs :post [(list `check! ret-spec '%)]}
         tag (some->> ret-ann .getName symbol)
+        tag? (some-> tag type-hint?)
         impl (cond-> (->> method-name (str "--") symbol)
                tag (vary-meta assoc :tag tag))
         method-name (cond-> method-name
-                      tag (vary-meta assoc :tag (list 'quote tag)))]
+                      tag? (vary-meta assoc :tag (list 'quote tag))
+                      (not tag?) (vary-meta dissoc :tag))
+        args-with-proper-tag-hints (strip-extraneous-type-hints args)]
     {:declare `(declare ~impl)
-     :impl `(defn ~method-name ~docstring ~args ~prepost (~impl ~@args))
-     :method `(~impl ~args ~docstring)}))
+     :impl `(defn ~method-name ~docstring ~args-with-proper-tag-hints ~prepost (~impl ~@args))
+     :method `(~impl ~args-with-proper-tag-hints ~docstring)}))
 
 (defmacro defprotocol [name docstring & methods]
   {:pre [(check! symbol? name

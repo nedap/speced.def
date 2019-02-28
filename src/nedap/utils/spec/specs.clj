@@ -2,7 +2,8 @@
   "Specs for this library."
   (:require
    [clojure.spec.alpha :as spec]
-   [nedap.utils.spec.impl.def-with-doc :refer [def-with-doc]]))
+   [nedap.utils.spec.impl.def-with-doc :refer [def-with-doc]]
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint?]]))
 
 (def-with-doc ::concise-format
   "Example: ^::foo
@@ -25,7 +26,17 @@
   (spec/and map?
             (partial some (fn [[k v]]
                             (and (= :tag k)
-                                 (symbol? v))))))
+                                 (type-hint? v))))))
+
+(def-with-doc ::inline-function
+  "Example: ^boolean?
+i.e. a function, passed as if it were type hint. A spec will be emitted against that function.
+The function will be detected as such whenever the type hint is not a symbol or a class.
+No :tag metadata will be emitted, since that would that would generate invalid Clojure code."
+  (spec/and map?
+            (partial some (fn [[k v]]
+                            (and (= :tag k)
+                                 (not (type-hint? v)))))))
 
 (def-with-doc ::spec-metadata
   "'Spec metadata' is metadata passed to this namespace's `#'defn` and `#'defprotocol`, in:
@@ -38,4 +49,5 @@
   Refer to the tests (and the project's README) for examples, and to this spec/ns for format descriptions + docstrings."
   (spec/or :concise-format ::concise-format
            :explicit-format ::explicit-format
-           :type-hint ::type-hint))
+           :type-hint ::type-hint
+           :inline-function ::inline-function))

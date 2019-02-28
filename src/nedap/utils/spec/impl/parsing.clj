@@ -1,6 +1,7 @@
 (ns nedap.utils.spec.impl.parsing
   (:require
    [nedap.utils.spec.impl.check :refer [check!]]
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint?]]
    [nedap.utils.spec.specs :as specs]))
 
 (defn proper-spec-metadata? [metadata-map extracted-specs]
@@ -25,10 +26,15 @@
                  :type-annotation nil}
 
                 (and (#{:tag} k)
-                     (symbol? v))
+                     (type-hint? v))
                 {:spec (list 'fn ['x]
                              (list `instance? v 'x))
-                 :type-annotation (resolve v)})))
+                 :type-annotation (resolve v)}
+
+                (and (#{:tag} k)
+                     (not (type-hint? v)))
+                {:spec v
+                 :type-annotation nil})))
        (filter some?)))
 
 (defn ^{:author "Rich Hickey"

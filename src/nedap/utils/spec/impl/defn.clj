@@ -2,7 +2,8 @@
   (:require
    [clojure.core.specs.alpha :as specs]
    [nedap.utils.spec.api :refer [check!]]
-   [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata fntails]]))
+   [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata fntails]]
+   [nedap.utils.spec.impl.type-hinting :refer :all]))
 
 (defn add-prepost [tails ret-spec]
   (->> tails
@@ -31,8 +32,9 @@
                               ret-spec (update :post conj (list `check! ret-spec '%))
                               inner-ret-spec (update :post conj (list `check! inner-ret-spec '%))
                               ;; ret-spec and inner-ret-spec may be identical
-                              true (update :post (comp vec distinct)))]
-                (apply list args prepost body))))))
+                              true (update :post (comp vec distinct)))
+                    args-with-proper-tag-hints (strip-extraneous-type-hints args)]
+                (apply list args-with-proper-tag-hints prepost body))))))
 
 (defn impl
   [[name & tail :as args]]
@@ -45,7 +47,8 @@
         tails (fntails name tail)
         tails (add-prepost tails ret-spec)
         name-had-tag? (-> name meta keys #{:tag})
-        name (if name-had-tag?
+        name (if (and name-had-tag?
+                      (-> name meta :tag type-hint?))
                name
                (vary-meta name dissoc :tag))]
     (apply list `clojure.core/defn (cons name tails))))

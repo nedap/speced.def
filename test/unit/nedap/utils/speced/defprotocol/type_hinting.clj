@@ -1,5 +1,5 @@
 (ns unit.nedap.utils.speced.defprotocol.type-hinting
-  "This ns exercises the type hint emmission of `#'nedap.utils.speced/defprotocol`."
+  "This ns exercises the type hint emission of `#'nedap.utils.speced/defprotocol`."
   (:refer-clojure :exclude [defprotocol])
   (:require
    [clojure.test :refer :all]
