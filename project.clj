@@ -1,4 +1,4 @@
-(defproject com.nedap.staffing-solutions/utils.spec "0.2.1"
+(defproject com.nedap.staffing-solutions/utils.spec "0.3.0"
   :description "clojure.spec utilities"
   :url "https://github.com/nedap/utils.spec"
   :license {:name "Eclipse Public License"
@@ -14,4 +14,5 @@
   :dependencies [[expound "0.7.2"]
                  [org.clojure/clojure "1.10.0"]
                  [org.clojure/spec.alpha "0.1.143"]
-                 [spec-coerce "1.0.0-alpha9"]])
+                 [spec-coerce "1.0.0-alpha9"]]
+  :profiles {:dev {:global-vars {*warn-on-reflection* true}}})
