@@ -60,6 +60,8 @@
 
   Behaves exactly as its clojure.core counterpart, except that it also checks for metadata-based implementations.
 
+  Note that matching clojure.core's behavior also means that `true` will be returned for _partial _metadata-based implementations.
+
   Works around https://dev.clojure.org/jira/browse/CLJ-2426."
   [protocol x]
   `(nedap.utils.spec.impl.satisfies/satisfies? ~protocol ~x))

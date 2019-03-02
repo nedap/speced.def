@@ -8,6 +8,6 @@
    val]
   (or (and extend-via-metadata
            (instance? IObj val)
-           (every? (partial contains? (meta val))
-                   (map symbol (keys method-builders))))
+           (some (partial contains? (meta val))
+                 (map symbol (keys method-builders))))
       (clojure.core/satisfies? protocol val)))
