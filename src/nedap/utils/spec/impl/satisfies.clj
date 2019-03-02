@@ -1,16 +1,13 @@
 (ns nedap.utils.spec.impl.satisfies
-  (:import (clojure.lang IObj)))
+  (:refer-clojure :exclude [satisfies?])
+  (:import
+   (clojure.lang IObj)))
 
-(defn satisfies-or-meta?
-  [proto val]
-  "Checks whether `val` satisfies `protocol` by first checking whether there
-  is an implementation in metadata, or otherwise consulting
-  `clojure.core/satisfies?`.
-
-  This function is a (suggested) workaround for
-  https://dev.clojure.org/jira/browse/CLJ-2426"
-  (or (and (:extend-via-metadata proto)
+(defn satisfies?
+  [{:keys [extend-via-metadata method-builders] :as protocol}
+   val]
+  (or (and extend-via-metadata
            (instance? IObj val)
-           (every? #(contains? (meta val) %)
-                   (map symbol (keys (:method-builders proto)))))
-      (satisfies? proto val)))
+           (every? (partial contains? (meta val))
+                   (map symbol (keys method-builders))))
+      (clojure.core/satisfies? protocol val)))

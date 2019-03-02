@@ -2,7 +2,6 @@
   (:require
    [clojure.spec.alpha :as spec]
    [nedap.utils.spec.impl.check]
-   [nedap.utils.spec.impl.satisfies]
    [spec-coerce.core :as coerce]))
 
 (defmacro check!
@@ -26,19 +25,3 @@
   (let [m (coerce/coerce spec m)]
     (cond-> m
       (not (spec/valid? spec m)) (assoc ::invalid? true))))
-
-(defmacro satisfies-protocol?
-  "Generates a predicate that returns true for values that implement `proto`.
-
-  Checking whether vals implement a protocol is done in two ways, either by
-  looking for an implementation in metadata of a value or by consulting
-  `clojure.core/satisfies?`. See also:
-  `nedap.utils.spec.impl.satisfies/satisfies-or-meta?`
-
-  Implementation detail: this check is implemented as a macro. Implementing it
-  as a ordinary partial function application causes vals that are implementing
-  protocols at runtime to not be considered implementations and also causes
-  issues with hot reloading of code."
-  [proto]
-  `(fn [val#]
-     (nedap.utils.spec.impl.satisfies/satisfies-or-meta? ~proto val#)))

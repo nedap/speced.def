@@ -2,14 +2,14 @@
   (:require
    [clojure.spec.alpha :as spec]
    [clojure.test :refer :all]
-   [nedap.utils.spec.api :as sut]))
+   [nedap.utils.speced :as sut]))
 
 (defprotocol DoThings
   :extend-via-metadata true
   (things       [_] "Does things")
   (other-things [_] "Does other things"))
 
-(spec/def ::thing-doer (sut/satisfies-protocol? DoThings))
+(spec/def ::thing-doer #(sut/satisfies? DoThings %))
 
 (defrecord NotRecordThings [])
 
