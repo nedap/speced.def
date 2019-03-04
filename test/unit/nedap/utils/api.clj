@@ -6,8 +6,8 @@
 
 (deftest check!
   (let [f (fn [x y]
-            {:pre [(sut/check! int? x
-                               boolean? y)]
+            {:pre  [(sut/check! int? x
+                                boolean? y)]
              :post [(sut/check! string? %)]}
             (when y
               (str x)))]
@@ -28,6 +28,6 @@
 (deftest coerce-map-indicating-invalidity
   (are [x y] (= y (sut/coerce-map-indicating-invalidity ::user
                                                         x))
-    {:age "1"} {:age 1}
-    {:age "one"} {:age "one"
+    {:age "1"}   {:age 1}
+    {:age "one"} {:age           "one"
                   ::sut/invalid? true}))
