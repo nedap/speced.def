@@ -55,7 +55,7 @@
   {:pre [(check! ::specs/defn-args args)]}
   (impl.defn/impl args))
 
-(defmacro satisfies?
+(clojure.core/defn satisfies?
   "Returns true if `x` implements `protocol`.
 
   Behaves exactly as its clojure.core counterpart, except that it also checks for metadata-based implementations.
@@ -64,4 +64,4 @@
 
   Works around https://dev.clojure.org/jira/browse/CLJ-2426."
   [protocol x]
-  `(nedap.utils.spec.impl.satisfies/satisfies? ~protocol ~x))
+  (nedap.utils.spec.impl.satisfies/satisfies? protocol x))

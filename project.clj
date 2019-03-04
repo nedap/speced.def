@@ -1,12 +1,12 @@
-(defproject com.nedap.staffing-solutions/utils.spec "0.3.0"
+(defproject com.nedap.staffing-solutions/utils.spec "0.4.0"
   :description "clojure.spec utilities"
   :url "https://github.com/nedap/utils.spec"
   :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :repositories {"releases"       {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
-                                   :username :env/artifactory_user
-                                   :password :env/artifactory_pass}}
-  :deploy-repositories [["releases" {:url "https://nedap.jfrog.io/nedap/staffing-solutions/"
+            :url  "http://www.eclipse.org/legal/epl-v10.html"}
+  :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
+                             :username :env/artifactory_user
+                             :password :env/artifactory_pass}}
+  :deploy-repositories [["releases" {:url           "https://nedap.jfrog.io/nedap/staffing-solutions/"
                                      :sign-releases false}]]
   :repository-auth {#"https://nedap.jfrog\.io/nedap/staffing-solutions/"
                     {:username :env/artifactory_user
