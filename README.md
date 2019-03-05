@@ -5,7 +5,7 @@ Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 ## installation
 
 ```clojure
-[com.nedap.staffing-solutions/utils.spec "0.4.1"]
+[com.nedap.staffing-solutions/utils.spec "0.4.2"]
 ````
 
 ## ns organisation

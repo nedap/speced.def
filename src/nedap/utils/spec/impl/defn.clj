@@ -10,7 +10,7 @@
        (map (fn [[args maybe-prepost & maybe-rest-of-body :as tail]]
               (let [rest-of-body? (-> maybe-rest-of-body seq)
                     body (if rest-of-body?
-                           (cons maybe-rest-of-body rest-of-body?)
+                           (cons maybe-prepost rest-of-body?)
                            [maybe-prepost])
                     {inner-ret-spec :spec} (-> args meta extract-specs-from-metadata first)
                     args-sigs (map (fn [arg arg-meta]
@@ -24,10 +24,13 @@
                                                 [spec arg]))
                                          (apply concat)
                                          (apply list `check!))
-                    prepost (cond-> (when-not (= [maybe-prepost] body)
+                    prepost (cond-> (when (and (not= [maybe-prepost] body)
+                                               (map? maybe-prepost))
                                       maybe-prepost)
-                              true                             (update :pre vec)  ;; maybe there was no :pre. Ensure it's a vector
-                              true                             (update :post vec) ;; maybe there was no :post. Ensure it's a vector
+                              ;; maybe there was no :pre. Ensure it's a vector:
+                              true                             (update :pre vec)
+                              ;; maybe there was no :post. Ensure it's a vector:
+                              true                             (update :post vec)
                               (-> args-check-form count (> 1)) (update :pre conj args-check-form)
                               ret-spec                         (update :post conj (list `check! ret-spec '%))
                               inner-ret-spec                   (update :post conj (list `check! inner-ret-spec '%))
