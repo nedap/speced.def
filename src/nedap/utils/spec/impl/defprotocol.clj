@@ -17,7 +17,7 @@
   {:pre [(check! ::method method)]}
   (let [{ret-spec :spec
          ^Class
-         ret-ann :type-annotation} (->> method-name meta extract-specs-from-metadata first)
+         ret-ann  :type-annotation} (->> method-name meta extract-specs-from-metadata first)
         args-sigs (map (fn [arg arg-meta]
                          (merge {:arg arg}
                                 (->> arg-meta extract-specs-from-metadata first)))
@@ -30,18 +30,19 @@
                         (apply concat)
                         (apply list `check!)
                         vector)
-        prepost {:pre args-specs :post [(list `check! ret-spec '%)]}
+        prepost (cond-> {:pre args-specs}
+                  ret-spec (assoc :post [(list `check! ret-spec '%)]))
         tag (some->> ret-ann .getName symbol)
         tag? (some-> tag type-hint?)
         impl (cond-> (->> method-name (str "--") symbol)
                tag (vary-meta assoc :tag tag))
         method-name (cond-> method-name
-                      tag? (vary-meta assoc :tag (list 'quote tag))
+                      tag?       (vary-meta assoc :tag (list 'quote tag))
                       (not tag?) (vary-meta dissoc :tag))
         args-with-proper-tag-hints (strip-extraneous-type-hints args)]
     {:declare `(declare ~impl)
-     :impl `(defn ~method-name ~docstring ~args-with-proper-tag-hints ~prepost (~impl ~@args))
-     :method `(~impl ~args-with-proper-tag-hints ~docstring)}))
+     :impl    `(defn ~method-name ~docstring ~args-with-proper-tag-hints ~prepost (~impl ~@args))
+     :method  `(~impl ~args-with-proper-tag-hints ~docstring)}))
 
 (defmacro defprotocol [name docstring & methods]
   {:pre [(check! symbol? name
@@ -55,9 +56,9 @@
                                                                   (update :impls conj impl)
                                                                   (update :declares conj declare)
                                                                   (update :methods conj method)))
-                                                            {:impls []
+                                                            {:impls    []
                                                              :declares []
-                                                             :methods []}))]
+                                                             :methods  []}))]
 
     `(do
        ~@declares

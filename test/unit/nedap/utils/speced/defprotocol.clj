@@ -20,19 +20,47 @@
            ^::x boolean]
     "Docstring"))
 
+(speced/defprotocol UnspecifiedRetValProtocol
+  "A protocol having a method with non-speced return value"
+  (do-it-unspeced-ret [^::this this
+                       ^::x boolean]
+    "Docstring"))
+
 (defrecord Sut [age]
   ExampleProtocol
   (--do-it [this x]
     (if x
       42
+      :fail))
+
+  UnspecifiedRetValProtocol
+  (--do-it-unspeced-ret [this x]
+    (if x
+      42
       :fail)))
 
 (deftest defprotocol
-  (is (= 42 (do-it (->Sut 42) true)))
-  (is (thrown? Exception (with-out-str
-                           (-> (->Sut 42) (do-it :not-a-boolean)))))
-  (is (thrown? Exception (with-out-str
-                           (-> (->Sut 42) (do-it false))))
-      "`false` will cause the method not to return an int")
-  (is (thrown? Exception (with-out-str
-                           (-> (->Sut :not-an-int) (do-it true))))))
+
+  (testing "Return values are computed"
+    (is (= 42 (do-it (->Sut 42) true)))
+    (is (= 42 (do-it-unspeced-ret (->Sut 42) true))))
+
+  (testing "Argument validation"
+    (is (thrown? Exception (with-out-str
+                             (-> (->Sut 42) (do-it :not-a-boolean)))))
+    (is (thrown? Exception (with-out-str
+                             (-> (->Sut 42) (do-it-unspeced-ret :not-a-boolean))))))
+
+  (testing "Return value validation"
+    (is (thrown? Exception (with-out-str
+                             (-> (->Sut 42) (do-it false))))
+        "`false` will cause the method not to return an int")
+    (is (with-out-str
+          (-> (->Sut 42) (do-it-unspeced-ret false)))
+        "Unspecified ret val allows the method to succeed"))
+
+  (testing "Validation of the object that implements the protocol"
+    (is (thrown? Exception (with-out-str
+                             (-> (->Sut :not-an-int) (do-it true)))))
+    (is (thrown? Exception (with-out-str
+                             (-> (->Sut :not-an-int) (do-it-unspeced-ret true)))))))
