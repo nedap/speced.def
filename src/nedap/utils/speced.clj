@@ -65,3 +65,8 @@
   Works around https://dev.clojure.org/jira/browse/CLJ-2426."
   [protocol x]
   (nedap.utils.spec.impl.satisfies/satisfies? protocol x))
+
+(def-with-doc ::nilable
+  "Can be summed to an existing spec (also passed as metadata),
+for indicating that that spec is nilable."
+  any?)

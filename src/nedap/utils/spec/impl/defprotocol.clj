@@ -15,9 +15,11 @@
 
 (defn emit-method [[method-name args docstring :as method]]
   {:pre [(check! ::method method)]}
-  (let [{ret-spec :spec
+  (let [ret-metadata (merge (meta method-name)
+                            (meta args))
+        {ret-spec :spec
          ^Class
-         ret-ann  :type-annotation} (->> method-name meta extract-specs-from-metadata first)
+         ret-ann  :type-annotation} (-> ret-metadata extract-specs-from-metadata first)
         args-sigs (map (fn [arg arg-meta]
                          (merge {:arg arg}
                                 (->> arg-meta extract-specs-from-metadata first)))
