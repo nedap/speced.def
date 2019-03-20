@@ -12,6 +12,11 @@
                     body (if rest-of-body?
                            (cons maybe-prepost rest-of-body?)
                            [maybe-prepost])
+                    has-prepost? (and (not= [maybe-prepost] body)
+                                      (map? maybe-prepost))
+                    body (if has-prepost?
+                           (rest body)
+                           body)
                     {inner-ret-spec :spec} (-> args meta extract-specs-from-metadata first)
                     args-sigs (map (fn [arg arg-meta]
                                      (merge {:arg arg}
@@ -24,8 +29,7 @@
                                                 [spec arg]))
                                          (apply concat)
                                          (apply list `check!))
-                    prepost (cond-> (when (and (not= [maybe-prepost] body)
-                                               (map? maybe-prepost))
+                    prepost (cond-> (when has-prepost?
                                       maybe-prepost)
                               ;; maybe there was no :pre. Ensure it's a vector:
                               true                             (update :pre vec)
