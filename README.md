@@ -10,10 +10,11 @@ Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 
 ## ns organisation
 
-There are exactly 2 namespaces meant for public consumption:
+There are exactly 3 namespaces meant for public consumption:
 
 * `nedap.utils.spec.api`: various utility functions, most notably `check!` which is meant to be used in conjunction with clojure's `:pre` and `:post`. 
 * `nedap.utils.speced`: 'speced' forms of defprotocol, defn, etc.
+* `nedap.utils.predicates`: generic predicates that you might find handy when specing things.
 
 They are deliberately thin so you can browse them comfortably.
 
