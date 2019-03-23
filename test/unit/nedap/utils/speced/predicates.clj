@@ -3,22 +3,46 @@
    [clojure.test :refer :all]
    [nedap.utils.spec.predicates :as sut]))
 
-(deftest pos-integer?
-  (are [x expected] (= expected
-                       (sut/pos-integer? x))
-    nil                              false
-    ""                               false
-    []                               false
-    -1                               false
-    -1.0                             false
-    0                                false
-    0.0                              false
-    1.0                              false
-    Double/MAX_VALUE                 false
-    1                                true
-    (Integer. 1)                     true
-    (Long. 1)                        true
-    (clojure.lang.BigInt/fromLong 1) true
-    (BigInteger/valueOf 1)           true
-    (Short. "1")                     true
-    (Long. 1)                        true))
+(deftest integers
+  (are [v
+        f ef
+        g eg
+        h eh] (do
+                (is (= ef (f v)))
+                (is (= eg (g v)))
+                (is (= eh (h v))))
+    nil                               sut/neg-integer? false sut/nat-integer? false sut/pos-integer? false
+    ""                                sut/neg-integer? false sut/nat-integer? false sut/pos-integer? false
+    []                                sut/neg-integer? false sut/nat-integer? false sut/pos-integer? false
+    Double/MIN_VALUE                  sut/neg-integer? false sut/nat-integer? false sut/pos-integer? false
+    Double/MAX_VALUE                  sut/neg-integer? false sut/nat-integer? false sut/pos-integer? false
+    -1.0                              sut/neg-integer? false sut/nat-integer? false sut/pos-integer? false
+    0.0                               sut/neg-integer? false sut/nat-integer? false sut/pos-integer? false
+    1.0                               sut/neg-integer? false sut/nat-integer? false sut/pos-integer? false
+
+    -1                                sut/neg-integer? true  sut/nat-integer? false sut/pos-integer? false
+
+    0                                 sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? false
+
+    1                                 sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true
+
+    (Integer. -1)                     sut/neg-integer? true  sut/nat-integer? false sut/pos-integer? false
+    (Long. -1)                        sut/neg-integer? true  sut/nat-integer? false sut/pos-integer? false
+    (clojure.lang.BigInt/fromLong -1) sut/neg-integer? true  sut/nat-integer? false sut/pos-integer? false
+    (BigInteger/valueOf -1)           sut/neg-integer? true  sut/nat-integer? false sut/pos-integer? false
+    (Short. "-1")                     sut/neg-integer? true  sut/nat-integer? false sut/pos-integer? false
+    (Long. -1)                        sut/neg-integer? true  sut/nat-integer? false sut/pos-integer? false
+
+    (Integer. 0)                      sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? false
+    (Long. 0)                         sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? false
+    (clojure.lang.BigInt/fromLong 0)  sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? false
+    (BigInteger/valueOf 0)            sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? false
+    (Short. "0")                      sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? false
+    (Long. 0)                         sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? false
+
+    (Integer. 1)                      sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true
+    (Long. 1)                         sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true
+    (clojure.lang.BigInt/fromLong 1)  sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true
+    (BigInteger/valueOf 1)            sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true
+    (Short. "1")                      sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true
+    (Long. 1)                         sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true))
