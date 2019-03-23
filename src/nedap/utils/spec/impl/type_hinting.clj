@@ -20,7 +20,7 @@
 (defn strip-extraneous-type-hints
   "As per this library's 'syntax', functions can be passed as type hints.
 
-  That wouldn't emit valid Clojure code, so those pseudo type hints are removed (and will be only used for spec validation)/"
+  That wouldn't emit valid Clojure code, so those pseudo type hints are removed (and will be only used for spec validation)."
   [args]
   (with-meta (mapv strip-extraneous-type-hint args)
     (meta (strip-extraneous-type-hint args))))
