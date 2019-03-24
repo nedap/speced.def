@@ -81,7 +81,7 @@
         (assoc :impls [(:fn reduced)])
         (assoc :methods [(:proto-decl reduced)])
         (update-in [:methods 0] append-to-list (:proto-docstring reduced))
-        (dissoc :fn :proto-decl))))
+        (dissoc :fn :proto-decl :proto-docstring))))
 
 (defn impl [name docstring methods]
   (let [{:keys [impls methods declares] :as x} (->> methods
