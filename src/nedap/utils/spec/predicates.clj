@@ -25,3 +25,10 @@
   [x]
   (and (integer? x)
        (pos? x)))
+
+(speced/defn ^Boolean named?
+  "Is `x` something that `clojure.core/name` can handle?"
+  [x]
+  (or (string? x)
+      (symbol? x)
+      (keyword? x)))

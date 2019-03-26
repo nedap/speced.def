@@ -46,3 +46,25 @@
     (BigInteger/valueOf 1)            sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true
     (Short. "1")                      sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true
     (Long. 1)                         sut/neg-integer? false sut/nat-integer? true  sut/pos-integer? true))
+
+(deftest named?
+  (are [x expectation] (= expectation
+                          (sut/named? x))
+    nil                false
+    []                 false
+    42                 false
+    ""                 true
+    (symbol "")        true
+    (keyword "")       true
+    "     "            true
+    (symbol "     ")   true
+    (keyword "     ")  true
+    "  a   "           true
+    (symbol "  a   ")  true
+    (keyword "   a  ") true
+    "a"                true
+    'a                 true
+    :a                 true
+    "a/a"              true
+    ::a                true
+    'a/a               true))
