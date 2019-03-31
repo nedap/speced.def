@@ -1,6 +1,8 @@
 (ns nedap.utils.spec.predicates
   (:require
-   [nedap.utils.speced :as speced]))
+   [nedap.utils.spec.impl.predicates :as impl]
+   [nedap.utils.speced :as speced]
+   [spec-coerce.core :as spec-coerce]))
 
 (speced/defn ^Boolean neg-integer?
   "Is `x` negative (as per `clojure.core/neg?`) and integer (as per `clojure.core/integer?`)?
@@ -32,3 +34,15 @@
   (or (string? x)
       (symbol? x)
       (keyword? x)))
+
+(def neg-integer-coercer (impl/coercer neg-integer?))
+
+(def nat-integer-coercer (impl/coercer nat-integer?))
+
+(def pos-integer-coercer (impl/coercer pos-integer?))
+
+(defmethod spec-coerce/sym->coercer `neg-integer? [_] neg-integer-coercer)
+
+(defmethod spec-coerce/sym->coercer `nat-integer? [_] nat-integer-coercer)
+
+(defmethod spec-coerce/sym->coercer `pos-integer? [_] pos-integer-coercer)
