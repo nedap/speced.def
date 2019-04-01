@@ -48,3 +48,31 @@ jobs:
     - store_artifacts:
         path: ~/repo/coverage
 
+  jfrog:
+    docker:
+      - image: circleci/clojure:lein-2.8.1
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: release to JFrog
+          command: lein deploy
+
+workflows:
+  version: 2
+  CircleCI:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /.*/
+
+      - jfrog:
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v\d+\.\d+\.\d+(-[A-Z]*)*$/
