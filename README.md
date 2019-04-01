@@ -1,4 +1,4 @@
-# nedap.utils.spec
+# nedap.utils.spec [![CircleCI](https://circleci.com/gh/nedap/utils.spec.svg?style=svg&circle-token=5895f9f338cb751d2c2e8a24844d82e21228190e)](https://circleci.com/gh/nedap/utils.spec)
 
 Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 
