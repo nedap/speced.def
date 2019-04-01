@@ -14,4 +14,6 @@
   :dependencies [[expound "0.7.2"]
                  [org.clojure/clojure "1.10.0"]
                  [org.clojure/spec.alpha "0.1.143"]
-                 [spec-coerce "1.0.0-alpha9"]])
+                 [spec-coerce "1.0.0-alpha9"]]
+
+  :profiles {:dev {:plugins [[lein-cloverage "1.0.13"]]}})
