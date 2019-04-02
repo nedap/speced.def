@@ -66,11 +66,13 @@ workflows:
   CircleCI:
     jobs:
       - build:
+          context: JFrog
           filters:
             branches:
               only: /.*/
 
       - jfrog:
+          context: JFrog
           filters:
             branches:
               ignore: /.*/
