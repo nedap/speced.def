@@ -70,11 +70,12 @@ workflows:
           filters:
             branches:
               only: /.*/
-            tags:
-              only: /^v\d+\.\d+\.\d+(-[A-Z]*)*$/
+
+
 
       - jfrog:
           context: JFrog
+          requires: build
           filters:
             branches:
               ignore: /.*/
