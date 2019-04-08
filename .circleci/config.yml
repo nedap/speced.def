@@ -75,7 +75,8 @@ workflows:
 
       - jfrog:
           context: JFrog
-          requires: build
+          requires: 
+            - build
           filters:
             branches:
               ignore: /.*/
