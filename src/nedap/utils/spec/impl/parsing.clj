@@ -6,9 +6,10 @@
    [nedap.utils.spec.specs :as specs]))
 
 (defn proper-spec-metadata? [metadata-map extracted-specs]
-  (if (-> extracted-specs count #{1})
-    (check! ::specs/spec-metadata metadata-map)
-    true))
+  (case (-> extracted-specs count)
+    0 true
+    1 (check! ::specs/spec-metadata metadata-map)
+    false))
 
 (def nilable :nedap.utils.speced/nilable)
 
@@ -17,7 +18,9 @@
 (def spec-directive? (comp spec-directives first))
 
 (defn extract-specs-from-metadata [metadata-map]
-  {:post [(check! #{0 1} (->> % spec-directive? count)
+  {:post [(check! #{0 1} (->> metadata-map
+                              (filter spec-directive?)
+                              count)
                   (partial proper-spec-metadata? metadata-map) %)]}
   (let [nilable? (->> metadata-map keys (some #{nilable}))]
     (->> metadata-map
