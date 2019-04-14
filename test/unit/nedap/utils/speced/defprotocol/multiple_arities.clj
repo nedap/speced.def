@@ -4,6 +4,8 @@
    [clojure.test :refer :all]
    [nedap.utils.speced :as sut]))
 
+;; XXX port to cljs
+
 (use-fixtures :once (fn [t]
                       (with-out-str
                         (t))))

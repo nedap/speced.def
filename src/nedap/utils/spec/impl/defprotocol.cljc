@@ -1,30 +1,31 @@
 (ns nedap.utils.spec.impl.defprotocol
   (:refer-clojure :exclude [defprotocol])
   (:require
-   [clojure.spec.alpha :as spec]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [nedap.utils.spec.impl.check :refer [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata]]
-   [nedap.utils.spec.impl.type-hinting :refer :all]))
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint? strip-extraneous-type-hints]])
+  #?(:cljs (:require-macros [nedap.utils.spec.impl.defprotocol])))
 
 (spec/def ::method-name symbol?)
 (spec/def ::docstring string?)
 (spec/def ::args (spec/coll-of symbol? :kind vector :min-count 1))
 
 (spec/def ::method (spec/and list?
-                             (spec/cat :name ::method-name
-                                       :args (spec/+ ::args)
+                             (spec/cat :name      ::method-name
+                                       :args      (spec/+ ::args)
                                        :docstring ::docstring)))
 
-(defn emit-method [[method-name args docstring :as method]]
+(defn emit-method [clj? [method-name args docstring :as method]]
   {:pre [(check! ::method method)]}
   (let [ret-metadata (merge (meta method-name)
                             (meta args))
         {ret-spec :spec
          ^Class
-         ret-ann  :type-annotation} (-> ret-metadata extract-specs-from-metadata first)
+         ret-ann  :type-annotation} (-> ret-metadata (extract-specs-from-metadata clj?) first)
         args-sigs (map (fn [arg arg-meta]
                          (merge {:arg arg}
-                                (->> arg-meta extract-specs-from-metadata first)))
+                                (-> arg-meta (extract-specs-from-metadata clj?) first)))
                        args
                        (map meta args))
         args-specs (->> args-sigs
@@ -36,7 +37,9 @@
                         vector)
         prepost (cond-> {:pre args-specs}
                   ret-spec (assoc :post [(list `check! ret-spec '%)]))
-        tag (some->> ret-ann .getName symbol)
+        tag (if clj?
+              (some->> ret-ann .getName symbol)
+              ret-ann)
         tag? (some-> tag type-hint?)
         impl (cond-> (->> method-name (str "--") symbol)
                tag (vary-meta assoc :tag tag))
@@ -71,7 +74,12 @@
                                (-> acc
                                    (update :fn append-to-list impl-tail)
                                    (update :proto-decl append-to-list proto-tail)))
-                             {:fn              (list 'defn method-name docstring)
+                             {:declares        #{}
+                              :fn              (list (if (find-ns 'cljs.analyzer)
+                                                       'cljs.core/defn
+                                                       'clojure.core/defn)
+                                                     method-name
+                                                     docstring)
                               :proto-decl      (list protocol-method-name)
                               :proto-docstring docstring}))]
     (-> reduced
@@ -80,27 +88,31 @@
         (update-in [:methods 0] append-to-list (:proto-docstring reduced))
         (dissoc :fn :proto-decl :proto-docstring))))
 
-(defn impl [name docstring methods]
-  (let [{:keys [impls methods] :as x} (->> methods
-                                           (mapcat extract-signatures)
-                                           (map emit-method)
-                                           (group-by :method-name)
-                                           (vals)
-                                           (map consolidate-group)
-                                           (apply merge-with into))]
-
-    `(do
-       (clojure.core/defprotocol ~name
-         ~docstring
-         :extend-via-metadata true
-         ~@methods)
-       ~@impls
-       ;; matches the clojure.core behavior:
-       ~(list 'quote name))))
-
-(defmacro defprotocol [name docstring & methods]
-  {:pre [(check! symbol? name
-                 string? docstring
-                 ;; (`methods` are already checked in emit-method)
-                 )]}
-  (impl name docstring methods))
+#?(:clj
+   (defmacro defprotocol [name docstring & methods]
+     {:pre [(check! symbol? name
+                    string? docstring
+                    ;; (`methods` are already checked in emit-method)
+                    )]}
+     (let [clj? (-> &env :ns nil?)
+           impl (fn [name docstring methods]
+                  (let [{:keys [impls methods] :as x} (->> methods
+                                                           (mapcat extract-signatures)
+                                                           (map (partial emit-method clj?))
+                                                           (group-by :method-name)
+                                                           (vals)
+                                                           (map consolidate-group)
+                                                           (apply merge-with into))
+                        v `(do
+                             (clojure.core/defprotocol ~name
+                               ~docstring
+                               :extend-via-metadata true
+                               ~@methods)
+                             ~@impls
+                             ;; matches the clojure.core behavior:
+                             ~(list 'quote name))]
+                    ;; hack around mistery https://dev.clojure.org/jira/browse/CLJS-3072 :
+                    (if clj?
+                      v
+                      (read-string (pr-str v)))))]
+       (impl name docstring methods))))

@@ -1,8 +1,11 @@
 (ns unit.nedap.utils.speced.defn.nilable-specs
   (:require
    [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest testing are is use-fixtures]]
    [nedap.utils.speced :as sut]))
+
+
+;; XXX cljs
 
 (use-fixtures :once (fn [t]
                       (with-out-str

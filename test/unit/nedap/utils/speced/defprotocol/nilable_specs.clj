@@ -1,7 +1,7 @@
 (ns unit.nedap.utils.speced.defprotocol.nilable-specs
   (:require
    [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest testing are is use-fixtures]]
    [nedap.utils.speced :as sut]))
 
 (use-fixtures :once (fn [t]
@@ -38,9 +38,9 @@
   ""
   (^{::sut/spec    ::string
      ::sut/nilable true}
-   explicit
-   [_ ^{::sut/spec ::string ::sut/nilable true} x]
-   ""))
+    explicit
+    [_ ^{::sut/spec ::string ::sut/nilable true} x]
+    ""))
 
 (sut/defprotocol Explicit2
   ""

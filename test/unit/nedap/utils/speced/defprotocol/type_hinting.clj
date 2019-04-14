@@ -2,15 +2,17 @@
   "This ns exercises the type hint emission of `#'nedap.utils.speced/defprotocol`."
   (:refer-clojure :exclude [defprotocol])
   (:require
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest testing are is use-fixtures]]
    [nedap.utils.speced :as speced]))
+
+;; XXX cover cljs
 
 (speced/defprotocol ExampleProtocol
   "Docstring"
   (^Integer do-it
-   [this
-    ^Boolean boolean]
-   "Docstring"))
+    [this
+     ^Boolean boolean]
+    "Docstring"))
 
 (speced/defprotocol ExampleProtocol--AltRetValSyntax
   "Uses an alternative syntax for the type hinting."
@@ -22,8 +24,8 @@
 
 (clojure.core/defprotocol PlainProtocol
   (^Integer plain-do-it
-   [this
-    ^Boolean boolean]))
+    [this
+     ^Boolean boolean]))
 
 (defrecord Sut []
   ExampleProtocol
@@ -72,8 +74,8 @@
   (is (thrown? Exception (with-out-str
                            (alt-do-it (Bad.) true))))
 
-  (is (thrown? Exception (with-out-str
-                           (-> (->Sut) (do-it :not-a-boolean)))))
+  (is (thrown?  Exception (with-out-str
+                            (-> (->Sut) (do-it :not-a-boolean)))))
   (is (thrown? Exception (with-out-str
                            (-> (->Sut) (alt-do-it :not-a-boolean)))))
 
