@@ -6,12 +6,14 @@
   That way, you will invoke e.g. `speced/defprotocol` which is clean and clear."
   (:refer-clojure :exclude [defn defprotocol satisfies?])
   (:require
-   [clojure.core.specs.alpha :as specs]
+   #?(:clj  [clojure.core.specs.alpha :as specs]
+      :cljs [cljs.core.specs.alpha :as specs])
    [nedap.utils.spec.api :refer [check!]]
    [nedap.utils.spec.impl.def-with-doc]
    [nedap.utils.spec.impl.defn :as impl.defn]
    [nedap.utils.spec.impl.defprotocol :as impl.defprotocol]
-   [nedap.utils.spec.impl.satisfies]))
+   [nedap.utils.spec.impl.satisfies])
+  #?(:cljs (:require-macros [nedap.utils.speced])))
 
 (defmacro def-with-doc
   "Performs a plain `clojure.spec.alpha/def` with the given arguments.

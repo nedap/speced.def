@@ -1,7 +1,7 @@
 (ns nedap.utils.spec.impl.parsing
   (:require
-   [clojure.spec.alpha :as spec]
-   [nedap.utils.spec.impl.check :refer [check!]]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   [nedap.utils.spec.impl.check #?(:clj :refer :cljs :refer-macros) [check!]]
    [nedap.utils.spec.impl.type-hinting :refer [type-hint?]]
    [nedap.utils.spec.specs :as specs]))
 
@@ -41,7 +41,8 @@
                        (type-hint? v))
                   {:spec            (list 'fn ['x]
                                           (list `instance? v 'x))
-                   :type-annotation (resolve v)}
+                   :type-annotation #?(:clj  (resolve v)
+                                       :cljs v)}
 
                   (and (#{:tag} k)
                        (not (type-hint? v)))

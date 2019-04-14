@@ -1,16 +1,19 @@
-(ns nedap.utils.spec.impl.type-hinting)
+(ns nedap.utils.spec.impl.type-hinting
+  #?(:clj (:import
+           (clojure.lang IMeta))))
 
 (def this-ns *ns*)
 
 (defn type-hint? [x]
   (assert (not= *ns* this-ns) "For an accurate `resolve` call (see below).")
-  (or (class? x)
-      (and (symbol? x)
-           (class? (resolve x)))))
+  #?(:clj  (or (class? x)
+               (and (symbol? x)
+                    (class? (resolve x))))
+     :cljs true))
 
 (defn strip-extraneous-type-hint
   [imeta]
-  (if-not (instance? clojure.lang.IMeta imeta)
+  (if-not (instance? IMeta imeta)
     imeta
     (let [{:keys [tag]} (meta imeta)]
       (if (type-hint? tag)

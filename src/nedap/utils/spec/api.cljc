@@ -1,8 +1,9 @@
 (ns nedap.utils.spec.api
   (:require
-   [clojure.spec.alpha :as spec]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [nedap.utils.spec.impl.check]
-   [spec-coerce.core :as coerce]))
+   [spec-coerce.core :as coerce])
+  #?(:cljs (:require-macros [nedap.utils.spec.api])))
 
 (defmacro check!
   "Asserts validity, explaining the cause otherwise. Apt for :pre conditions.

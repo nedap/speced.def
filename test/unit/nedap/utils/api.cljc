@@ -1,7 +1,7 @@
 (ns unit.nedap.utils.api
   (:require
-   [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.spec.api :as sut]))
 
 (deftest check!
@@ -13,13 +13,13 @@
               (str x)))]
     (is (f 42 true))
     (testing ":post"
-      (is (thrown? Exception (with-out-str
-                               (f 42 false)))))
+      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
+                                                       (f 42 false)))))
     (testing ":pre"
-      (is (thrown? Exception (with-out-str
-                               (f :not-an-int true))))
-      (is (thrown? Exception (with-out-str
-                               (f 42 :not-a-boolean)))))))
+      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
+                                                       (f :not-an-int true))))
+      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
+                                                       (f 42 :not-a-boolean)))))))
 
 (spec/def ::age int?)
 

@@ -1,7 +1,7 @@
 (ns unit.nedap.utils.speced.defprotocol.nilable-specs
   (:require
-   [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.speced :as sut]))
 
 (use-fixtures :once (fn [t]

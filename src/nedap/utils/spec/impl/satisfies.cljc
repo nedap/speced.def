@@ -1,7 +1,7 @@
 (ns nedap.utils.spec.impl.satisfies
   (:refer-clojure :exclude [satisfies?])
-  (:import
-   (clojure.lang IMeta)))
+  #?(:clj (:import
+           (clojure.lang IMeta))))
 
 (defn satisfies?
   [{:keys [extend-via-metadata method-builders] :as protocol}

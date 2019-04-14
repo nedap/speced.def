@@ -1,9 +1,10 @@
 (ns nedap.utils.spec.impl.defn
   (:require
-   [clojure.core.specs.alpha :as specs]
-   [nedap.utils.spec.api :refer [check!]]
+   #?(:clj  [clojure.core.specs.alpha :as specs]
+      :cljs [cljs.core.specs.alpha :as specs])
+   [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata fntails]]
-   [nedap.utils.spec.impl.type-hinting :refer :all]))
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint? strip-extraneous-type-hints]]))
 
 (defn add-prepost [tails ret-spec]
   (->> tails
