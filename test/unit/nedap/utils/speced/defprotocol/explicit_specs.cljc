@@ -2,8 +2,8 @@
   "This ns exercises the 'explicit specs' format of `#'nedap.utils.speced/defprotocol`."
   (:refer-clojure :exclude [defprotocol])
   (:require
-   [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.speced :as speced]))
 
 (spec/def ::int int?)
@@ -30,10 +30,10 @@
 
 (deftest defprotocol
   (is (= 42 (do-it (->Sut 42) true)))
-  (is (thrown? Exception (with-out-str
-                           (-> (->Sut 42) (do-it :not-a-boolean)))))
-  (is (thrown? Exception (with-out-str
-                           (-> (->Sut 42) (do-it false))))
+  (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
+                                                   (-> (->Sut 42) (do-it :not-a-boolean)))))
+  (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
+                                                   (-> (->Sut 42) (do-it false))))
       "`false` will cause the method not to return an int")
-  (is (thrown? Exception (with-out-str
-                           (-> (->Sut :not-an-int) (do-it true))))))
+  (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
+                                                   (-> (->Sut :not-an-int) (do-it true))))))

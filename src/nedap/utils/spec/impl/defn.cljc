@@ -1,11 +1,12 @@
 (ns nedap.utils.spec.impl.defn
   (:require
-   [clojure.core.specs.alpha :as specs]
-   [nedap.utils.spec.api :refer [check!]]
+   #?(:clj  [clojure.core.specs.alpha :as specs]
+      :cljs [cljs.core.specs.alpha :as specs])
+   [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata fntails]]
-   [nedap.utils.spec.impl.type-hinting :refer :all]))
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint? strip-extraneous-type-hints]]))
 
-(defn add-prepost [tails ret-spec]
+(defn add-prepost [tails ret-spec clj?]
   (->> tails
        (map (fn [[args maybe-prepost & maybe-rest-of-body :as tail]]
               (let [rest-of-body? (-> maybe-rest-of-body seq)
@@ -17,10 +18,10 @@
                     body (if has-prepost?
                            (rest body)
                            body)
-                    {inner-ret-spec :spec} (-> args meta extract-specs-from-metadata first)
+                    {inner-ret-spec :spec} (-> args meta (extract-specs-from-metadata clj?) first)
                     args-sigs (map (fn [arg arg-meta]
                                      (merge {:arg arg}
-                                            (->> arg-meta extract-specs-from-metadata first)))
+                                            (-> arg-meta (extract-specs-from-metadata clj?) first)))
                                    args
                                    (map meta args))
                     args-check-form (->> args-sigs
@@ -54,12 +55,12 @@
      :docstring-and-meta docstring-and-meta}))
 
 (defn impl
-  [[name & tail :as args]]
+  [clj? [name & tail :as args]]
   {:pre [(check! ::specs/defn-args args)]}
   (let [{ret-spec :spec
-         ret-ann  :type-annotation} (-> name meta extract-specs-from-metadata first)
+         ret-ann  :type-annotation} (-> name meta (extract-specs-from-metadata clj?) first)
         {:keys [tails docstring-and-meta]} (parse name tail)
-        tails (add-prepost tails ret-spec)
+        tails (add-prepost tails ret-spec clj?)
         name-had-tag? (-> name meta keys #{:tag})
         name (if (and name-had-tag?
                       (-> name meta :tag type-hint?))

@@ -1,7 +1,7 @@
 (ns nedap.utils.spec.impl.parsing
   (:require
-   [clojure.spec.alpha :as spec]
-   [nedap.utils.spec.impl.check :refer [check!]]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   [nedap.utils.spec.impl.check #?(:clj :refer :cljs :refer-macros) [check!]]
    [nedap.utils.spec.impl.type-hinting :refer [type-hint?]]
    [nedap.utils.spec.specs :as specs]))
 
@@ -17,7 +17,7 @@
 
 (def spec-directive? (comp spec-directives first))
 
-(defn extract-specs-from-metadata [metadata-map]
+(defn extract-specs-from-metadata [metadata-map clj?]
   {:post [(check! #{0 1} (->> metadata-map
                               (filter spec-directive?)
                               count)
@@ -38,10 +38,16 @@
                    :type-annotation nil}
 
                   (and (#{:tag} k)
-                       (type-hint? v))
+                       (type-hint? v clj?))
                   {:spec            (list 'fn ['x]
-                                          (list `instance? v 'x))
-                   :type-annotation (resolve v)}
+                                          (list (if clj?
+                                                  'clojure.core/instance?
+                                                  'cljs.core/instance?)
+                                                v
+                                                'x))
+                   :type-annotation (if clj?
+                                      #?(:clj (resolve v) :cljs (assert false))
+                                      v)}
 
                   (and (#{:tag} k)
                        (not (type-hint? v)))
@@ -50,7 +56,10 @@
          (filter some?)
          (map (fn [{:keys [spec] :as result}]
                 (cond-> result
-                  nilable? (assoc :spec (list `spec/nilable spec))))))))
+                  nilable? (assoc :spec (list (if clj?
+                                                'clojure.spec.alpha/nilable
+                                                'cljs.spec.alpha/nilable)
+                                              spec))))))))
 
 (defn ^{:author  "Rich Hickey"
         :license "Eclipse Public License 1.0"

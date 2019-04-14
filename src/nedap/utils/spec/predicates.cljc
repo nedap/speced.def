@@ -4,7 +4,7 @@
    [nedap.utils.speced :as speced]
    [spec-coerce.core :as spec-coerce]))
 
-(speced/defn ^Boolean neg-integer?
+(speced/defn ^boolean? neg-integer?
   "Is `x` negative (as per `clojure.core/neg?`) and integer (as per `clojure.core/integer?`)?
 
   This function is recommended over `clojure.core/neg?` and `clojure.pos/neg-int?` for maximum abstraction over specific types."
@@ -12,7 +12,7 @@
   (and (integer? x)
        (neg? x)))
 
-(speced/defn ^Boolean nat-integer?
+(speced/defn ^boolean? nat-integer?
   "Is `x` non-negative (as per `clojure.core/nat-int?`) and integer (as per `clojure.core/integer?`)?
 
   This function is recommended over `clojure.core/nat-int?`r maximum abstraction over specific types."
@@ -20,7 +20,7 @@
   (and (integer? x)
        (not (neg? x))))
 
-(speced/defn ^Boolean pos-integer?
+(speced/defn ^boolean? pos-integer?
   "Is `x` positive (as per `clojure.core/pos?`) and integer (as per `clojure.core/integer?`)?
 
   This function is recommended over `clojure.core/pos?` and `clojure.pos/pos-int?` for maximum abstraction over specific types."
@@ -28,7 +28,7 @@
   (and (integer? x)
        (pos? x)))
 
-(speced/defn ^Boolean named?
+(speced/defn ^boolean? named?
   "Is `x` something that `clojure.core/name` can handle?"
   [x]
   (or (string? x)
