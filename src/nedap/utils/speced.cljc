@@ -61,16 +61,17 @@
      (impl.defn/impl (-> &env :ns nil?)
                      args)))
 
-(clojure.core/defn satisfies?
-  "Returns true if `x` implements `protocol`.
+#?(:clj
+   (clojure.core/defn satisfies?
+     "Returns true if `x` implements `protocol`.
 
   Behaves exactly as its clojure.core counterpart, except that it also checks for metadata-based implementations.
 
   Note that matching clojure.core's behavior also means that `true` will be returned for _partial _metadata-based implementations.
 
   Works around https://dev.clojure.org/jira/browse/CLJ-2426."
-  [protocol x]
-  (nedap.utils.spec.impl.satisfies/satisfies? protocol x))
+     [protocol x]
+     (nedap.utils.spec.impl.satisfies/satisfies? protocol x)))
 
 (def-with-doc ::nilable
   "Can be summed to an existing spec (also passed as metadata),
