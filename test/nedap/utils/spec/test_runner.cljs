@@ -3,7 +3,6 @@
    [cljs.nodejs :as nodejs]
    [cljs.test :refer-macros [run-tests]]
    unit.nedap.utils.api
-   unit.nedap.utils.api.satisfies
    unit.nedap.utils.speced.defprotocol.inline-function-specs
    unit.nedap.utils.speced.defprotocol.explicit-specs
    unit.nedap.utils.speced.defprotocol.type-hinting.inline-function-specs
@@ -19,7 +18,6 @@
 (defn -main []
   (run-tests
    'unit.nedap.utils.api
-   'unit.nedap.utils.api.satisfies
    'unit.nedap.utils.speced.def-with-doc
    'unit.nedap.utils.speced.defn
    'unit.nedap.utils.speced.defn.parsing

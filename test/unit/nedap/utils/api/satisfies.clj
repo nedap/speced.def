@@ -1,8 +1,8 @@
 (ns unit.nedap.utils.api.satisfies
   (:refer-clojure :exclude [satisfies?])
   (:require
-   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
-   #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
+   [clojure.spec.alpha :as spec]
+   [clojure.test :refer [deftest testing are is use-fixtures]]
    [nedap.utils.speced :as sut]))
 
 (defprotocol DoThings
