@@ -1,10 +1,8 @@
 (ns unit.nedap.utils.speced.defprotocol.multiple-arities
   (:require
-   [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.speced :as sut]))
-
-;; XXX port to cljs
 
 (use-fixtures :once (fn [t]
                       (with-out-str
@@ -34,15 +32,16 @@
      ^::integer y]
     ""))
 
-(sut/defprotocol TypeHinted
-  ""
-  (type-hinted
-    [_]
-    [_ ^String x]
-    [_
-     ^String x
-     ^Long y]
-    ""))
+#?(:clj
+   (sut/defprotocol TypeHinted
+     ""
+     (type-hinted
+       [_]
+       [_ ^String x]
+       [_
+        ^String x
+        ^Long y]
+       "")))
 
 (sut/defprotocol Explicit
   ""
@@ -58,14 +57,14 @@
   x)
 
 (def obj
-  ^{`--inline      impl
-    `--concise     impl
-    `--type-hinted impl
-    `--explicit    impl}
+  ^{`--inline               impl
+    `--concise              impl
+    #?(:clj `--type-hinted) #?(:clj impl)
+    `--explicit             impl}
   {})
 
 (deftest parsing
-  (doseq [f [inline concise type-hinted explicit]]
+  (doseq [f [inline concise #?(:clj type-hinted) explicit]]
     (testing f
       (testing "Arity 1"
         (are [ret] (= ret (f obj))
@@ -74,11 +73,11 @@
         (are [arg ret] (= ret (f obj arg))
           "x" "x"))
       (testing "Arity 2 - Spec failure"
-        (are [arg] (thrown-with-msg? clojure.lang.ExceptionInfo #"Validation failed" (f obj arg))
+        (are [arg] (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core.ExceptionInfo) #"Validation failed" (f obj arg))
           :not-a-string))
       (testing "Arity 3 - OK"
         (are [arg ret] (= ret (f obj arg 42))
           "x" "x"))
       (testing "Arity 3 - Spec failure"
-        (are [arg] (thrown-with-msg? clojure.lang.ExceptionInfo #"Validation failed" (f obj arg :not-an-int))
+        (are [arg] (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core.ExceptionInfo) #"Validation failed" (f obj arg :not-an-int))
           "x")))))

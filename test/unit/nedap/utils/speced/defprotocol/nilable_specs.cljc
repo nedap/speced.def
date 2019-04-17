@@ -26,21 +26,23 @@
   ""
   (concise2 ^::sut/nilable ^::string [_ ^::sut/nilable ^::string x] ""))
 
-(sut/defprotocol TypeHinted
-  ""
-  (^::sut/nilable ^String type-hinted [_ ^::sut/nilable ^String x] ""))
+#?(:clj
+   (sut/defprotocol TypeHinted
+     ""
+     (^::sut/nilable ^String type-hinted [_ ^::sut/nilable ^String x] "")))
 
-(sut/defprotocol TypeHinted2
-  ""
-  (type-hinted2 ^::sut/nilable ^String [_ ^::sut/nilable ^String x] ""))
+#?(:clj
+   (sut/defprotocol TypeHinted2
+     ""
+     (type-hinted2 ^::sut/nilable ^String [_ ^::sut/nilable ^String x] "")))
 
 (sut/defprotocol Explicit
   ""
   (^{::sut/spec    ::string
      ::sut/nilable true}
-    explicit
-    [_ ^{::sut/spec ::string ::sut/nilable true} x]
-    ""))
+   explicit
+   [_ ^{::sut/spec ::string ::sut/nilable true} x]
+   ""))
 
 (sut/defprotocol Explicit2
   ""
@@ -57,24 +59,24 @@
     :else                  x))
 
 (def obj
-  ^{`--inline       impl
-    `--concise      impl
-    `--type-hinted  impl
-    `--explicit     impl
-    `--inline2      impl
-    `--concise2     impl
-    `--type-hinted2 impl
-    `--explicit2    impl}
+  ^{`--inline                impl
+    `--concise               impl
+    #?(:clj `--type-hinted)  #?(:clj impl)
+    `--explicit              impl
+    `--inline2               impl
+    `--concise2              impl
+    #?(:clj `--type-hinted2) #?(:clj impl)
+    `--explicit2             impl}
   {})
 
 (deftest parsing
-  (doseq [f [inline concise type-hinted explicit
-             inline2 concise2 type-hinted2 explicit2]]
+  (doseq [f [inline concise #?(:clj type-hinted) explicit
+             inline2 concise2 #?(:clj type-hinted2) explicit2]]
     (testing f
       (are [arg ret] (= ret (f obj arg))
         "x" "x"
         nil nil)
 
-      (are [arg] (thrown-with-msg? clojure.lang.ExceptionInfo #"Validation failed" (f obj arg))
+      (are [arg] (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core.ExceptionInfo) #"Validation failed" (f obj arg))
         :not-a-nilable-string
         "return-an-int!"))))
