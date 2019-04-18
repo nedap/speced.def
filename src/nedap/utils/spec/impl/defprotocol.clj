@@ -47,7 +47,6 @@
     {:method-name          method-name
      :protocol-method-name impl
      :docstring            docstring
-     :declare              `(declare ~impl)
      :impl-tail            (list args-with-proper-tag-hints prepost (apply list impl args))
      :proto-tail           args-with-proper-tag-hints}))
 
@@ -68,13 +67,11 @@
   [group]
   (let [{:keys [method-name docstring protocol-method-name]} (first group)
         reduced (->> group
-                     (reduce (fn [acc {:keys [method-name docstring impl-tail declare proto-tail]}]
+                     (reduce (fn [acc {:keys [method-name docstring impl-tail proto-tail]}]
                                (-> acc
                                    (update :fn append-to-list impl-tail)
-                                   (update :proto-decl append-to-list proto-tail)
-                                   (update :declares conj declare)))
-                             {:declares        #{}
-                              :fn              (list 'defn method-name docstring)
+                                   (update :proto-decl append-to-list proto-tail)))
+                             {:fn              (list 'defn method-name docstring)
                               :proto-decl      (list protocol-method-name)
                               :proto-docstring docstring}))]
     (-> reduced
@@ -84,16 +81,15 @@
         (dissoc :fn :proto-decl :proto-docstring))))
 
 (defn impl [name docstring methods]
-  (let [{:keys [impls methods declares] :as x} (->> methods
-                                                    (mapcat extract-signatures)
-                                                    (map emit-method)
-                                                    (group-by :method-name)
-                                                    (vals)
-                                                    (map consolidate-group)
-                                                    (apply merge-with into))]
+  (let [{:keys [impls methods] :as x} (->> methods
+                                           (mapcat extract-signatures)
+                                           (map emit-method)
+                                           (group-by :method-name)
+                                           (vals)
+                                           (map consolidate-group)
+                                           (apply merge-with into))]
 
     `(do
-       ~@declares
        (clojure.core/defprotocol ~name
          ~docstring
          :extend-via-metadata true
