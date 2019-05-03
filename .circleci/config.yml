@@ -58,6 +58,10 @@ jobs:
       - checkout
 
       - run:
+          name: import GPG key
+          command: echo -e "$GPG_KEY" | gpg --import
+
+      - run:
           name: release to JFrog
           command: lein deploy
 
@@ -76,7 +80,7 @@ workflows:
 
       - jfrog:
           context: JFrog
-          requires: 
+          requires:
             - build
           filters:
             branches:
