@@ -3,11 +3,11 @@
   :url "https://github.com/nedap/utils.spec"
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
+  :signing { :gpg-key "E787B2AE"}
   :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
                              :username :env/artifactory_user
                              :password :env/artifactory_pass}}
-  :deploy-repositories [["releases" {:url           "https://nedap.jfrog.io/nedap/staffing-solutions/"
-                                     :sign-releases false}]]
+  :deploy-repositories [["releases" {:url "https://nedap.jfrog.io/nedap/staffing-solutions/"}]]
   :repository-auth {#"https://nedap.jfrog\.io/nedap/staffing-solutions/"
                     {:username :env/artifactory_user
                      :password :env/artifactory_pass}}
