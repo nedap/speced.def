@@ -21,8 +21,8 @@
   The docstring argument is omitted. Its purpose is to show up for both human readers, and tooling."
      [spec-name docstring spec]
      {:pre [(check! qualified-keyword? spec-name
-                    string? docstring
-                    some? spec)]}
+                    string?            docstring
+                    some?              spec)]}
      `(nedap.utils.spec.impl.def-with-doc/def-with-doc ~spec-name ~docstring ~spec)))
 
 #?(:clj

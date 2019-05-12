@@ -12,7 +12,7 @@
 (do
   #?@(:clj [(spec/def ::age pos?)
 
-            (spec/def ::temperature int?)
+            (spec/def ::temperature double?)
 
             (spec/def ::name (spec/and string? (fn [x]
                                                  (-> x count (< 10)))))
@@ -42,8 +42,9 @@
                                                       (^::name
                                                        [^::age x]
                                                        (-> x (* x) str))
+
                                                       (^::name
-                                                       [^::age x ^::temperature y]
+                                                       [^::age x, ^::temperature y]
                                                        (-> x (* y) str)))
 
                            :explicit-metadata      '(sut/defn ^{::sut/spec ::present?}
@@ -62,37 +63,37 @@
                                                         ^{::sut/spec ::temperature} y]
                                                        (-> x (* y) str)))
 
-                           :type-hinted-metadata   '(sut/defn ^Object
+                           :type-hinted-metadata   '(sut/defn
                                                       type-hinted-metadata
                                                       ^String
-                                                      [^Long x]
+                                                      [^Double x]
                                                       (when (< 0 x 100)
                                                         (-> x (* x) str)))
 
-                           :type-hinted-metadata-n '(sut/defn ^Object
+                           :type-hinted-metadata-n '(sut/defn
                                                       type-hinted-metadata-n
-                                                      (^String [^Long x]
+                                                      (^String [^Double x]
                                                        (when (< 0 x 100)
                                                          (-> x (* x) str)))
 
-                                                      (^String [^Long x ^Long y]
+                                                      (^String [^Double x, ^Double y]
                                                        (when (< 0 x 100)
                                                          (-> x (* y) str))))
 
                            :inline-function        '(sut/defn ^present?
                                                       inline-function
                                                       ^string?
-                                                      [^int? x]
+                                                      [^double? x]
                                                       (when (< 0 x 100)
                                                         (-> x (* x) str)))
 
                            :inline-function-n      '(sut/defn ^present?
                                                       inline-function-n
-                                                      (^string? [^int? x]
+                                                      (^string? [^double? x]
                                                        (when (< 0 x 100)
                                                          (-> x (* x) str)))
 
-                                                      (^string? [^int? x ^int? y]
+                                                      (^string? [^double? x, ^double? y]
                                                        (when (< 0 x 100)
                                                          (-> x (* y) str))))}]
               (eval v)
@@ -176,10 +177,9 @@
                                                            (clojure.core/fn
                                                              ([x]
                                                               {:pre
-                                                               [(nedap.utils.spec.api/check! (fn [x] (clojure.core/instance? Long x)) x)],
+                                                               [(nedap.utils.spec.api/check! (fn [x] (clojure.core/instance? Double x)) x)],
                                                                :post
-                                                               [(nedap.utils.spec.api/check! (fn [x] (clojure.core/instance? Object x)) %)
-                                                                (nedap.utils.spec.api/check! (fn [x] (clojure.core/instance? String x)) %)]}
+                                                               [(nedap.utils.spec.api/check! (fn [x] (clojure.core/instance? String x)) %)]}
                                                               (when (< 0 x 100)
                                                                 (-> x (* x) str)))))
 
@@ -188,13 +188,10 @@
                                                              ([x]
                                                               {:pre
                                                                [(nedap.utils.spec.api/check!
-                                                                 (fn [x] (clojure.core/instance? Long x))
+                                                                 (fn [x] (clojure.core/instance? Double x))
                                                                  x)],
                                                                :post
                                                                [(nedap.utils.spec.api/check!
-                                                                 (fn [x] (clojure.core/instance? Object x))
-                                                                 %)
-                                                                (nedap.utils.spec.api/check!
                                                                  (fn [x] (clojure.core/instance? String x))
                                                                  %)]}
                                                               (when (< 0 x 100)
@@ -202,15 +199,12 @@
                                                              ([x y]
                                                               {:pre
                                                                [(nedap.utils.spec.api/check!
-                                                                 (fn [x] (clojure.core/instance? Long x))
+                                                                 (fn [x] (clojure.core/instance? Double x))
                                                                  x
-                                                                 (fn [x] (clojure.core/instance? Long x))
+                                                                 (fn [x] (clojure.core/instance? Double x))
                                                                  y)],
                                                                :post
                                                                [(nedap.utils.spec.api/check!
-                                                                 (fn [x] (clojure.core/instance? Object x))
-                                                                 %)
-                                                                (nedap.utils.spec.api/check!
                                                                  (fn [x] (clojure.core/instance? String x))
                                                                  %)]}
                                                               (when (< 0 x 100)
@@ -219,33 +213,61 @@
                   inline-function-macroexpansion        '(def inline-function
                                                            (clojure.core/fn
                                                              ([x]
-                                                              {:pre [(nedap.utils.spec.api/check! int? x)],
+                                                              {:pre [(nedap.utils.spec.api/check!
+                                                                      (clojure.spec.alpha/and
+                                                                       double?
+                                                                       (fn [x] (clojure.core/instance? java.lang.Double x)))
+                                                                      x)],
                                                                :post
                                                                [(nedap.utils.spec.api/check! present? %)
-                                                                (nedap.utils.spec.api/check! string? %)]}
+                                                                (nedap.utils.spec.api/check!
+                                                                 (clojure.spec.alpha/and
+                                                                  string?
+                                                                  (fn [x] (clojure.core/instance? java.lang.String x)))
+                                                                 %)]}
                                                               (when (< 0 x 100)
                                                                 (-> x (* x) str)))))
                   inline-function-n-macroexpansion      '(def
                                                            inline-function-n
                                                            (clojure.core/fn
                                                              ([x]
-                                                              {:pre [(nedap.utils.spec.api/check! int? x)],
+                                                              {:pre [(nedap.utils.spec.api/check!
+                                                                      (clojure.spec.alpha/and
+                                                                       double?
+                                                                       (fn [x] (clojure.core/instance? java.lang.Double x)))
+                                                                      x)],
                                                                :post
                                                                [(nedap.utils.spec.api/check! present? %)
-                                                                (nedap.utils.spec.api/check! string? %)]}
+                                                                (nedap.utils.spec.api/check!
+                                                                 (clojure.spec.alpha/and
+                                                                  string?
+                                                                  (fn [x] (clojure.core/instance? java.lang.String x)))
+                                                                 %)]}
                                                               (when (< 0 x 100)
                                                                 (-> x (* x) str)))
                                                              ([x y]
-                                                              {:pre [(nedap.utils.spec.api/check! int? x int? y)],
+                                                              {:pre [(nedap.utils.spec.api/check!
+                                                                      (clojure.spec.alpha/and
+                                                                       double?
+                                                                       (fn [x] (clojure.core/instance? java.lang.Double x)))
+                                                                      x
+                                                                      (clojure.spec.alpha/and
+                                                                       double?
+                                                                       (fn [x] (clojure.core/instance? java.lang.Double x)))
+                                                                      y)],
                                                                :post
                                                                [(nedap.utils.spec.api/check! present? %)
-                                                                (nedap.utils.spec.api/check! string? %)]}
+                                                                (nedap.utils.spec.api/check!
+                                                                 (clojure.spec.alpha/and
+                                                                  string?
+                                                                  (fn [x] (clojure.core/instance? java.lang.String x)))
+                                                                 %)]}
                                                               (when (< 0 x 100)
                                                                 (-> x (* y) str))))))))
 
             (deftest correct-execution
               (testing "Arity 1"
-                (are [f] (= "64" (f 8))
+                (are [f] (= "64.0" (f 8.0))
                   no-metadata
                   no-metadata-n
                   concise-metadata
@@ -258,7 +280,7 @@
                   inline-function-n))
 
               (testing "Arity 2"
-                (are [f] (= "16" (f 8 2))
+                (are [f] (= "16.0" (f 8.0 2.0))
                   no-metadata-n
                   concise-metadata-n
                   explicit-metadata-n
@@ -270,13 +292,14 @@
               (testing "Arity 1"
                 (with-out-str
                   (let [arg 0]
-                    (are [expectation f] (case expectation
-                                           :not-thrown (= "0" (f arg))
-                                           :thrown (try
-                                                     (f arg)
-                                                     false
-                                                     (catch #?(:clj Exception :cljs js/Error) e
-                                                       (-> e ex-data :spec))))
+                    (are [expectation f] (testing [f expectation]
+                                           (case expectation
+                                             :not-thrown (= "0" (f arg))
+                                             :thrown (try
+                                                       (f arg)
+                                                       false
+                                                       (catch #?(:clj Exception :cljs js/Error) e
+                                                         (-> e ex-data :spec)))))
                       :not-thrown no-metadata
                       :not-thrown no-metadata-n
                       :thrown     concise-metadata
@@ -291,13 +314,14 @@
               (testing "Arity 2"
                 (with-out-str
                   (let [arg 0]
-                    (are [expectation f] (case expectation
-                                           :not-thrown (= "0" (f arg))
-                                           :thrown (try
-                                                     (f arg 1)
-                                                     false
-                                                     (catch #?(:clj Exception :cljs js/Error) e
-                                                       (-> e ex-data :spec))))
+                    (are [expectation f] (testing [f expectation]
+                                           (case expectation
+                                             :not-thrown (= "0" (f arg))
+                                             :thrown (try
+                                                       (f arg 1)
+                                                       false
+                                                       (catch #?(:clj Exception :cljs js/Error) e
+                                                         (-> e ex-data :spec)))))
                       :not-thrown no-metadata-n
                       :thrown     concise-metadata-n
                       :thrown     explicit-metadata-n
@@ -308,13 +332,14 @@
               (testing "Arity 1"
                 (with-out-str
                   (let [arg 99999]
-                    (are [expectation f] (case expectation
-                                           :not-thrown (= "9999800001" (f arg))
-                                           :thrown (try
-                                                     (f arg)
-                                                     false
-                                                     (catch #?(:clj Exception :cljs js/Error) e
-                                                       (-> e ex-data :spec))))
+                    (are [expectation f] (testing [f expectation]
+                                           (case expectation
+                                             :not-thrown (= "9999800001" (f arg))
+                                             :thrown (try
+                                                       (f arg)
+                                                       false
+                                                       (catch #?(:clj Exception :cljs js/Error) e
+                                                         (-> e ex-data :spec)))))
                       :not-thrown no-metadata
                       :not-thrown no-metadata-n
                       :thrown     concise-metadata
@@ -330,44 +355,64 @@
                 (with-out-str
                   (let [arg1 99999
                         arg2 100000]
-                    (are [expectation f] (case expectation
-                                           :not-thrown (= "9999900000" (f arg1 arg2))
-                                           :thrown (try
-                                                     (f arg1 arg2)
-                                                     false
-                                                     (catch #?(:clj Exception :cljs js/Error) e
-                                                       (-> e ex-data :spec))))
+                    (are [expectation f] (testing [f expectation]
+                                           (case expectation
+                                             :not-thrown (= "9999900000" (f arg1 arg2))
+                                             :thrown (try
+                                                       (f arg1 arg2)
+                                                       false
+                                                       (catch #?(:clj Exception :cljs js/Error) e
+                                                         (-> e ex-data :spec)))))
                       :not-thrown no-metadata-n
                       :thrown     concise-metadata-n
                       :thrown     explicit-metadata-n
                       :thrown     type-hinted-metadata-n
                       :thrown     inline-function-n)))))
 
-            ;; Plain defn, not sut/defn
-            (defn plain-defn-arity-1 ^String [s])
-
-            ;; Plain defn, not sut/defn
-            (defn plain-defn-arity-n
-              (^String [x])
-              (^String [x y]))
-
             (deftest type-hint-emission
-              (testing "Emitted type hints matches Clojure's behavior"
+              (testing "Type hints are preserved or emitted"
 
-                (are [v] (-> v meta :tag nil?)
-                  #'plain-defn-arity-1
-                  #'type-hinted-metadata   meta
-                  #'type-hinted-metadata-n meta)
+                (testing "Return value hinting for single-arity functions"
+                  (are [v] (testing v
+                             (-> v meta :tag #{String}))
+                    #'type-hinted-metadata
+                    #'type-hinted-metadata-n
+                    #'inline-function
+                    #'inline-function-n))
 
-                (are [v] (-> v meta :arglists first meta :tag #{`String})
-                  #'type-hinted-metadata
-                  #'plain-defn-arity-1)
+                (testing "Arglist hinting for single-arity functions"
+                  (are [v] (testing v
+                             (-> v meta :arglists first meta :tag #{String}))
+                    #'type-hinted-metadata
+                    #'inline-function))
 
-                (are [v] (->> v
-                              meta
-                              :arglists
-                              (map meta)
-                              (map :tag)
-                              (every? #{`String}))
-                  #'type-hinted-metadata-n
-                  #'plain-defn-arity-n)))]))
+                (testing "Arglist hinting for single-arity functions"
+                  (are [v] (testing v
+                             (-> v meta :arglists ffirst meta :tag #{`Double}))
+                    #'type-hinted-metadata
+                    #'inline-function))
+
+                (testing "Return value hinting for multi-arity functions"
+                  (are [v] (testing v
+                             (->> v
+                                  meta
+                                  :arglists
+                                  (map meta)
+                                  (map :tag)
+                                  (every? #{String})))
+                    #'type-hinted-metadata-n
+                    #'inline-function-n))
+
+                (testing "Arguments hinting for multi-arity functions"
+                  (are [v] (testing v
+                             (->> v
+                                  meta
+                                  :arglists
+                                  (map (fn [arglist]
+                                         (->> arglist
+                                              (map meta)
+                                              (map :tag)
+                                              (every? #{`Double}))))
+                                  (every? true?)))
+                    #'type-hinted-metadata-n
+                    #'inline-function-n))))]))

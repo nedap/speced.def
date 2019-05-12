@@ -23,7 +23,7 @@
   ;; but never 'inline' as any other kind of objects.
   ;; Else spec-coerce will fail to coerce things.
   {:pre [(check! qualified-ident? spec
-                 map? m)]}
+                 map?             m)]}
   (let [m (coerce/coerce spec m)]
     (cond-> m
       (not (spec/valid? spec m)) (assoc ::invalid? true))))
