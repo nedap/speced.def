@@ -36,6 +36,4 @@
               :test-commands
               {"dev" ["node" "target/out/tests.js"]}}
 
-  :profiles {:dev      {:plugins [[lein-cloverage "1.0.13"]]}
-
-             :provided {:dependencies [[org.clojure/clojurescript "1.10.520"]]}})
+  :profiles {:provided {:dependencies [[org.clojure/clojurescript "1.10.520"]]}})
