@@ -18,11 +18,11 @@
 (speced/defprotocol ExampleProtocolV
   "Docstring"
   (^int?
-    do-it [^this?
-           this
-           ^boolean?
-           boolean]
-    "Docstring"))
+   do-it [^this?
+          this
+          ^boolean?
+          boolean]
+   "Docstring"))
 
 (defrecord Sut [age]
   ExampleProtocolV
