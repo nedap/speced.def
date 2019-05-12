@@ -8,8 +8,8 @@
    (defmacro def-with-doc
      [spec-name docstring spec]
      {:pre [(check! qualified-keyword? spec-name
-                    string? docstring
-                    some? spec)]}
+                    string?            docstring
+                    some?              spec)]}
      (list (if (-> &env :ns some?)
              'cljs.spec.alpha/def
              'clojure.spec.alpha/def)

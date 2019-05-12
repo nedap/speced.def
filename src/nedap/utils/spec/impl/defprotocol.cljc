@@ -4,7 +4,7 @@
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [nedap.utils.spec.impl.check :refer [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata]]
-   [nedap.utils.spec.impl.type-hinting :refer [type-hint? strip-extraneous-type-hints]])
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint? strip-extraneous-type-hints type-hint ann->symbol]])
   #?(:cljs (:require-macros [nedap.utils.spec.impl.defprotocol])))
 
 (spec/def ::method-name symbol?)
@@ -28,19 +28,20 @@
                                 (-> arg-meta (extract-specs-from-metadata clj?) first)))
                        args
                        (map meta args))
+        args (type-hint args args-sigs)
         args-specs (->> args-sigs
                         (filter :spec)
                         (map (fn [{:keys [spec arg]}]
                                [spec arg]))
                         (apply concat)
                         (apply list `check!)
-                        vector)
+                        (vector))
         prepost (cond-> {:pre args-specs}
                   ret-spec (assoc :post [(list `check! ret-spec '%)]))
         tag (if clj?
-              (some->> ret-ann .getName symbol)
+              (ann->symbol ret-ann)
               ret-ann)
-        tag? (some-> tag type-hint?)
+        tag? (some-> tag (type-hint? clj?))
         impl (cond-> (->> method-name (str "--") symbol)
                tag (vary-meta assoc :tag tag))
         method-name (cond-> method-name

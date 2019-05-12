@@ -4,26 +4,29 @@
 
 (def this-ns *ns*)
 
+(defn clj-type-hint? [x]
+  (or (class? x)
+      (and (symbol? x)
+           (class? #?(:clj  (resolve x)
+                      :cljs (assert false))))))
+
+(defn cljs-type-hint? [x]
+  (or (and (symbol? x)
+           (let [c (-> x name first)]
+             (= c (Character/toUpperCase c))))
+      (#{'boolean 'string 'number} x)))
+
 (defn type-hint?
   ([x]
-   (assert (not= *ns* this-ns) "For an accurate `resolve` call (see below).")
-   #?(:clj  (or (class? x)
-                (and (symbol? x)
-                     (class? (resolve x))))
-      ;; maybe: starts by capital:
-      :cljs (and (symbol? x)
-                 (let [c (-> x name first)]
-                   (= c (-> c .toUpperCase))))))
+   (assert (not= *ns* this-ns) "For an accurate `resolve` call (see `#'clj-type-hint?`).")
+   #?(:clj  (clj-type-hint? x)
+      :cljs (cljs-type-hint? x)))
 
   ([x clj?]
-   (assert (not= *ns* this-ns) "For an accurate `resolve` call (see below).")
+   (assert (not= *ns* this-ns) "For an accurate `resolve` call (see `#'clj-type-hint?`).")
    #?(:clj  (if clj?
-              (or (class? x)
-                  (and (symbol? x)
-                       (class? (resolve x))))
-              (and (symbol? x)
-                   (let [c (-> x name first)]
-                     (= c (Character/toUpperCase c)))))
+              (clj-type-hint? x)
+              (cljs-type-hint? x))
       :cljs (assert false))))
 
 (defn strip-extraneous-type-hint
@@ -42,3 +45,16 @@
   [args]
   (with-meta (mapv strip-extraneous-type-hint args)
     (meta (strip-extraneous-type-hint args))))
+
+(defn ann->symbol [ann]
+  (if (class? ann)
+    (-> ann .getName symbol)
+    ann))
+
+(defn type-hint [args args-sigs]
+  (let [result (mapv (fn [arg {:keys [type-annotation]}]
+                       (cond-> arg
+                         type-annotation (vary-meta assoc :tag (ann->symbol type-annotation))))
+                     args
+                     args-sigs)]
+    (with-meta result (meta args))))
