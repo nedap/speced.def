@@ -59,6 +59,11 @@
         tail (if (-> tail first list?)
                tail
                (list tail))]
+    (assert (->> tail
+                 (map meta)
+                 (mapcat keys)
+                 (not-any? #{:tag}))
+            ":tag metadata placed in a wrong position.")
     {:tails              (fntails name tail)
      :docstring-and-meta docstring-and-meta}))
 
