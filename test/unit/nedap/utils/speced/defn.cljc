@@ -6,6 +6,7 @@
   In practice, that is completely optional and you are free to use 2, 1, or 0 return value hints in any position of your choice."
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   [clojure.string :as string]
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.speced :as sut]
    [unit.nedap.test-helpers :refer [every-and-at-least-one?]]))
@@ -489,4 +490,18 @@
                     #'type-hinted-metadata-n
                     #'type-hinted-metadata-n-alt
                     #'inline-function-n
-                    #'inline-function-n-alt))))]))
+                    #'inline-function-n-alt))
+
+                (testing ":tag metadata placed in wrong positions is guarded against"
+                  (are [desc input] (testing desc
+                                      (testing input
+                                        (try
+                                          (eval input)
+                                          false
+                                          (catch Exception e
+                                            true))))
+
+                    "Hinting an arity"
+                    '(sut/defn faulty
+                       ^String ([x]
+                                (-> x (* x) str)))))))]))
