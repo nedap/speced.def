@@ -110,6 +110,23 @@
         true
         (apply tag= all)))))
 
+(defn maybe-tag-tails [tag tails]
+  (if-not tag
+    tails
+    (let [tags (-> (->> tails (keep tail-tag) (distinct) (set))
+                   (conj tag))
+          _ (assert (#{0 1} (count tags))
+                    "Type hints/specs must have the same type across arities, and between arities and the defn's name metadata.")
+          tag (first tags)]
+      (if-not tag
+        tails
+        (->> tails
+             (map (fn [[args & remaining :as all]]
+                    (let [args (vary-meta args assoc :tag tag)
+                          tail (cons args remaining)]
+                      (with-meta tail
+                        (meta all))))))))))
+
 (defn impl
   [clj? [name & tail :as args]]
   {:pre [(check! some?             clj?
@@ -125,6 +142,7 @@
                      first
                      :type-annotation
                      (or tails-ann))
+        tails (maybe-tag-tails name-ann tails)
         _ (assert (consistent-tagging? name-ann tails clj?)
                   "Type hints/specs must have the same type across arities, and between arities and the defn's name metadata.")
         name (if (type-hint? name-ann clj?)
