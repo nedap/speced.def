@@ -31,12 +31,14 @@
       42
       :fail)))
 
+(def validation-failed #"Validation failed")
+
 (deftest defprotocol
   (is (= 42 (do-it (->Sut 42) true)))
-  (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                   (-> (->Sut 42) (do-it :not-a-boolean)))))
-  (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                   (-> (->Sut 42) (do-it false))))
+  (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                              (-> (->Sut 42) (do-it :not-a-boolean)))))
+  (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                              (-> (->Sut 42) (do-it false))))
       "`false` will cause the method not to return an int")
-  (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                   (-> (->Sut :not-an-int) (do-it true))))))
+  (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                              (-> (->Sut :not-an-int) (do-it true))))))

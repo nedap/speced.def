@@ -16,14 +16,14 @@
 (speced/defprotocol ExampleProtocol
   "Docstring"
   (^::int
-    do-it [^::this this
-           ^::x boolean]
-    "Docstring")
+   do-it [^::this this
+          ^::x boolean]
+   "Docstring")
 
   (^::int
-    do-other-thing [^::this this
-                    ^::x boolean]
-    "Docstring"))
+   do-other-thing [^::this this
+                   ^::x boolean]
+   "Docstring"))
 
 (speced/defprotocol UnspecifiedRetValProtocol
   "A protocol having a method with non-speced return value"
@@ -58,6 +58,8 @@
       42
       :fail)))
 
+(def validation-failed #"Validation failed")
+
 (deftest defprotocol
 
   (testing "Return values are computed"
@@ -65,24 +67,24 @@
     (is (= 42 (do-it-unspeced-ret (->Sut 42) true))))
 
   (testing "Argument validation"
-    (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                     (-> (->Sut 42) (do-it :not-a-boolean)))))
-    (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                     (-> (->Sut 42) (do-it-unspeced-ret :not-a-boolean))))))
+    (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                (-> (->Sut 42) (do-it :not-a-boolean)))))
+    (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                (-> (->Sut 42) (do-it-unspeced-ret :not-a-boolean))))))
 
   (testing "Return value validation"
-    (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                     (-> (->Sut 42) (do-it false))))
+    (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                (-> (->Sut 42) (do-it false))))
         "`false` will cause the method not to return an int")
     (is (with-out-str
           (-> (->Sut 42) (do-it-unspeced-ret false)))
         "Unspecified ret val allows the method to succeed"))
 
   (testing "Validation of the object that implements the protocol"
-    (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                     (-> (->Sut :not-an-int) (do-it true)))))
-    (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                     (-> (->Sut :not-an-int) (do-it-unspeced-ret true)))))))
+    (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                (-> (->Sut :not-an-int) (do-it true)))))
+    (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                (-> (->Sut :not-an-int) (do-it-unspeced-ret true)))))))
 
 (deftest multiple-methods
   (testing "Protocols can have more than one method, compiling fine and emitting valid executable code"
@@ -92,21 +94,21 @@
       (is (= 42 (do-other-thing-unspeced-ret (->Sut 42) true))))
 
     (testing "Argument validation"
-      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                       (-> (->Sut 42) (do-other-thing :not-a-boolean)))))
-      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                       (-> (->Sut 42) (do-other-thing-unspeced-ret :not-a-boolean))))))
+      (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                  (-> (->Sut 42) (do-other-thing :not-a-boolean)))))
+      (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                  (-> (->Sut 42) (do-other-thing-unspeced-ret :not-a-boolean))))))
 
     (testing "Return value validation"
-      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                       (-> (->Sut 42) (do-other-thing false))))
+      (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                  (-> (->Sut 42) (do-other-thing false))))
           "`false` will cause the method not to return an int")
       (is (with-out-str
             (-> (->Sut 42) (do-other-thing-unspeced-ret false)))
           "Unspecified ret val allows the method to succeed"))
 
     (testing "Validation of the object that implements the protocol"
-      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                       (-> (->Sut :not-an-int) (do-other-thing true)))))
-      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                       (-> (->Sut :not-an-int) (do-other-thing-unspeced-ret true))))))))
+      (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                  (-> (->Sut :not-an-int) (do-other-thing true)))))
+      (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                  (-> (->Sut :not-an-int) (do-other-thing-unspeced-ret true))))))))
