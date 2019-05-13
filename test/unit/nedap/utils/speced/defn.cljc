@@ -23,86 +23,124 @@
 
             (spec/def ::present? present?)
 
-            (doseq [[k v] {:no-metadata            '(sut/defn no-metadata [x]
-                                                      (-> x (* x) str))
+            (doseq [[k v] {:no-metadata                '(sut/defn no-metadata [x]
+                                                          (-> x (* x) str))
 
-                           :no-metadata-n          '(sut/defn no-metadata-n
-                                                      ([x]
-                                                       (-> x (* x) str))
-                                                      ([x y]
-                                                       (-> x (* y) str)))
+                           :no-metadata-n              '(sut/defn no-metadata-n
+                                                          ([x]
+                                                           (-> x (* x) str))
 
-                           :concise-metadata       '(sut/defn ^::present?
-                                                      concise-metadata
-                                                      ^::name
-                                                      [^::age x]
-                                                      (-> x (* x) str))
+                                                          ([x y]
+                                                           (-> x (* y) str)))
 
-                           :concise-metadata-n     '(sut/defn ^::present?
-                                                      concise-metadata-n
-                                                      (^::name
-                                                       [^::age x]
-                                                       (-> x (* x) str))
+                           :concise-metadata           '(sut/defn ^::present?
+                                                          concise-metadata
+                                                          ^::name
+                                                          [^::age x]
+                                                          (-> x (* x) str))
 
-                                                      (^::name
-                                                       [^::age x, ^::temperature y]
-                                                       (-> x (* y) str)))
+                           :concise-metadata-n         '(sut/defn ^::present?
+                                                          concise-metadata-n
+                                                          (^::name
+                                                           [^::age x]
+                                                           (-> x (* x) str))
 
-                           :explicit-metadata      '(sut/defn ^{::sut/spec ::present?}
-                                                      explicit-metadata
-                                                      ^{::sut/spec ::name}
-                                                      [^{::sut/spec ::age} x]
-                                                      (-> x (* x) str))
+                                                          (^::name
+                                                           [^::age x, ^::temperature y]
+                                                           (-> x (* y) str)))
 
-                           :explicit-metadata-n    '(sut/defn ^{::sut/spec ::present?}
-                                                      explicit-metadata-n
-                                                      (^{::sut/spec ::name}
-                                                       [^{::sut/spec ::age} x]
-                                                       (-> x (* x) str))
-                                                      (^{::sut/spec ::name}
-                                                       [^{::sut/spec ::age} x
-                                                        ^{::sut/spec ::temperature} y]
-                                                       (-> x (* y) str)))
+                           :explicit-metadata          '(sut/defn ^{::sut/spec ::present?}
+                                                          explicit-metadata
+                                                          ^{::sut/spec ::name}
+                                                          [^{::sut/spec ::age} x]
+                                                          (-> x (* x) str))
 
-                           :type-hinted-metadata   '(sut/defn
-                                                      type-hinted-metadata
-                                                      ^String
-                                                      [^Double x]
-                                                      (when (< 0 x 100)
-                                                        (-> x (* x) str)))
+                           :explicit-metadata-n        '(sut/defn ^{::sut/spec ::present?}
+                                                          explicit-metadata-n
+                                                          (^{::sut/spec ::name}
+                                                           [^{::sut/spec ::age} x]
+                                                           (-> x (* x) str))
 
-                           :type-hinted-metadata-n '(sut/defn
-                                                      type-hinted-metadata-n
-                                                      (^String [^Double x]
-                                                       (when (< 0 x 100)
-                                                         (-> x (* x) str)))
+                                                          (^{::sut/spec ::name}
+                                                           [^{::sut/spec ::age} x
+                                                            ^{::sut/spec ::temperature} y]
+                                                           (-> x (* y) str)))
 
-                                                      (^String [^Double x, ^Double y]
-                                                       (when (< 0 x 100)
-                                                         (-> x (* y) str))))
+                           :type-hinted-metadata       '(sut/defn
+                                                          type-hinted-metadata
+                                                          ^String
+                                                          [^Double x]
+                                                          (when (< 0 x 100)
+                                                            (-> x (* x) str)))
 
-                           :inline-function        '(sut/defn ^present?
-                                                      inline-function
-                                                      ^string?
-                                                      [^double? x]
-                                                      (when (< 0 x 100)
-                                                        (-> x (* x) str)))
+                           :type-hinted-metadata-alt   '(sut/defn
+                                                          ^String
+                                                          type-hinted-metadata-alt
+                                                          [^Double x]
+                                                          (when (< 0 x 100)
+                                                            (-> x (* x) str)))
 
-                           :inline-function-n      '(sut/defn ^present?
-                                                      inline-function-n
-                                                      (^string? [^double? x]
-                                                       (when (< 0 x 100)
-                                                         (-> x (* x) str)))
+                           :type-hinted-metadata-n     '(sut/defn
+                                                          type-hinted-metadata-n
+                                                          (^String [^Double x]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* x) str)))
 
-                                                      (^string? [^double? x, ^double? y]
-                                                       (when (< 0 x 100)
-                                                         (-> x (* y) str))))}]
+                                                          (^String [^Double x, ^Double y]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* y) str))))
+
+                           :type-hinted-metadata-n-alt '(sut/defn
+                                                          ^String type-hinted-metadata-n-alt
+                                                          ([^Double x]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* x) str)))
+
+                                                          ([^Double x, ^Double y]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* y) str))))
+
+                           :inline-function            '(sut/defn ^present?
+                                                          inline-function
+                                                          ^string?
+                                                          [^double? x]
+                                                          (when (< 0 x 100)
+                                                            (-> x (* x) str)))
+
+                           :inline-function-n          '(sut/defn ^present?
+                                                          inline-function-n
+                                                          (^string? [^double? x]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* x) str)))
+
+                                                          (^string? [^double? x, ^double? y]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* y) str))))
+
+                           :inline-function-alt        '(sut/defn ^string?
+                                                          inline-function-alt
+                                                          [^double? x]
+                                                          (when (< 0 x 100)
+                                                            (-> x (* x) str)))
+
+                           :inline-function-n-alt      '(sut/defn ^string?
+                                                          inline-function-n-alt
+                                                          ([^double? x]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* x) str)))
+
+                                                          ([^double? x, ^double? y]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* y) str))))
+
+                           }]
               (eval v)
               (eval `(def ~(-> k
                                name
                                (str "-macroexpansion")
                                symbol)
                        ~(list 'quote (macroexpand v)))))
+
             (deftest macroexpansion
               (testing "It macroexpands to known-good (and evidently-good) forms"
                 (are [x y] (= x y)
@@ -114,6 +152,7 @@
                                                              ([x]
                                                               {:pre [], :post []}
                                                               (-> x (* x) str))
+
                                                              ([x y]
                                                               {:pre [], :post []}
                                                               (-> x (* y) str))))
@@ -137,6 +176,7 @@
                                                                [(nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/present? %)
                                                                 (nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/name  %)]}
                                                               (-> x (* x) str))
+
                                                              ([x y]
                                                               {:pre
                                                                [(nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/age x
@@ -165,6 +205,7 @@
                                                                [(nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/present? %)
                                                                 (nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/name  %)]}
                                                               (-> x (* x) str))
+
                                                              ([x y]
                                                               {:pre
                                                                [(nedap.utils.spec.api/check! :unit.nedap.utils.speced.defn/age x
@@ -197,6 +238,7 @@
                                                                  %)]}
                                                               (when (< 0 x 100)
                                                                 (-> x (* x) str)))
+
                                                              ([x y]
                                                               {:pre
                                                                [(nedap.utils.spec.api/check!
@@ -246,6 +288,7 @@
                                                                  %)]}
                                                               (when (< 0 x 100)
                                                                 (-> x (* x) str)))
+
                                                              ([x y]
                                                               {:pre [(nedap.utils.spec.api/check!
                                                                       (clojure.spec.alpha/and
@@ -277,8 +320,12 @@
                   explicit-metadata-n
                   type-hinted-metadata
                   type-hinted-metadata-n
+                  type-hinted-metadata-alt
+                  type-hinted-metadata-n-alt
                   inline-function
-                  inline-function-n))
+                  inline-function-n
+                  inline-function-alt
+                  inline-function-n-alt))
 
               (testing "Arity 2"
                 (are [f] (= "16.0" (f 8.0 2.0))
@@ -286,7 +333,9 @@
                   concise-metadata-n
                   explicit-metadata-n
                   type-hinted-metadata-n
-                  inline-function-n)))
+                  type-hinted-metadata-n-alt
+                  inline-function-n
+                  inline-function-n-alt)))
 
             (deftest preconditions-are-checked
 
@@ -309,8 +358,12 @@
                       :thrown     explicit-metadata-n
                       :thrown     type-hinted-metadata
                       :thrown     type-hinted-metadata-n
+                      :thrown     type-hinted-metadata-alt
+                      :thrown     type-hinted-metadata-n-alt
                       :thrown     inline-function
-                      :thrown     inline-function-n))))
+                      :thrown     inline-function-n
+                      :thrown     inline-function-alt
+                      :thrown     inline-function-n-alt))))
 
               (testing "Arity 2"
                 (with-out-str
@@ -327,7 +380,9 @@
                       :thrown     concise-metadata-n
                       :thrown     explicit-metadata-n
                       :thrown     type-hinted-metadata-n
-                      :thrown     inline-function-n)))))
+                      :thrown     type-hinted-metadata-n-alt
+                      :thrown     inline-function-n
+                      :thrown     inline-function-n-alt)))))
 
             (deftest postconditions-are-checked
               (testing "Arity 1"
@@ -349,8 +404,12 @@
                       :thrown     explicit-metadata-n
                       :thrown     type-hinted-metadata
                       :thrown     type-hinted-metadata-n
+                      :thrown     type-hinted-metadata-alt
+                      :thrown     type-hinted-metadata-n-alt
                       :thrown     inline-function
-                      :thrown     inline-function-n))))
+                      :thrown     inline-function-n
+                      :thrown     inline-function-alt
+                      :thrown     inline-function-n-alt))))
 
               (testing "Arity 2"
                 (with-out-str
@@ -368,7 +427,9 @@
                       :thrown     concise-metadata-n
                       :thrown     explicit-metadata-n
                       :thrown     type-hinted-metadata-n
-                      :thrown     inline-function-n)))))
+                      :thrown     inline-function-n
+                      :thrown     type-hinted-metadata-n-alt
+                      :thrown     inline-function-n-alt)))))
 
             (deftest type-hint-emission
               (testing "Type hints are preserved or emitted"
@@ -378,20 +439,28 @@
                              (-> v meta :tag #{String}))
                     #'type-hinted-metadata
                     #'type-hinted-metadata-n
+                    #'type-hinted-metadata-alt
+                    #'type-hinted-metadata-n-alt
                     #'inline-function
-                    #'inline-function-n))
+                    #'inline-function-n
+                    #'inline-function-alt
+                    #'inline-function-n-alt))
 
                 (testing "Arglist hinting for single-arity functions"
                   (are [v] (testing v
                              (-> v meta :arglists first meta :tag #{String}))
                     #'type-hinted-metadata
-                    #'inline-function))
+                    #'type-hinted-metadata-alt
+                    #'inline-function
+                    #'inline-function-alt))
 
                 (testing "Arglist hinting for single-arity functions"
                   (are [v] (testing v
                              (-> v meta :arglists ffirst meta :tag #{`Double}))
                     #'type-hinted-metadata
-                    #'inline-function))
+                    #'type-hinted-metadata-alt
+                    #'inline-function
+                    #'inline-function-alt))
 
                 (testing "Return value hinting for multi-arity functions"
                   (are [v] (testing v
@@ -402,7 +471,9 @@
                                   (map :tag)
                                   (every-and-at-least-one? #{String})))
                     #'type-hinted-metadata-n
-                    #'inline-function-n))
+                    #'type-hinted-metadata-n-alt
+                    #'inline-function-n
+                    #'inline-function-n-alt))
 
                 (testing "Arguments hinting for multi-arity functions"
                   (are [v] (testing v
@@ -416,4 +487,6 @@
                                               (every-and-at-least-one? #{`Double}))))
                                   (every-and-at-least-one? true?)))
                     #'type-hinted-metadata-n
-                    #'inline-function-n))))]))
+                    #'type-hinted-metadata-n-alt
+                    #'inline-function-n
+                    #'inline-function-n-alt))))]))
