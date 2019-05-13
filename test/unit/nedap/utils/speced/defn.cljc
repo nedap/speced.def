@@ -7,7 +7,8 @@
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
-   [nedap.utils.speced :as sut]))
+   [nedap.utils.speced :as sut]
+   [unit.nedap.test-helpers :refer [every-and-at-least-one?]]))
 
 (do
   #?@(:clj [(spec/def ::age pos?)
@@ -399,7 +400,7 @@
                                   :arglists
                                   (map meta)
                                   (map :tag)
-                                  (every? #{String})))
+                                  (every-and-at-least-one? #{String})))
                     #'type-hinted-metadata-n
                     #'inline-function-n))
 
@@ -412,7 +413,7 @@
                                          (->> arglist
                                               (map meta)
                                               (map :tag)
-                                              (every? #{`Double}))))
-                                  (every? true?)))
+                                              (every-and-at-least-one? #{`Double}))))
+                                  (every-and-at-least-one? true?)))
                     #'type-hinted-metadata-n
                     #'inline-function-n))))]))
