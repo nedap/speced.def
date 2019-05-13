@@ -6,7 +6,9 @@
 
 (speced/def-with-doc ::email "An email" string?)
 
+(def validation-failed #"Validation failed")
+
 (deftest def-with-doc
   (is (check! ::email "a@a.a"))
-  (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                   (check! ::email :not-an-email)))))
+  (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                              (check! ::email :not-an-email)))))

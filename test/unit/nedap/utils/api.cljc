@@ -4,6 +4,8 @@
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.spec.api :as sut]))
 
+(def validation-failed #"Validation failed")
+
 (deftest check!
   (let [f (fn [x y]
             {:pre  [(sut/check! int? x
@@ -13,13 +15,13 @@
               (str x)))]
     (is (f 42 true))
     (testing ":post"
-      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                       (f 42 false)))))
+      (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                  (f 42 false)))))
     (testing ":pre"
-      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                       (f :not-an-int true))))
-      (is (thrown? #?(:clj Exception :cljs js/Error) (with-out-str
-                                                       (f 42 :not-a-boolean)))))))
+      (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                  (f :not-an-int true))))
+      (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
+                                                                                  (f 42 :not-a-boolean)))))))
 
 (spec/def ::age int?)
 
