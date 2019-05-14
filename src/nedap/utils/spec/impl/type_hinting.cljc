@@ -4,11 +4,46 @@
 
 (def this-ns *ns*)
 
+(def clj-primitives-map
+  {'int      'int
+   'ints     'ints
+   'long     'long
+   'longs    'longs
+   'float    'float
+   'floats   'floats
+   'double   'double
+   'doubles  'doubles
+   'short    'short
+   'shorts   'shorts
+   'boolean  'boolean
+   'booleans 'booleans
+   'byte     'byte
+   'bytes    'bytes
+   'char     'char
+   'chars    'chars})
+
+(def cljs-primitives-map
+  {'string  'string
+   'boolean 'boolean
+   'number  'number})
+
+(defn primitives [clj?]
+  (if clj?
+    clj-primitives-map
+    cljs-primitives-map))
+
+(defn primitive? [s clj?]
+  (-> (primitives clj?)
+      (keys)
+      (set)
+      (contains? s)))
+
 (defn clj-type-hint? [x]
   (or (class? x)
       (and (symbol? x)
-           (class? #?(:clj  (resolve x)
-                      :cljs (assert false))))))
+           (or (class? #?(:clj  (resolve x)
+                          :cljs (assert false)))
+               (primitive? x true)))))
 
 (defn cljs-type-hint? [x]
   (or (and (symbol? x)

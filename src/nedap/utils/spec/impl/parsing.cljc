@@ -2,7 +2,7 @@
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [nedap.utils.spec.impl.check #?(:clj :refer :cljs :refer-macros) [check!]]
-   [nedap.utils.spec.impl.type-hinting :refer [type-hint?]]
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint? primitives primitive?]]
    [nedap.utils.spec.specs :as specs]))
 
 (defn proper-spec-metadata? [metadata-map extracted-specs]
@@ -18,19 +18,22 @@
 (def spec-directive? (comp spec-directives first))
 
 (defn and-spec [clj? & xs]
-  (apply list
-         (if clj?
-           'clojure.spec.alpha/and
-           'cljs.spec.alpha/and)
-         xs))
+  (let [specs (->> xs distinct (remove nil?))
+        pred (if clj?
+               'clojure.spec.alpha/and
+               'cljs.spec.alpha/and)]
+    (if (#{1} (count specs))
+      (first specs)
+      (apply list pred specs))))
 
 (defn instance-spec [clj? class]
-  (list 'fn ['x]
-        (list (if clj?
-                'clojure.core/instance?
-                'cljs.core/instance?)
-              class
-              'x)))
+  (when-not (primitive? class clj?)
+    (list 'fn ['x]
+          (list (if clj?
+                  'clojure.core/instance?
+                  'cljs.core/instance?)
+                class
+                'x))))
 
 (def clj-class-mapping
   (->> {`boolean?   `Boolean
@@ -54,26 +57,53 @@
               [[k v]
                [(-> k name symbol) v]]))
        (apply concat)
-       (into {})))
+       (into {})
+       (merge (primitives true))))
+
+(def cljs-class-mapping
+  {'string             'js/String
+   'string?            'js/String
+   'cljs.core.string?  'js/String
+
+   'boolean            'js/Boolean
+   'boolean?           'js/Boolean
+   'cljs.core/boolean? 'js/Boolean
+
+   'number             'js/Number
+   'number?            'js/Number
+   'cljs.core/number?  'js/Number})
 
 (defn class-mapping [clj?]
   (if clj?
     clj-class-mapping
-    {'string             'js/String
-     'string?            'js/String
-     'cljs.core.string?  'js/String
+    cljs-class-mapping))
 
-     'boolean            'js/Boolean
-     'boolean?           'js/Boolean
-     'cljs.core/boolean? 'js/Boolean
+(defn fail [& _]
+  (assert false))
 
-     'number             'js/Number
-     'number?            'js/Number
-     'cljs.core/number?  'js/Number}))
+(defn array-class-expr [class]
+  {:pre [(symbol? class)
+         (#?(:clj resolve :cljs fail) class)]}
+  `(class (make-array ~class 0)))
 
 (defn spec-mapping [clj?]
   (if clj?
-    {}
+    {'int      (instance-spec clj? `Integer)
+     'ints     (instance-spec clj? (array-class-expr `Integer))
+     'long     (instance-spec clj? `Long)
+     'longs    (instance-spec clj? (array-class-expr `Long))
+     'float    (instance-spec clj? `Float)
+     'floats   (instance-spec clj? (array-class-expr `Float))
+     'double   (instance-spec clj? `Double)
+     'doubles  (instance-spec clj? (array-class-expr `Double))
+     'short    (instance-spec clj? `Short)
+     'shorts   (instance-spec clj? (array-class-expr `Short))
+     'boolean  (instance-spec clj? `Boolean)
+     'booleans (instance-spec clj? (array-class-expr `Boolean))
+     'byte     (instance-spec clj? `Byte)
+     'bytes    (instance-spec clj? (array-class-expr `Byte))
+     'char     (instance-spec clj? `Character)
+     'chars    (instance-spec clj? (array-class-expr `Character))}
     {'string             'cljs.core/string?
      'string?            'cljs.core/string?
      'cljs.core/string?  'cljs.core/string?
@@ -86,11 +116,9 @@
      'number?            'cljs.core/number?
      'cljs.core/number?  'cljs.core/number?}))
 
-(defn fail [& _]
-  (assert false))
-
-(defn infer-spec-from-symbol [clj? s]
+(defn infer-spec-from-symbol
   "For a few selected cases, one can derive a type hint out of symbol metatata."
+  [clj? s]
   (let [class-mapping (class-mapping clj?)
         spec-mapping (spec-mapping clj?)
         spec (get spec-mapping
@@ -105,9 +133,10 @@
                           (and-spec clj?
                                     spec
                                     (instance-spec clj? inferred-class)))
-       :type-annotation (cond-> inferred-class
-                          clj? #?(:clj  resolve
-                                  :cljs fail))})))
+       :type-annotation (cond
+                          (primitive? inferred-class clj?) inferred-class
+                          clj?                             (#?(:clj resolve :cljs fail) inferred-class)
+                          true                             inferred-class)})))
 
 (defn extract-specs-from-metadata [metadata-map clj?]
   {:post [(check! #{0 1}                                       (->> metadata-map
@@ -119,7 +148,8 @@
          (remove spec-directive?)
          (map (fn [[k v]]
                 (let [symbol-inferred-type (and (#{:tag} k)
-                                                (not (type-hint? v))
+                                                (or (not (type-hint? v))
+                                                    (primitive? v clj?))
                                                 (infer-spec-from-symbol clj? v))]
                   (cond
                     symbol-inferred-type
