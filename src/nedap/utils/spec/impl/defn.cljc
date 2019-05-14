@@ -4,7 +4,7 @@
       :cljs [cljs.core.specs.alpha :as specs])
    [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata fntails]]
-   [nedap.utils.spec.impl.type-hinting :refer [type-hint type-hint? strip-extraneous-type-hints]]))
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint type-hint? strip-extraneous-type-hints primitive?]]))
 
 (defn add-prepost [tails ret-spec clj?]
   (->> tails
@@ -35,7 +35,9 @@
                     args-check-form (->> args-sigs
                                          (filter :spec)
                                          (map (fn [{:keys [spec arg]}]
-                                                [spec arg]))
+                                                [spec
+                                                 ;; Avoid "Can't type hint a primitive local" error:
+                                                 (vary-meta arg dissoc :tag)]))
                                          (apply concat)
                                          (apply list `check!))
                     prepost (cond-> (when has-prepost?
@@ -150,7 +152,9 @@
         tails (maybe-tag-tails name-ann tails)
         _ (assert (consistent-tagging? name-ann tails clj?)
                   "Type hints/specs must have the same type across arities, and between arities and the defn's name metadata.")
-        name (if (type-hint? name-ann clj?)
+        name (if (and (type-hint? name-ann clj?)
+                      ;; 'int would become #'int after compilation, that's how the compiler works. Avoid that:
+                      (not (primitive? name-ann clj?)))
                (vary-meta name assoc :tag name-ann)
                (vary-meta name dissoc :tag))]
     (apply list `clojure.core/defn (cons name (concat docstring-and-meta tails)))))
