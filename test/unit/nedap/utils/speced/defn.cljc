@@ -134,7 +134,18 @@
                                                            (when (< 0 x 100)
                                                              (-> x (* y) str))))
 
-                           }]
+                           :primitive                  '(sut/defn ^string? primitive
+                                                          [^double x]
+                                                          (when (< 0 x 100)
+                                                            (-> x (* x) str)))
+                           :primitive-n                '(sut/defn ^string? primitive-n
+                                                          ([^double x]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* x) str)))
+
+                                                          ([^double x, ^double y]
+                                                           (when (< 0 x 100)
+                                                             (-> x (* y) str))))}]
               (eval v)
               (eval `(def ~(-> k
                                name
@@ -308,6 +319,57 @@
                                                                   (fn [x] (clojure.core/instance? java.lang.String x)))
                                                                  %)]}
                                                               (when (< 0 x 100)
+                                                                (-> x (* y) str)))))
+
+                  primitive-macroexpansion              '(def
+                                                           primitive
+                                                           (clojure.core/fn
+                                                             ([x]
+                                                              {:pre
+                                                               [(nedap.utils.spec.api/check!
+                                                                 (fn [x] (clojure.core/instance? java.lang.Double x))
+                                                                 x)],
+                                                               :post
+                                                               [(nedap.utils.spec.api/check!
+                                                                 (clojure.spec.alpha/and string?
+                                                                                         (fn [x]
+                                                                                           (clojure.core/instance? java.lang.String x)))
+                                                                 %)]}
+                                                              (when (< 0 x 100)
+                                                                (-> x (* x) str)))))
+                  primitive-n-macroexpansion            '(def
+                                                           primitive-n
+                                                           (clojure.core/fn
+                                                             ([x]
+                                                              {:pre
+                                                               [(nedap.utils.spec.api/check!
+                                                                 (fn [x]
+                                                                   (clojure.core/instance? java.lang.Double x))
+                                                                 x)],
+                                                               :post
+                                                               [(nedap.utils.spec.api/check!
+                                                                 (clojure.spec.alpha/and string?
+                                                                                         (fn [x]
+                                                                                           (clojure.core/instance? java.lang.String x)))
+                                                                 %)]}
+                                                              (when (< 0 x 100)
+                                                                (-> x (* x) str)))
+                                                             ([x y]
+                                                              {:pre
+                                                               [(nedap.utils.spec.api/check!
+                                                                 (fn [x]
+                                                                   (clojure.core/instance? java.lang.Double x))
+                                                                 x
+                                                                 (fn [x]
+                                                                   (clojure.core/instance? java.lang.Double x))
+                                                                 y)],
+                                                               :post
+                                                               [(nedap.utils.spec.api/check!
+                                                                 (clojure.spec.alpha/and string?
+                                                                                         (fn [x]
+                                                                                           (clojure.core/instance? java.lang.String x)))
+                                                                 %)]}
+                                                              (when (< 0 x 100)
                                                                 (-> x (* y) str))))))))
 
             (deftest correct-execution
@@ -326,7 +388,9 @@
                   inline-function
                   inline-function-n
                   inline-function-alt
-                  inline-function-n-alt))
+                  inline-function-n-alt
+                  primitive
+                  primitive-n))
 
               (testing "Arity 2"
                 (are [f] (= "16.0" (f 8.0 2.0))
@@ -336,7 +400,8 @@
                   type-hinted-metadata-n
                   type-hinted-metadata-n-alt
                   inline-function-n
-                  inline-function-n-alt)))
+                  inline-function-n-alt
+                  primitive-n)))
 
             (deftest preconditions-are-checked
 
@@ -364,7 +429,9 @@
                       :thrown     inline-function
                       :thrown     inline-function-n
                       :thrown     inline-function-alt
-                      :thrown     inline-function-n-alt))))
+                      :thrown     inline-function-n-alt
+                      :thrown     primitive
+                      :thrown     primitive-n))))
 
               (testing "Arity 2"
                 (with-out-str
@@ -383,7 +450,8 @@
                       :thrown     type-hinted-metadata-n
                       :thrown     type-hinted-metadata-n-alt
                       :thrown     inline-function-n
-                      :thrown     inline-function-n-alt)))))
+                      :thrown     inline-function-n-alt
+                      :thrown     primitive-n)))))
 
             (deftest postconditions-are-checked
               (testing "Arity 1"
@@ -410,7 +478,9 @@
                       :thrown     inline-function
                       :thrown     inline-function-n
                       :thrown     inline-function-alt
-                      :thrown     inline-function-n-alt))))
+                      :thrown     inline-function-n-alt
+                      :thrown     primitive
+                      :thrown     primitive-n))))
 
               (testing "Arity 2"
                 (with-out-str
@@ -430,7 +500,8 @@
                       :thrown     type-hinted-metadata-n
                       :thrown     inline-function-n
                       :thrown     type-hinted-metadata-n-alt
-                      :thrown     inline-function-n-alt)))))
+                      :thrown     inline-function-n-alt
+                      :thrown     primitive-n)))))
 
             (deftest type-hint-emission
               (testing "Type hints are preserved or emitted"
@@ -445,7 +516,9 @@
                     #'inline-function
                     #'inline-function-n
                     #'inline-function-alt
-                    #'inline-function-n-alt))
+                    #'inline-function-n-alt
+                    #'primitive
+                    #'primitive-n))
 
                 (testing "Arglist hinting for single-arity functions"
                   (are [v] (testing v
@@ -453,7 +526,9 @@
                     #'type-hinted-metadata
                     #'type-hinted-metadata-alt
                     #'inline-function
-                    #'inline-function-alt))
+                    #'inline-function-alt
+                    #'primitive
+                    #'primitive-n))
 
                 (testing "Arglist hinting for single-arity functions"
                   (are [v] (testing v
@@ -463,7 +538,12 @@
                     #'inline-function
                     #'inline-function-alt))
 
-                (testing "Return value hinting for multi-arity functions"
+                (testing "Primitive arglist hinting for single-arity functions"
+                  (are [v] (testing v
+                             (-> v meta :arglists ffirst meta :tag #{'double}))
+                    #'primitive))
+
+                (testing "Arglist hinting for multi-arity functions"
                   (are [v] (testing v
                              (->> v
                                   meta
@@ -474,7 +554,9 @@
                     #'type-hinted-metadata-n
                     #'type-hinted-metadata-n-alt
                     #'inline-function-n
-                    #'inline-function-n-alt))
+                    #'inline-function-n-alt
+                    #'primitive
+                    #'primitive-n))
 
                 (testing "Arguments hinting for multi-arity functions"
                   (are [v] (testing v
@@ -492,6 +574,19 @@
                     #'inline-function-n
                     #'inline-function-n-alt))
 
+                (testing "Primitive arguments hinting for multi-arity functions"
+                  (are [v] (testing v
+                             (->> v
+                                  meta
+                                  :arglists
+                                  (map (fn [arglist]
+                                         (->> arglist
+                                              (map meta)
+                                              (map :tag)
+                                              (every-and-at-least-one? #{'double}))))
+                                  (every-and-at-least-one? true?)))
+                    #'primitive-n))
+
                 (testing ":tag metadata placed in wrong positions is guarded against"
                   (are [desc input] (testing desc
                                       (testing input
@@ -504,4 +599,40 @@
                     "Hinting an arity"
                     '(sut/defn faulty
                        ^String ([x]
-                                (-> x (* x) str)))))))]))
+                                (-> x (* x) str)))))
+
+                (testing "Only long and double primitive annotations are supported, just like in clojure.core/defn"
+                  (are [input good?] (testing input
+                                       (try
+                                         (eval input)
+                                         good?
+                                         (catch Exception e
+                                           (not good?))))
+
+                    '(nedap.utils.speced/defn primitive-sample [^int x])    false
+                    '(nedap.utils.speced/defn primitive-sample ^int [x])    false
+
+                    '(nedap.utils.speced/defn primitive-sample [^long x])   true
+                    '(nedap.utils.speced/defn primitive-sample ^long [x])   true
+
+                    '(nedap.utils.speced/defn primitive-sample [^double x]) true
+                    '(nedap.utils.speced/defn primitive-sample ^double [x]) true
+
+                    '(defn primitive-sample [^int x])                       false
+                    '(defn primitive-sample ^int [x])                       false
+
+                    '(defn primitive-sample [^long x])                      true
+                    '(defn primitive-sample ^long [x])                      true
+
+                    '(defn primitive-sample [^double x])                    true
+                    '(defn primitive-sample ^double [x])                    true))
+
+                (are [input expected-tag] (testing input
+                                            (testing "If the user tags the defn name (as opposed to the arg vector) with a primitive hint"
+                                              (eval input)
+                                              (testing "The hint will be removed"
+                                                (is (-> 'primitive-sample resolve meta :tag nil?)))
+                                              (testing "The argument vector will receive the primitive hint instead"
+                                                (is (-> 'primitive-sample resolve meta :arglists first meta :tag #{expected-tag})))))
+                  '(nedap.utils.speced/defn ^long primitive-sample [x])   'long
+                  '(nedap.utils.speced/defn ^double primitive-sample [x]) 'double)))]))
