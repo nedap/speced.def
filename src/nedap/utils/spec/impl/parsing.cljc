@@ -1,6 +1,7 @@
 (ns nedap.utils.spec.impl.parsing
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   [clojure.string :as string]
    [nedap.utils.spec.impl.check #?(:clj :refer :cljs :refer-macros) [check!]]
    [nedap.utils.spec.impl.type-hinting :refer [type-hint? primitives primitive?]]
    [nedap.utils.spec.specs :as specs]))
@@ -35,24 +36,60 @@
                 class
                 'x))))
 
+(def base-clj-class-mapping
+  {`associative?        `clojure.lang.Associative
+   `boolean?            `Boolean
+   `bytes?              (symbol "[B")
+   `char?               `Character
+   `chunked-seq?        `clojure.lang.IChunkedSeq
+   `class?              `Class
+   `coll?               `clojure.lang.IPersistentCollection
+   `counted?            `clojure.lang.Counted
+   `decimal?            `BigDecimal
+   `delay?              `clojure.lang.Delay
+   `double?             `Double
+   `false?              `Boolean
+   `fn?                 `clojure.lang.Fn
+   `future?             `java.util.concurrent.Future
+   `ifn?                `clojure.lang.IFn
+   `indexed?            `clojure.lang.Indexed
+   `keyword?            `clojure.lang.Keyword
+   `list?               `clojure.lang.IPersistentList
+   `map-entry?          `java.util.Map$Entry
+   `map?                `clojure.lang.IPersistentMap
+   `number?             `Number
+   `qualified-keyword?  `clojure.lang.Keyword
+   `qualified-symbol?   `clojure.lang.Symbol
+   `ratio?              `clojure.lang.Ratio
+   `reader-conditional? `clojure.lang.ReaderConditional
+   `realized?           `clojure.lang.IPending
+   `record?             `clojure.lang.IRecord
+   `reversible?         `clojure.lang.Reversible
+   `set?                `clojure.lang.IPersistentSet
+   `seq?                `clojure.lang.ISeq
+   `sequential?         `clojure.lang.Sequential
+   `simple-keyword?     `clojure.lang.Keyword
+   `simple-symbol?      `clojure.lang.Symbol
+   `sorted?             `clojure.lang.Sorted
+   `string?             `String
+   `symbol?             `clojure.lang.Symbol
+   `tagged-literal?     `clojure.lang.TaggedLiteral
+   `true?               `Boolean
+   `uri?                `java.net.URI
+   `uuid?               `java.util.UUID
+   `var?                `clojure.lang.Var
+   `vector?             `clojure.lang.IPersistentVector
+   `volatile?           `clojure.lang.Volatile})
+
+(do
+  #?(:clj (assert (->> base-clj-class-mapping
+                       (apply concat)
+                       (every? (fn [x]
+                                 (or (resolve x)
+                                     (Class/forName x))))))))
+
 (def clj-class-mapping
-  (->> {`boolean?   `Boolean
-        `char?      `Character
-        `class?     `Class
-        `decimal?   `BigDecimal
-        `delay?     `clojure.lang.Delay
-        `double?    `Double
-        `future?    `java.util.concurrent.Future
-        `keyword?   `clojure.lang.Keyword
-        `map-entry? `java.util.Map$Entry
-        `map?       `clojure.lang.IPersistentMap
-        `number?    `Number
-        `ratio?     `clojure.lang.Ratio
-        `set?       `clojure.lang.IPersistentSet
-        `string?    `String
-        `symbol?    `clojure.lang.Symbol
-        `var?       `clojure.lang.Var
-        `vector?    `clojure.lang.IPersistentVector}
+  (->> base-clj-class-mapping
        (map (fn [[k v]]
               [[k v]
                [(-> k name symbol) v]]))

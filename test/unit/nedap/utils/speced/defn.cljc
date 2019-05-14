@@ -635,4 +635,10 @@
                                               (testing "The argument vector will receive the primitive hint instead"
                                                 (is (-> 'primitive-sample resolve meta :arglists first meta :tag #{expected-tag})))))
                   '(nedap.utils.speced/defn ^long primitive-sample [x])   'long
-                  '(nedap.utils.speced/defn ^double primitive-sample [x]) 'double)))]))
+                  '(nedap.utils.speced/defn ^double primitive-sample [x]) 'double)
+
+                (testing "Inline function specs emit type hints of array type"
+                  (sut/defn ^bytes? bytes-defn [])
+                  (let [the-class (Class/forName "[B")]
+                    (is (-> #'bytes-defn meta :tag #{the-class}))
+                    (is (= the-class (-> #'bytes-defn meta :arglists first meta :tag #{the-class})))))))]))
