@@ -9,6 +9,7 @@
    [clojure.string :as string]
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.speced :as sut]
+   [nedap.utils.spec.impl.parsing :as impl.parsing]
    [unit.nedap.test-helpers :refer [every-and-at-least-one?]])
   #?(:cljs
      (:require-macros [unit.nedap.utils.speced.defn :refer [the-defns]])))
@@ -752,3 +753,15 @@
             (let [the-class (Class/forName "[B")]
               (is (-> #'bytes-defn meta :tag #{the-class}))
               (is (= the-class (-> #'bytes-defn meta :arglists first meta :tag #{the-class})))))))))
+
+#?(:clj
+   (deftest nilable-primitive-specs
+     (testing "^:nedap.utils.speced/nilable <primitive hint> is forbidden"
+       (are [input] (try
+                      (eval input)
+                      false
+                      (catch Exception e
+                        (-> e .getCause .getMessage (string/includes? impl.parsing/forbidden-primitives-message))))
+         '(nedap.utils.speced/defn nilable-primitive-specs-1 ^:nedap.utils.speced/nilable ^double [])
+
+         '(nedap.utils.speced/defn nilable-primitive-specs-1 [^:nedap.utils.speced/nilable ^double x])))))
