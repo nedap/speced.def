@@ -77,17 +77,19 @@
          (pos? (count xs))
          (every? (fn [x]
                    (or (symbol? x)
-                       (class? x)))
+                       (#?(:clj  class?
+                           :cljs (assert false)) x)))
                  xs)]}
   (if-not *clj?*
     (apply = xs)
     (->> xs
          (map (fn [x]
                 (cond
-                  (class? x)  x
-                  (symbol? x) #?(:clj  (resolve x)
-                                 :cljs (assert false))
-                  true        (assert false))))
+                  (#?(:clj  class?
+                      :cljs (assert false)) x) x
+                  (symbol? x)                  #?(:clj  (resolve x)
+                                                  :cljs (assert false))
+                  true                         (assert false))))
          (apply =))))
 
 (defn tail-tag [tail]
