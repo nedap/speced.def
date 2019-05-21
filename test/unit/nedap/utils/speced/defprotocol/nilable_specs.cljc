@@ -31,10 +31,20 @@
      ""
      (^::sut/nilable ^String type-hinted [_ ^::sut/nilable ^String x] "")))
 
+#?(:cljs
+   (sut/defprotocol TypeHinted
+     ""
+     (^::sut/nilable ^js/String type-hinted [_ ^::sut/nilable ^js/String x] "")))
+
 #?(:clj
    (sut/defprotocol TypeHinted2
      ""
      (type-hinted2 ^::sut/nilable ^String [_ ^::sut/nilable ^String x] "")))
+
+#?(:cljs
+   (sut/defprotocol TypeHinted2
+     ""
+     (type-hinted2 ^::sut/nilable ^js/String [_ ^::sut/nilable ^js/String x] "")))
 
 (sut/defprotocol Explicit
   ""
@@ -59,19 +69,19 @@
     :else                  x))
 
 (def obj
-  ^{`--inline                impl
-    `--concise               impl
-    #?(:clj `--type-hinted)  #?(:clj impl)
-    `--explicit              impl
-    `--inline2               impl
-    `--concise2              impl
-    #?(:clj `--type-hinted2) #?(:clj impl)
-    `--explicit2             impl}
+  ^{`--inline       impl
+    `--concise      impl
+    `--type-hinted  impl
+    `--explicit     impl
+    `--inline2      impl
+    `--concise2     impl
+    `--type-hinted2 impl
+    `--explicit2    impl}
   {})
 
 (deftest parsing
-  (doseq [f [inline concise #?(:clj type-hinted) explicit
-             inline2 concise2 #?(:clj type-hinted2) explicit2]]
+  (doseq [f [inline concise type-hinted explicit
+             inline2 concise2 type-hinted2 explicit2]]
     (testing f
       (are [arg ret] (= ret (f obj arg))
         "x" "x"

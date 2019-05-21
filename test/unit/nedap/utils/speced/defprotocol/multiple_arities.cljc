@@ -43,6 +43,17 @@
         ^Long y]
        "")))
 
+#?(:cljs
+   (sut/defprotocol TypeHinted
+     ""
+     (type-hinted
+       [_]
+       [_ ^js/String x]
+       [_
+        ^js/String x
+        ^js/Number y]
+       "")))
+
 (sut/defprotocol Explicit
   ""
   (explicit
@@ -57,14 +68,14 @@
   x)
 
 (def obj
-  ^{`--inline               impl
-    `--concise              impl
-    #?(:clj `--type-hinted) #?(:clj impl)
-    `--explicit             impl}
+  ^{`--inline      impl
+    `--concise     impl
+    `--type-hinted impl
+    `--explicit    impl}
   {})
 
 (deftest parsing
-  (doseq [f [inline concise #?(:clj type-hinted) explicit]]
+  (doseq [f [inline concise type-hinted explicit]]
     (testing f
       (testing "Arity 1"
         (are [ret] (= ret (f obj))

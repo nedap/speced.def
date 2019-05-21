@@ -68,17 +68,16 @@
 
 (defn consolidate-group
   "Builds the info for a single protocol method, out of a 'group', namely N signatures of the same method."
-  [group]
+  [clj? group]
   (let [{:keys [method-name docstring protocol-method-name]} (first group)
         reduced (->> group
                      (reduce (fn [acc {:keys [method-name docstring impl-tail proto-tail]}]
                                (-> acc
                                    (update :fn append-to-list impl-tail)
                                    (update :proto-decl append-to-list proto-tail)))
-                             {:declares        #{}
-                              :fn              (list (if (find-ns 'cljs.analyzer)
-                                                       'cljs.core/defn
-                                                       'clojure.core/defn)
+                             {:fn              (list (if clj?
+                                                       'clojure.core/defn
+                                                       'cljs.core/defn)
                                                      method-name
                                                      docstring)
                               :proto-decl      (list protocol-method-name)
@@ -102,7 +101,7 @@
                                                            (map (partial emit-method clj?))
                                                            (group-by :method-name)
                                                            (vals)
-                                                           (map consolidate-group)
+                                                           (map (partial consolidate-group clj?))
                                                            (apply merge-with into))
                         v `(do
                              (clojure.core/defprotocol ~name

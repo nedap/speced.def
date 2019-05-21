@@ -48,10 +48,27 @@
        (= "return-an-int!" x) 42
        :else                  x)))
 
+#?(:cljs
+   (sut/defn ^::sut/nilable ^js/String type-hinted
+     [^::sut/nilable ^js/String x]
+     (cond
+       (nil? x)               nil
+       (= "return-an-int!" x) 42
+       :else                  x)))
+
 #?(:clj
    (sut/defn type-hinted2
      ^::sut/nilable ^String
      [^::sut/nilable ^String x]
+     (cond
+       (nil? x)               nil
+       (= "return-an-int!" x) 42
+       :else                  x)))
+
+#?(:cljs
+   (sut/defn type-hinted2
+     ^::sut/nilable ^js/String
+     [^::sut/nilable ^js/String x]
      (cond
        (nil? x)               nil
        (= "return-an-int!" x) 42
@@ -78,8 +95,8 @@
     :else                  x))
 
 (deftest parsing
-  (doseq [f [inline concise #?(:clj type-hinted) explicit
-             inline2 concise2 #?(:clj type-hinted2) explicit2]]
+  (doseq [f [inline concise  type-hinted explicit
+             inline2 concise2 type-hinted2 explicit2]]
     (testing f
       (are [arg ret] (= ret (f arg))
         "x" "x"
