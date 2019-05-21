@@ -172,7 +172,12 @@
        :type-annotation (cond
                           (primitive? inferred-class clj?) inferred-class
                           clj?                             (#?(:clj resolve :cljs fail) inferred-class)
-                          true                             inferred-class)})))
+                          true                             inferred-class)
+
+       :was-primitive?  (primitive? s clj?)})))
+
+(def forbidden-primitives-message
+  "Primitive type hints aren't nilable. That would emit code that would fail opaquely.")
 
 (defn extract-specs-from-metadata [metadata-map clj?]
   {:post [(check! #{0 1}                                       (->> metadata-map
@@ -213,12 +218,15 @@
                     {:spec            v
                      :type-annotation nil}))))
          (filter some?)
-         (map (fn [{:keys [spec] :as result}]
-                (cond-> result
-                  nilable? (assoc :spec (list (if clj?
-                                                'clojure.spec.alpha/nilable
-                                                'cljs.spec.alpha/nilable)
-                                              spec))))))))
+         (map (fn [{:keys [spec was-primitive?] :as result}]
+                (cond
+                  nilable? (do
+                             (assert (not was-primitive?) forbidden-primitives-message)
+                             (assoc result :spec (list (if clj?
+                                                         'clojure.spec.alpha/nilable
+                                                         'cljs.spec.alpha/nilable)
+                                                       spec)))
+                  true     result))))))
 
 (defn ^{:author  "Rich Hickey"
         :license "Eclipse Public License 1.0"
