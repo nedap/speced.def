@@ -30,11 +30,10 @@
 (defn instance-spec [clj? class]
   (when-not (primitive? class clj?)
     (list 'fn ['x]
-          (list (if clj?
-                  'clojure.core/instance?
-                  'cljs.core/instance?)
-                class
-                'x))))
+          (if clj?
+            (list 'clojure.core/instance? class 'x)
+            ;; Don't use `cljs.core/instance?`! https://dev.clojure.org/jira/browse/CLJS-98
+            (list 'cljs.core/= class (list 'cljs.core/type 'x))))))
 
 (def base-clj-class-mapping
   {`associative?        `clojure.lang.Associative

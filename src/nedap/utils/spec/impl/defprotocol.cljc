@@ -12,8 +12,8 @@
 (spec/def ::args (spec/coll-of symbol? :kind vector :min-count 1))
 
 (spec/def ::method (spec/and list?
-                             (spec/cat :name ::method-name
-                                       :args (spec/+ ::args)
+                             (spec/cat :name      ::method-name
+                                       :args      (spec/+ ::args)
                                        :docstring ::docstring)))
 
 (defn emit-method [clj? [method-name args docstring :as method]]
@@ -51,9 +51,9 @@
     {:method-name          method-name
      :protocol-method-name impl
      :docstring            docstring
-     :declare              `(~(if (find-ns 'cljs.analyzer)
-                                'declare
-                                'clojure.core/declare)
+     :declare              `(~(if clj?
+                                'clojure.core/declare
+                                'declare)
                              ~impl)
      :impl-tail            (list args-with-proper-tag-hints prepost (apply list impl args))
      :proto-tail           args-with-proper-tag-hints}))
@@ -72,7 +72,7 @@
 
 (defn consolidate-group
   "Builds the info for a single protocol method, out of a 'group', namely N signatures of the same method."
-  [group]
+  [clj? group]
   (let [{:keys [method-name docstring protocol-method-name]} (first group)
         reduced (->> group
                      (reduce (fn [acc {:keys [method-name docstring impl-tail declare proto-tail]}]
@@ -81,9 +81,9 @@
                                    (update :proto-decl append-to-list proto-tail)
                                    (update :declares conj declare)))
                              {:declares        #{}
-                              :fn              (list (if (find-ns 'cljs.analyzer)
-                                                       'cljs.core/defn
-                                                       'clojure.core/defn)
+                              :fn              (list (if clj?
+                                                       'clojure.core/defn
+                                                       'cljs.core/defn)
                                                      method-name
                                                      docstring)
                               :proto-decl      (list protocol-method-name)
@@ -107,7 +107,7 @@
                                                                     (map (partial emit-method clj?))
                                                                     (group-by :method-name)
                                                                     (vals)
-                                                                    (map consolidate-group)
+                                                                    (map (partial consolidate-group clj?))
                                                                     (apply merge-with into))
                         v `(do
                              ~@declares

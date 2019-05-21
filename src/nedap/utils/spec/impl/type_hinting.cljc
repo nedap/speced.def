@@ -39,16 +39,19 @@
       (contains? s)))
 
 (defn clj-type-hint? [x]
-  (or (class? x)
+  (or (#?(:clj  class?
+          :cljs (assert false)) x)
       (and (symbol? x)
-           (or (class? #?(:clj  (resolve x)
-                          :cljs (assert false)))
+           (or (#?(:clj  class?
+                   :cljs (assert false)) #?(:clj  (resolve x)
+                                            :cljs (assert false)))
                (primitive? x true)))))
 
 (defn cljs-type-hint? [x]
   (or (and (symbol? x)
            (let [c (-> x name first)]
-             (= c (Character/toUpperCase c))))
+             (= c #?(:clj  (Character/toUpperCase c)
+                     :cljs (-> c .toUpperCase)))))
       (#{'boolean 'string 'number} x)))
 
 (defn type-hint?
@@ -82,7 +85,8 @@
     (meta (strip-extraneous-type-hint args))))
 
 (defn ann->symbol [ann]
-  (if (class? ann)
+  (if (#?(:clj  class?
+          :cljs (assert false)) ann)
     (-> ann .getName symbol)
     ann))
 
