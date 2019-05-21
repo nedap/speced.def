@@ -2,8 +2,10 @@
   (:refer-clojure :exclude [defprotocol])
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   [clojure.string :as string]
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
-   [nedap.utils.speced :as speced]))
+   [nedap.utils.speced :as speced]
+   [nedap.utils.spec.impl.defprotocol :as impl.defprotocol]))
 
 (spec/def ::int int?)
 
@@ -112,3 +114,15 @@
                                                                                   (-> (->Sut :not-an-int) (do-other-thing true)))))
       (is (thrown-with-msg? #?(:clj Exception :cljs js/Error) validation-failed (with-out-str
                                                                                   (-> (->Sut :not-an-int) (do-other-thing-unspeced-ret true))))))))
+
+#?(:clj
+   (deftest primitive-type-hints
+     (testing "Primitive hints is forbidden"
+       (are [input] (try
+                      (eval input)
+                      false
+                      (catch Exception e
+                        (-> e .getCause .getMessage (string/includes? impl.defprotocol/assert-not-primitively-hinted-message))))
+         '(nedap.utils.speced/defprotocol primitive-type-hints-A "Doc" (aaa-it [this, ^long x] "Doc"))
+         '(nedap.utils.speced/defprotocol primitive-type-hints-B "Doc" (bbb-it ^long [this x] "Doc"))
+         '(nedap.utils.speced/defprotocol primitive-type-hints-C "Doc" (^long ccc-it [this x] "Doc"))))))

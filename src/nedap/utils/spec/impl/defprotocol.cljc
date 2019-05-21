@@ -4,8 +4,20 @@
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [nedap.utils.spec.impl.check :refer [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata]]
-   [nedap.utils.spec.impl.type-hinting :refer [type-hint? strip-extraneous-type-hints type-hint ann->symbol]])
-  #?(:cljs (:require-macros [nedap.utils.spec.impl.defprotocol])))
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint? strip-extraneous-type-hints type-hint ann->symbol primitive?]]
+   [clojure.walk :as walk])
+  #?(:cljs (:require-macros [nedap.utils.spec.impl.defprotocol]))
+  #?(:clj (:import
+           (clojure.lang IMeta))))
+
+(def assert-not-primitively-hinted-message
+  "Primitive type hints for protocols are unsupported. See https://dev.clojure.org/jira/browse/CLJ-1548")
+
+(defn assert-not-primitively-hinted! [x clj?]
+  {:pre [(boolean? clj?)]}
+  (assert (not (-> x meta :tag (primitive? clj?)))
+          assert-not-primitively-hinted-message)
+  true)
 
 (spec/def ::method-name symbol?)
 (spec/def ::docstring string?)
@@ -18,6 +30,11 @@
 
 (defn emit-method [clj? [method-name args docstring :as method]]
   {:pre [(check! ::method method)]}
+  (assert-not-primitively-hinted! method-name clj?)
+  (->> args (walk/postwalk (fn [x]
+                             (when (instance? IMeta x)
+                               (assert-not-primitively-hinted! x clj?))
+                             x)))
   (let [ret-metadata (merge (meta method-name)
                             (meta args))
         {ret-spec :spec
