@@ -39,12 +39,20 @@ jobs:
         key: v1-dependencies-{{ checksum "project.clj" }}
 
     - run:
-        name: 'Run tests'
+        name: 'Compile ClojureScript test suite'
+        command: lein do clean, cljsbuild once test
+
+    - run:
+        name: 'Run JVM tests'
         command: lein test
+
+    - run:
+        name: 'Run node.js tests'
+        command: node target/out/tests.js
 
   jfrog:
     docker:
-      - image: circleci/clojure:lein-2.8.1
+      - image: circleci/clojure:lein-2.8.1-node
 
     working_directory: ~/repo
 
