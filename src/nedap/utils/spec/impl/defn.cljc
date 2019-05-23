@@ -4,7 +4,7 @@
       :cljs [cljs.core.specs.alpha :as specs])
    [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata fntails]]
-   [nedap.utils.spec.impl.type-hinting :refer [type-hint type-hint? strip-extraneous-type-hints primitive?]]))
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint type-hint? strip-extraneous-type-hint strip-extraneous-type-hints primitive?]]))
 
 (defn add-prepost [tails ret-spec clj?]
   (->> tails
@@ -51,7 +51,7 @@
                               inner-ret-spec                   (update :post conj (list `check! inner-ret-spec '%))
                               ;; ret-spec and inner-ret-spec may be identical
                               true                             (update :post (comp vec distinct)))
-                    args-with-proper-tag-hints (strip-extraneous-type-hints args)]
+                    args-with-proper-tag-hints (strip-extraneous-type-hints clj? args)]
                 (apply list args-with-proper-tag-hints prepost body))))))
 
 (defn parse [name tail]
@@ -73,7 +73,7 @@
 
 (defn tag=
   [& xs]
-  {:pre [(some? *clj?*)
+  {:pre [(boolean? *clj?*)
          (pos? (count xs))
          (every? (fn [x]
                    (or (symbol? x)
@@ -93,14 +93,18 @@
          (apply =))))
 
 (defn tail-tag [tail]
-  (->> tail
-       (filter vector?)
-       (first)
-       (meta)
-       (:tag)))
+  {:pre [(boolean? *clj?*)]}
+  (let [m (->> tail
+               (filter vector?)
+               (first)
+               (meta))]
+    (some-> m
+            (extract-specs-from-metadata *clj?*)
+            (first)
+            (:type-annotation))))
 
 (defn ret-ann-from-tails [tails clj?]
-  {:pre [(some? clj?)]}
+  {:pre [(boolean? clj?)]}
   (binding [*clj?* clj?]
     (let [tags (->> tails
                     (keep tail-tag))]
@@ -110,7 +114,7 @@
         (first tags)))))
 
 (defn consistent-tagging? [ann tails clj?]
-  {:pre [(some? clj?)]}
+  {:pre [(boolean? clj?)]}
   (binding [*clj?* clj?]
     (let [tags (keep tail-tag tails)
           all (cond-> tags
@@ -138,7 +142,7 @@
 
 (defn impl
   [clj? [name & tail :as args]]
-  {:pre [(check! some?             clj?
+  {:pre [(check! boolean?          clj?
                  ::specs/defn-args args)]}
   (let [{ret-spec :spec
          ret-ann  :type-annotation} (-> name meta (extract-specs-from-metadata clj?) first)
@@ -149,14 +153,23 @@
                      meta
                      (extract-specs-from-metadata clj?)
                      first
-                     :type-annotation
-                     (or tails-ann))
-        tails (maybe-tag-tails name-ann tails)
+                     :type-annotation)
+        name-ann (or name-ann tails-ann)
+        name-ann (->> ^{:tag name-ann} {}
+                      (strip-extraneous-type-hint clj?)
+                      (meta)
+                      :tag)
+        tails (binding [*clj?* clj?]
+                (maybe-tag-tails name-ann tails))
         _ (assert (consistent-tagging? name-ann tails clj?)
                   "Type hints/specs must have the same type across arities, and between arities and the defn's name metadata.")
-        name (if (and (type-hint? name-ann clj?)
-                      ;; 'int would become #'int after compilation, that's how the compiler works. Avoid that:
-                      (not (primitive? name-ann clj?)))
-               (vary-meta name assoc :tag name-ann)
-               (vary-meta name dissoc :tag))]
+        name (cond-> name
+               (type-hint? name-ann clj?) (vary-meta assoc :tag name-ann))
+        name (strip-extraneous-type-hint clj? name)
+        name (cond-> name
+               (and clj?
+                    (primitive? name-ann clj?))
+               ;; 'int would become #'int after JVM compilation, that's how the compiler works, for defn names,
+               ;; because that's not their expected position. Avoid that:
+               (vary-meta dissoc :tag))]
     (apply list `clojure.core/defn (cons name (concat docstring-and-meta tails)))))
