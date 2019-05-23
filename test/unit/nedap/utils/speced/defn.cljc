@@ -80,6 +80,7 @@
                                                 [^Double x]
                                                 (when (< 0 x 100)
                                                   (-> x (* x) str)))
+
                                              '(sut/defn
                                                 type-hinted-metadata
                                                 ^js/String
@@ -94,6 +95,7 @@
                                                 [^Double x]
                                                 (when (< 0 x 100)
                                                   (-> x (* x) str)))
+
                                              '(sut/defn
                                                 ^js/String
                                                 type-hinted-metadata-alt
@@ -111,6 +113,7 @@
                                                 (^String [^Double x, ^Double y]
                                                  (when (< 0 x 100)
                                                    (-> x (* y) str))))
+
                                              '(sut/defn
                                                 type-hinted-metadata-n
                                                 (^js/String [^js/Number x]
@@ -131,6 +134,7 @@
                                                 ([^Double x, ^Double y]
                                                  (when (< 0 x 100)
                                                    (-> x (* y) str))))
+
                                              '(sut/defn
                                                 ^js/String type-hinted-metadata-n-alt
                                                 ([^js/Number x]
@@ -148,6 +152,7 @@
                                                 [^double? x]
                                                 (when (< 0 x 100)
                                                   (-> x (* x) str)))
+
                                              '(sut/defn ^present?
                                                 inline-function
                                                 ^string?
@@ -165,6 +170,7 @@
                                                 (^string? [^double? x, ^double? y]
                                                  (when (< 0 x 100)
                                                    (-> x (* y) str))))
+
                                              '(sut/defn ^present?
                                                 inline-function-n
                                                 (^string? [^number? x]
@@ -181,6 +187,7 @@
                                                 [^double? x]
                                                 (when (< 0 x 100)
                                                   (-> x (* x) str)))
+
                                              '(sut/defn ^string?
                                                 inline-function-alt
                                                 [^number? x]
@@ -197,6 +204,7 @@
                                                 ([^double? x, ^double? y]
                                                  (when (< 0 x 100)
                                                    (-> x (* y) str))))
+
                                              '(sut/defn ^string?
                                                 inline-function-n-alt
                                                 ([^number? x]
@@ -212,7 +220,8 @@
                                                 [^double x]
                                                 (when (< 0 x 100)
                                                   (-> x (* x) str)))
-                                             '(sut/defn ^string? primitive
+
+                                             '(sut/defn ^string primitive
                                                 [^number x]
                                                 (when (< 0 x 100)
                                                   (-> x (* x) str))))
@@ -226,14 +235,48 @@
                                                 ([^double x, ^double y]
                                                  (when (< 0 x 100)
                                                    (-> x (* y) str))))
-                                             '(sut/defn ^string? primitive-n
-                                                ([^double x]
+
+                                             '(sut/defn ^string primitive-n
+                                                ([^number x]
                                                  (when (< 0 x 100)
                                                    (-> x (* x) str)))
 
                                                 ([^number x, ^number y]
                                                  (when (< 0 x 100)
-                                                   (-> x (* y) str)))))}]
+                                                   (-> x (* y) str)))))
+
+               :primitive-alt              (if clj?
+                                             '(sut/defn primitive-alt
+                                                ^string?
+                                                [^double x]
+                                                (when (< 0 x 100)
+                                                  (-> x (* x) str)))
+
+                                             '(sut/defn primitive-alt
+                                                ^string
+                                                [^number x]
+                                                (when (< 0 x 100)
+                                                  (-> x (* x) str))))
+
+               :primitive-n-alt            (if clj?
+                                             '(sut/defn primitive-n-alt
+                                                (^string? [^double x]
+                                                 (when (< 0 x 100)
+                                                   (-> x (* x) str)))
+
+                                                (^string? [^double x, ^double y]
+                                                 (when (< 0 x 100)
+                                                   (-> x (* y) str))))
+
+                                             '(sut/defn primitive-n-alt
+                                                (^string [^number x]
+                                                 (when (< 0 x 100)
+                                                   (-> x (* x) str)))
+
+                                                (^string [^number x, ^number y]
+                                                 (when (< 0 x 100)
+                                                   (-> x (* y) str)))))
+               }]
        (cond->> xs
          clj? (map (fn [[k v]]
                      [k (list 'quote v)]))
@@ -379,8 +422,7 @@
                                                         %)]}
                                                      (when (< 0 x 100)
                                                        (-> x (* x) str)))))
-         inline-function-n-macroexpansion      '(def
-                                                  inline-function-n
+         inline-function-n-macroexpansion      '(def inline-function-n
                                                   (clojure.core/fn
                                                     ([x]
                                                      {:pre [(nedap.utils.spec.api/check!
@@ -418,8 +460,7 @@
                                                      (when (< 0 x 100)
                                                        (-> x (* y) str)))))
 
-         primitive-macroexpansion              '(def
-                                                  primitive
+         primitive-macroexpansion              '(def primitive
                                                   (clojure.core/fn
                                                     ([x]
                                                      {:pre
@@ -434,8 +475,7 @@
                                                         %)]}
                                                      (when (< 0 x 100)
                                                        (-> x (* x) str)))))
-         primitive-n-macroexpansion            '(def
-                                                  primitive-n
+         primitive-n-macroexpansion            '(def primitive-n
                                                   (clojure.core/fn
                                                     ([x]
                                                      {:pre
@@ -488,7 +528,9 @@
       inline-function-alt
       inline-function-n-alt
       primitive
-      primitive-n))
+      primitive-n
+      primitive-alt
+      primitive-n-alt))
 
   (testing "Arity 2"
     (are [f] (= #?(:clj "16.0"
@@ -500,10 +542,10 @@
       type-hinted-metadata-n-alt
       inline-function-n
       inline-function-n-alt
-      primitive-n)))
+      primitive-n
+      primitive-n-alt)))
 
 (deftest preconditions-are-checked
-
   (testing "Arity 1"
     (with-out-str
       (let [arg 0]
@@ -530,7 +572,9 @@
           :thrown     inline-function-alt
           :thrown     inline-function-n-alt
           :thrown     primitive
-          :thrown     primitive-n))))
+          :thrown     primitive-n
+          :thrown     primitive-alt
+          :thrown     primitive-n-alt))))
 
   (testing "Arity 2"
     (with-out-str
@@ -550,7 +594,8 @@
           :thrown     type-hinted-metadata-n-alt
           :thrown     inline-function-n
           :thrown     inline-function-n-alt
-          :thrown     primitive-n)))))
+          :thrown     primitive-n
+          :thrown     primitive-n-alt)))))
 
 (deftest postconditions-are-checked
   (testing "Arity 1"
@@ -579,7 +624,9 @@
           :thrown     inline-function-alt
           :thrown     inline-function-n-alt
           :thrown     primitive
-          :thrown     primitive-n))))
+          :thrown     primitive-n
+          :thrown     primitive-alt
+          :thrown     primitive-n-alt))))
 
   (testing "Arity 2"
     (with-out-str
@@ -600,52 +647,62 @@
           :thrown     inline-function-n
           :thrown     type-hinted-metadata-n-alt
           :thrown     inline-function-n-alt
-          :thrown     primitive-n)))))
+          :thrown     primitive-n
+          :thrown     primitive-n-alt)))))
 
-#?(:clj
-   (deftest type-hint-emission
-     (testing "Type hints are preserved or emitted"
+(deftest type-hint-emission
+  (testing "Type hints are preserved or emitted"
 
-       (testing "Return value hinting for single-arity functions"
-         (are [v] (testing v
-                    (-> v meta :tag #{#?(:clj String
-                                         :cljs js/String)}))
-           #'type-hinted-metadata
-           #'type-hinted-metadata-n
-           #'type-hinted-metadata-alt
-           #'type-hinted-metadata-n-alt
-           #'inline-function
-           #'inline-function-n
-           #'inline-function-alt
-           #'inline-function-n-alt
-           #'primitive
-           #'primitive-n))
+    (testing "Return value hinting for single-arity functions"
+      (are [v] (testing v
+                 (-> v meta :tag #{#?(:clj String
+                                      :cljs 'string)}))
+        #'type-hinted-metadata
+        #'type-hinted-metadata-n
+        #'type-hinted-metadata-alt
+        #'type-hinted-metadata-n-alt
+        #'inline-function
+        #'inline-function-n
+        #'inline-function-alt
+        #'inline-function-n-alt
+        #'primitive
+        #'primitive-n
+        #'primitive-alt
+        #'primitive-n-alt))
 
+    ;; in CLJS, arglists themselves don't ever get a :tag - only its members.
+    #?(:clj
        (testing "Arglist hinting for single-arity functions"
          (are [v] (testing v
                     (-> v meta :arglists first meta :tag #{#?(:clj String
-                                                              :cljs js/String)}))
+                                                              :cljs 'string)}))
            #'type-hinted-metadata
            #'type-hinted-metadata-alt
            #'inline-function
            #'inline-function-alt
            #'primitive
-           #'primitive-n))
+           #'primitive-n
+           #'primitive-alt
+           #'primitive-n-alt)))
 
-       (testing "Arglist hinting for single-arity functions"
-         (are [v] (testing v
-                    (-> v meta :arglists ffirst meta :tag #{#?(:clj `Double
-                                                               :cljs `js/Number)}))
-           #'type-hinted-metadata
-           #'type-hinted-metadata-alt
-           #'inline-function
-           #'inline-function-alt))
+    (testing "Arguments hinting for single-arity functions"
+      (are [v] (testing v
+                 (-> v meta :arglists ffirst meta :tag #{#?(:clj `Double
+                                                            :cljs 'number)}))
+        #'type-hinted-metadata
+        #'type-hinted-metadata-alt
+        #'inline-function
+        #'inline-function-alt))
 
-       (testing "Primitive arglist hinting for single-arity functions"
-         (are [v] (testing v
-                    (-> v meta :arglists ffirst meta :tag #{'double}))
-           #'primitive))
+    (testing "Primitive arguments hinting for single-arity functions"
+      (are [v] (testing v
+                 (-> v meta :arglists ffirst meta :tag #{#?(:clj 'double
+                                                            :cljs 'number)}))
+        #'primitive
+        #'primitive-alt))
 
+    ;; in CLJS, arglists themselves don't ever get a :tag - only its members.
+    #?(:clj
        (testing "Arglist hinting for multi-arity functions"
          (are [v] (testing v
                     (->> v
@@ -654,44 +711,49 @@
                          (map meta)
                          (map :tag)
                          (every-and-at-least-one? #{#?(:clj String
-                                                       :cljs js/String)})))
+                                                       :cljs 'string)})))
            #'type-hinted-metadata-n
            #'type-hinted-metadata-n-alt
            #'inline-function-n
            #'inline-function-n-alt
            #'primitive
-           #'primitive-n))
+           #'primitive-n
+           #'primitive-alt
+           #'primitive-n-alt)))
 
-       (testing "Arguments hinting for multi-arity functions"
-         (are [v] (testing v
-                    (->> v
-                         meta
-                         :arglists
-                         (map (fn [arglist]
-                                (->> arglist
-                                     (map meta)
-                                     (map :tag)
-                                     (every-and-at-least-one? #{#?(:clj `Double
-                                                                   :cljs js/Number)}))))
-                         (every-and-at-least-one? true?)))
-           #'type-hinted-metadata-n
-           #'type-hinted-metadata-n-alt
-           #'inline-function-n
-           #'inline-function-n-alt))
+    (testing "Arguments hinting for multi-arity functions"
+      (are [v] (testing v
+                 (->> v
+                      meta
+                      :arglists
+                      (map (fn [arglist]
+                             (->> arglist
+                                  (map meta)
+                                  (map :tag)
+                                  (every-and-at-least-one? #{#?(:clj `Double
+                                                                :cljs 'number)}))))
+                      (every-and-at-least-one? true?)))
+        #'type-hinted-metadata-n
+        #'type-hinted-metadata-n-alt
+        #'inline-function-n
+        #'inline-function-n-alt))
 
-       (testing "Primitive arguments hinting for multi-arity functions"
-         (are [v] (testing v
-                    (->> v
-                         meta
-                         :arglists
-                         (map (fn [arglist]
-                                (->> arglist
-                                     (map meta)
-                                     (map :tag)
-                                     (every-and-at-least-one? #{'double}))))
-                         (every-and-at-least-one? true?)))
-           #'primitive-n))
+    (testing "Primitive arguments hinting for multi-arity functions"
+      (are [v] (testing v
+                 (->> v
+                      meta
+                      :arglists
+                      (map (fn [arglist]
+                             (->> arglist
+                                  (map meta)
+                                  (map :tag)
+                                  (every-and-at-least-one? #{#?(:clj 'double
+                                                                :cljs 'number)}))))
+                      (every-and-at-least-one? true?)))
+        #'primitive-n
+        #'primitive-n-alt))
 
+    #?(:clj
        (testing ":tag metadata placed in wrong positions is guarded against"
          (are [desc input] (testing desc
                              (testing input
@@ -707,52 +769,52 @@
                                 (-> x (* x) str)))
               :cljs '(sut/defn faulty
                        ^js/String ([x]
-                                   (-> x (* x) str))))))
+                                   (-> x (* x) str)))))))
 
-       #?(:clj
-          (testing "Only long and double primitive annotations are supported, just like in clojure.core/defn"
-            (are [input good?] (testing input
-                                 (try
-                                   (eval input)
-                                   good?
-                                   (catch #?(:clj Exception :cljs js/Error) e
-                                     (not good?))))
+    #?(:clj
+       (testing "Only long and double primitive annotations are supported, just like in clojure.core/defn"
+         (are [input good?] (testing input
+                              (try
+                                (eval input)
+                                good?
+                                (catch #?(:clj Exception :cljs js/Error) e
+                                  (not good?))))
 
-              '(nedap.utils.speced/defn primitive-sample [^int x])    false
-              '(nedap.utils.speced/defn primitive-sample ^int [x])    false
+           '(nedap.utils.speced/defn primitive-sample [^int x])    false
+           '(nedap.utils.speced/defn primitive-sample ^int [x])    false
 
-              '(nedap.utils.speced/defn primitive-sample [^long x])   true
-              '(nedap.utils.speced/defn primitive-sample ^long [x])   true
+           '(nedap.utils.speced/defn primitive-sample [^long x])   true
+           '(nedap.utils.speced/defn primitive-sample ^long [x])   true
 
-              '(nedap.utils.speced/defn primitive-sample [^double x]) true
-              '(nedap.utils.speced/defn primitive-sample ^double [x]) true
+           '(nedap.utils.speced/defn primitive-sample [^double x]) true
+           '(nedap.utils.speced/defn primitive-sample ^double [x]) true
 
-              '(defn primitive-sample [^int x])                       false
-              '(defn primitive-sample ^int [x])                       false
+           '(defn primitive-sample [^int x])                       false
+           '(defn primitive-sample ^int [x])                       false
 
-              '(defn primitive-sample [^long x])                      true
-              '(defn primitive-sample ^long [x])                      true
+           '(defn primitive-sample [^long x])                      true
+           '(defn primitive-sample ^long [x])                      true
 
-              '(defn primitive-sample [^double x])                    true
-              '(defn primitive-sample ^double [x])                    true)))
+           '(defn primitive-sample [^double x])                    true
+           '(defn primitive-sample ^double [x])                    true)))
 
-       #?(:clj
-          (are [input expected-tag] (testing input
-                                      (testing "If the user tags the defn name (as opposed to the arg vector) with a primitive hint"
-                                        (eval input)
-                                        (testing "The hint will be removed"
-                                          (is (-> 'primitive-sample resolve meta :tag nil?)))
-                                        (testing "The argument vector will receive the primitive hint instead"
-                                          (is (-> 'primitive-sample resolve meta :arglists first meta :tag #{expected-tag})))))
-            '(nedap.utils.speced/defn ^long primitive-sample [x])   'long
-            '(nedap.utils.speced/defn ^double primitive-sample [x]) 'double))
+    #?(:clj
+       (are [input expected-tag] (testing input
+                                   (testing "If the user tags the defn name (as opposed to the arg vector) with a primitive hint"
+                                     (eval input)
+                                     (testing "The hint will be removed"
+                                       (is (-> 'primitive-sample resolve meta :tag nil?)))
+                                     (testing "The argument vector will receive the primitive hint instead"
+                                       (is (-> 'primitive-sample resolve meta :arglists first meta :tag #{expected-tag})))))
+         '(nedap.utils.speced/defn ^long primitive-sample [x])   'long
+         '(nedap.utils.speced/defn ^double primitive-sample [x]) 'double))
 
-       #?(:clj
-          (testing "Inline function specs can emit type hints of array type"
-            (sut/defn ^bytes? bytes-defn [])
-            (let [the-class (Class/forName "[B")]
-              (is (-> #'bytes-defn meta :tag #{the-class}))
-              (is (= the-class (-> #'bytes-defn meta :arglists first meta :tag #{the-class})))))))))
+    #?(:clj
+       (testing "Inline function specs can emit type hints of array type"
+         (sut/defn ^bytes? bytes-defn [])
+         (let [the-class (Class/forName "[B")]
+           (is (-> #'bytes-defn meta :tag #{the-class}))
+           (is (= the-class (-> #'bytes-defn meta :arglists first meta :tag #{the-class}))))))))
 
 #?(:clj
    (deftest nilable-primitive-specs
@@ -764,4 +826,6 @@
                         (-> e .getCause .getMessage (string/includes? impl.parsing/forbidden-primitives-message))))
          '(nedap.utils.speced/defn nilable-primitive-specs-1 ^:nedap.utils.speced/nilable ^double [])
 
-         '(nedap.utils.speced/defn nilable-primitive-specs-1 [^:nedap.utils.speced/nilable ^double x])))))
+         '(nedap.utils.speced/defn nilable-primitive-specs-1 [^:nedap.utils.speced/nilable ^double x])
+
+         '(nedap.utils.speced/defn ^:nedap.utils.speced/nilable ^double nilable-primitive-specs-1 [])))))

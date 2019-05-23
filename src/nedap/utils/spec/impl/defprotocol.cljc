@@ -64,7 +64,7 @@
         method-name (cond-> method-name
                       tag?       (vary-meta assoc :tag (list 'quote tag))
                       (not tag?) (vary-meta dissoc :tag))
-        args-with-proper-tag-hints (strip-extraneous-type-hints args)]
+        args-with-proper-tag-hints (strip-extraneous-type-hints clj? args)]
     {:method-name          method-name
      :protocol-method-name impl
      :docstring            docstring

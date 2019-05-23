@@ -1,4 +1,6 @@
 (ns nedap.utils.spec.impl.type-hinting
+  (:require
+   [clojure.string :as string])
   #?(:clj (:import
            (clojure.lang IMeta))))
 
@@ -27,6 +29,36 @@
    'boolean 'boolean
    'number  'number})
 
+(defn cljs-type-map [{:keys [string-value boolean-value number-value]}]
+  {:pre [string-value boolean-value number-value]}
+  {'string                string-value
+   'string?               string-value
+   'cljs.core.string?     string-value
+   'clojure.core.string?  string-value
+   'js/String             string-value
+
+   'boolean               boolean-value
+   'boolean?              boolean-value
+   'cljs.core/boolean?    boolean-value
+   'clojure.core/boolean? boolean-value
+   'js/Boolean            boolean-value
+
+   'number                number-value
+   'number?               number-value
+   'cljs.core/number?     number-value
+   'clojure.core/number?  number-value
+   'js/Number             number-value})
+
+(def cljs-checkable-class-mapping
+  (cljs-type-map {:string-value  'js/String
+                  :boolean-value 'js/Boolean
+                  :number-value  'js/Number}))
+
+(def cljs-hint-class-mapping
+  (cljs-type-map {:string-value  'string
+                  :boolean-value 'boolean
+                  :number-value  'number}))
+
 (defn primitives [clj?]
   (if clj?
     clj-primitives-map
@@ -49,9 +81,10 @@
 
 (defn cljs-type-hint? [x]
   (or (and (symbol? x)
-           (let [c (-> x name first)]
-             (= c #?(:clj  (Character/toUpperCase c)
-                     :cljs (-> c .toUpperCase)))))
+           (or (-> x str (string/starts-with? "js/"))
+               (let [c (-> x name first)]
+                 (= c #?(:clj  (Character/toUpperCase c)
+                         :cljs (-> c .toUpperCase))))))
       (#{'boolean 'string 'number} x)))
 
 (defn type-hint?
@@ -68,21 +101,26 @@
       :cljs (assert false))))
 
 (defn strip-extraneous-type-hint
-  [imeta]
+  [clj? imeta]
+  {:pre [(boolean? clj?)]}
   (if-not (instance? IMeta imeta)
     imeta
-    (let [{:keys [tag]} (meta imeta)]
-      (if (type-hint? tag)
-        imeta
+    (let [{:keys [tag]} (meta imeta)
+          tag (cond->> tag
+                (not clj?) (get cljs-hint-class-mapping))]
+      (if (type-hint? tag clj?)
+        (vary-meta imeta assoc :tag tag)
         (vary-meta imeta dissoc :tag)))))
 
 (defn strip-extraneous-type-hints
   "As per this library's 'syntax', functions can be passed as type hints.
 
   That wouldn't emit valid Clojure code, so those pseudo type hints are removed (and will be only used for spec validation)."
-  [args]
-  (with-meta (mapv strip-extraneous-type-hint args)
-    (meta (strip-extraneous-type-hint args))))
+  [clj? args]
+  {:pre [(boolean? clj?)]}
+  (with-meta (mapv (partial strip-extraneous-type-hint clj?)
+                   args)
+    (meta (strip-extraneous-type-hint clj? args))))
 
 (defn ann->symbol [ann]
   (if (#?(:clj  class?
