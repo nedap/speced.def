@@ -5,7 +5,7 @@
       :cljs [cljs.core.specs.alpha :as specs])
    [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata fntails]]
-   [nedap.utils.spec.impl.type-hinting :refer [type-hint type-hint? strip-extraneous-type-hint strip-extraneous-type-hints primitive?]]))
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint type-hint? ensure-proper-type-hint ensure-proper-type-hints primitive?]]))
 
 (defn add-prepost [tails ret-spec clj?]
   (->> tails
@@ -52,7 +52,7 @@
                               inner-ret-spec                   (update :post conj (list `check! inner-ret-spec '%))
                               ;; ret-spec and inner-ret-spec may be identical
                               true                             (update :post (comp vec distinct)))
-                    args-with-proper-tag-hints (strip-extraneous-type-hints clj? args)]
+                    args-with-proper-tag-hints (ensure-proper-type-hints clj? args)]
                 (apply list args-with-proper-tag-hints prepost body))))))
 
 (defn parse [name tail]
@@ -159,7 +159,7 @@
                      :type-annotation)
         name-ann (or name-ann tails-ann)
         name-ann (->> ^{:tag name-ann} {}
-                      (strip-extraneous-type-hint clj?)
+                      (ensure-proper-type-hint clj?)
                       (meta)
                       :tag)
         tails (binding [*clj?* clj?]
@@ -168,7 +168,7 @@
                   "Type hints/specs must have the same type across arities, and between arities and the defn's name metadata.")
         name (cond-> name
                (type-hint? name-ann clj?) (vary-meta assoc :tag name-ann))
-        name (strip-extraneous-type-hint clj? name)
+        name (ensure-proper-type-hint clj? name)
         name (cond-> name
                (and clj?
                     (primitive? name-ann clj?))

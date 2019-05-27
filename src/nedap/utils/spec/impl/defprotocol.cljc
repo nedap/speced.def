@@ -4,7 +4,7 @@
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [nedap.utils.spec.impl.check :refer [check!]]
    [nedap.utils.spec.impl.parsing :refer [extract-specs-from-metadata]]
-   [nedap.utils.spec.impl.type-hinting :refer [type-hint? strip-extraneous-type-hints type-hint ann->symbol primitive?]]
+   [nedap.utils.spec.impl.type-hinting :refer [type-hint? ensure-proper-type-hints type-hint ann->symbol primitive?]]
    [clojure.walk :as walk])
   #?(:cljs (:require-macros [nedap.utils.spec.impl.defprotocol]))
   #?(:clj (:import
@@ -64,7 +64,7 @@
         method-name (cond-> method-name
                       tag?       (vary-meta assoc :tag (list 'quote tag))
                       (not tag?) (vary-meta dissoc :tag))
-        args-with-proper-tag-hints (strip-extraneous-type-hints clj? args)]
+        args-with-proper-tag-hints (ensure-proper-type-hints clj? args)]
     {:method-name          method-name
      :protocol-method-name impl
      :docstring            docstring

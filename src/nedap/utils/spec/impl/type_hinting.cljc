@@ -100,7 +100,7 @@
               (cljs-type-hint? x))
       :cljs (assert false))))
 
-(defn strip-extraneous-type-hint
+(defn ensure-proper-type-hint
   [clj? imeta]
   {:pre [(boolean? clj?)]}
   (if-not (instance? IMeta imeta)
@@ -112,15 +112,18 @@
         (vary-meta imeta assoc :tag tag)
         (vary-meta imeta dissoc :tag)))))
 
-(defn strip-extraneous-type-hints
-  "As per this library's 'syntax', functions can be passed as type hints.
+(defn ensure-proper-type-hints
+  "Removes / converts type hints that would be extraneous to the compiler:
 
-  That wouldn't emit valid Clojure code, so those pseudo type hints are removed (and will be only used for spec validation)."
+  * For Clojure, functions cannot be type hints. So they're removed.
+
+  * For ClojureScript, e.g. `js/String` can be passed as a type hint under this library.
+  That is converted to `string`, so the related compiler optimizations are enabled."
   [clj? args]
   {:pre [(boolean? clj?)]}
-  (with-meta (mapv (partial strip-extraneous-type-hint clj?)
+  (with-meta (mapv (partial ensure-proper-type-hint clj?)
                    args)
-    (meta (strip-extraneous-type-hint clj? args))))
+    (meta (ensure-proper-type-hint clj? args))))
 
 (defn ann->symbol [ann]
   (if (#?(:clj  class?
