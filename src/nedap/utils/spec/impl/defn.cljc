@@ -1,5 +1,6 @@
 (ns nedap.utils.spec.impl.defn
   (:require
+   [clojure.spec.alpha :as spec]
    #?(:clj  [clojure.core.specs.alpha :as specs]
       :cljs [cljs.core.specs.alpha :as specs])
    [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]
@@ -73,13 +74,12 @@
 
 (defn tag=
   [& xs]
-  {:pre [(boolean? *clj?*)
-         (pos? (count xs))
-         (every? (fn [x]
-                   (or (symbol? x)
-                       (#?(:clj  class?
-                           :cljs (assert false)) x)))
-                 xs)]}
+  {:pre [(check! boolean?                                              *clj?*
+                 pos?                                                  (count xs)
+                 (partial every? (fn [x]
+                                   (or (symbol? x)
+                                       (#?(:clj  class?
+                                           :cljs (assert false)) x)))) xs)]}
   (if-not *clj?*
     (apply = xs)
     (->> xs
@@ -124,6 +124,9 @@
         (apply tag= all)))))
 
 (defn maybe-tag-tails [tag tails]
+  {:pre [(check! boolean?                                *clj?*
+                 (spec/nilable (fn [x]
+                                 (type-hint? x *clj?*))) tag)]}
   (if-not tag
     tails
     (let [tags (-> (->> tails (keep tail-tag) (distinct) (set))
