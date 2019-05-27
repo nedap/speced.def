@@ -17,7 +17,8 @@
                     {:username :env/artifactory_user
                      :password :env/artifactory_pass}}
 
-  :dependencies [[expound "0.7.2"]
+  :dependencies [[com.nedap.staffing-solutions/utils.test "0.1.0-alpha5"]
+                 [expound "0.7.2"]
                  [org.clojure/clojure "1.10.1-beta2"]
                  [org.clojure/spec.alpha "0.1.143"]
                  [spec-coerce "1.0.0-alpha9"]]
