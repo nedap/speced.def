@@ -1,9 +1,10 @@
 (ns unit.nedap.utils.speced.defn.parsing
   (:require
-   [clojure.test :refer :all]
+   #?(:cljs [cljs.core :refer [Atom]])
+   #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.speced :as sut])
   (:import
-   (clojure.lang Atom)))
+   #?(:clj (clojure.lang Atom))))
 
 (sut/defn one
   "Docstring"

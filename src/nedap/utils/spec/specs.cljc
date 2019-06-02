@@ -1,8 +1,8 @@
 (ns nedap.utils.spec.specs
   "Specs for this library."
   (:require
-   [clojure.spec.alpha :as spec]
-   [nedap.utils.spec.impl.def-with-doc :refer [def-with-doc]]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   [nedap.utils.spec.impl.def-with-doc #?(:clj :refer :cljs :refer-macros) [def-with-doc]]
    [nedap.utils.spec.impl.type-hinting :refer [type-hint?]]))
 
 (def-with-doc ::concise-format

@@ -1,7 +1,7 @@
 (ns unit.nedap.utils.speced.defn.nilable-specs
   (:require
-   [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.speced :as sut]))
 
 (use-fixtures :once (fn [t]
@@ -40,20 +40,39 @@
     (= "return-an-int!" x) 42
     :else                  x))
 
-(sut/defn ^::sut/nilable ^String type-hinted
-  [^::sut/nilable ^String x]
-  (cond
-    (nil? x)               nil
-    (= "return-an-int!" x) 42
-    :else                  x))
+#?(:clj
+   (sut/defn ^::sut/nilable ^String type-hinted
+     [^::sut/nilable ^String x]
+     (cond
+       (nil? x)               nil
+       (= "return-an-int!" x) 42
+       :else                  x)))
 
-(sut/defn type-hinted2
-  ^::sut/nilable ^String
-  [^::sut/nilable ^String x]
-  (cond
-    (nil? x)               nil
-    (= "return-an-int!" x) 42
-    :else                  x))
+#?(:cljs
+   (sut/defn ^::sut/nilable ^js/String type-hinted
+     [^::sut/nilable ^js/String x]
+     (cond
+       (nil? x)               nil
+       (= "return-an-int!" x) 42
+       :else                  x)))
+
+#?(:clj
+   (sut/defn type-hinted2
+     ^::sut/nilable ^String
+     [^::sut/nilable ^String x]
+     (cond
+       (nil? x)               nil
+       (= "return-an-int!" x) 42
+       :else                  x)))
+
+#?(:cljs
+   (sut/defn type-hinted2
+     ^::sut/nilable ^js/String
+     [^::sut/nilable ^js/String x]
+     (cond
+       (nil? x)               nil
+       (= "return-an-int!" x) 42
+       :else                  x)))
 
 (sut/defn
   ^{::sut/spec    ::string
@@ -76,13 +95,13 @@
     :else                  x))
 
 (deftest parsing
-  (doseq [f [inline concise type-hinted explicit
+  (doseq [f [inline concise  type-hinted explicit
              inline2 concise2 type-hinted2 explicit2]]
     (testing f
       (are [arg ret] (= ret (f arg))
         "x" "x"
         nil nil)
 
-      (are [arg] (thrown-with-msg? clojure.lang.ExceptionInfo #"Validation failed" (f arg))
+      (are [arg] (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core.ExceptionInfo) #"Validation failed" (f arg))
         :not-a-nilable-string
         "return-an-int!"))))

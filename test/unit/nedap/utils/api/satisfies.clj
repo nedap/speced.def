@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [satisfies?])
   (:require
    [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest testing are is use-fixtures]]
    [nedap.utils.speced :as sut]))
 
 (defprotocol DoThings

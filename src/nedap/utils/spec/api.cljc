@@ -1,16 +1,18 @@
 (ns nedap.utils.spec.api
   (:require
-   [clojure.spec.alpha :as spec]
+   #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [nedap.utils.spec.impl.check]
-   [spec-coerce.core :as coerce]))
+   [spec-coerce.core :as coerce])
+  #?(:cljs (:require-macros [nedap.utils.spec.api :refer [check!]])))
 
-(defmacro check!
-  "Asserts validity, explaining the cause otherwise. Apt for :pre conditions.
+#?(:clj
+   (defmacro check!
+     "Asserts validity, explaining the cause otherwise. Apt for :pre conditions.
 
   `args` is a sequence of spec-val pairs."
-  [& args]
-  {:pre [(-> args count even?)]}
-  `(nedap.utils.spec.impl.check/check! ~@args))
+     [& args]
+     {:pre [(-> args count even?)]}
+     `(nedap.utils.spec.impl.check/check! ~@args)))
 
 (defn coerce-map-indicating-invalidity
   "Tries to coerce the map `m` according to spec `spec`.
@@ -21,7 +23,7 @@
   ;; but never 'inline' as any other kind of objects.
   ;; Else spec-coerce will fail to coerce things.
   {:pre [(check! qualified-ident? spec
-                 map? m)]}
+                 map?             m)]}
   (let [m (coerce/coerce spec m)]
     (cond-> m
       (not (spec/valid? spec m)) (assoc ::invalid? true))))

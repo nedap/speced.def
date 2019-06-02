@@ -5,7 +5,7 @@ Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 ## Installation
 
 ```clojure
-[com.nedap.staffing-solutions/utils.spec "0.6.2"]
+[com.nedap.staffing-solutions/utils.spec "0.7.0"]
 ```
 
 > Remember to set [`*assert*`](https://github.com/technomancy/leiningen/blob/9981ae9086a352caf13a42bff4a7e43faa850452/sample.project.clj#L286) to `false` in your production environment!

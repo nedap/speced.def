@@ -1,7 +1,7 @@
 (ns unit.nedap.utils.speced.defprotocol.nilable-specs
   (:require
    [clojure.spec.alpha :as spec]
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest testing are is use-fixtures]]
    [nedap.utils.speced :as sut]))
 
 (use-fixtures :once (fn [t]
@@ -26,13 +26,25 @@
   ""
   (concise2 ^::sut/nilable ^::string [_ ^::sut/nilable ^::string x] ""))
 
-(sut/defprotocol TypeHinted
-  ""
-  (^::sut/nilable ^String type-hinted [_ ^::sut/nilable ^String x] ""))
+#?(:clj
+   (sut/defprotocol TypeHinted
+     ""
+     (^::sut/nilable ^String type-hinted [_ ^::sut/nilable ^String x] "")))
 
-(sut/defprotocol TypeHinted2
-  ""
-  (type-hinted2 ^::sut/nilable ^String [_ ^::sut/nilable ^String x] ""))
+#?(:cljs
+   (sut/defprotocol TypeHinted
+     ""
+     (^::sut/nilable ^js/String type-hinted [_ ^::sut/nilable ^js/String x] "")))
+
+#?(:clj
+   (sut/defprotocol TypeHinted2
+     ""
+     (type-hinted2 ^::sut/nilable ^String [_ ^::sut/nilable ^String x] "")))
+
+#?(:cljs
+   (sut/defprotocol TypeHinted2
+     ""
+     (type-hinted2 ^::sut/nilable ^js/String [_ ^::sut/nilable ^js/String x] "")))
 
 (sut/defprotocol Explicit
   ""
@@ -75,6 +87,6 @@
         "x" "x"
         nil nil)
 
-      (are [arg] (thrown-with-msg? clojure.lang.ExceptionInfo #"Validation failed" (f obj arg))
+      (are [arg] (thrown-with-msg? #?(:clj clojure.lang.ExceptionInfo :cljs cljs.core.ExceptionInfo) #"Validation failed" (f obj arg))
         :not-a-nilable-string
         "return-an-int!"))))

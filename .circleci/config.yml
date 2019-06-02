@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
     # specify the version you desire here
-    - image: circleci/clojure:lein-2.8.1
+    - image: circleci/clojure:lein-2.8.1-node
 
     # Specify service dependencies here if necessary
     # CircleCI maintains a library of pre-built images
@@ -39,18 +39,20 @@ jobs:
         key: v1-dependencies-{{ checksum "project.clj" }}
 
     - run:
-        name: 'Run tests and report coverage'
-        command: lein trampoline cloverage --lcov --junit -o coverage/
+        name: 'Run JVM test suite'
+        command: lein test
 
-    - store_test_results:
-        path: ~/repo/coverage
+    - run:
+        name: 'Compile ClojureScript test suite'
+        command: lein do clean, cljsbuild once test
 
-    - store_artifacts:
-        path: ~/repo/coverage
+    - run:
+        name: 'Run node.js tests'
+        command: node target/out/tests.js
 
   jfrog:
     docker:
-      - image: circleci/clojure:lein-2.8.1
+      - image: circleci/clojure:lein-2.8.1-node
 
     working_directory: ~/repo
 
