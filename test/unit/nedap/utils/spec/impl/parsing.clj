@@ -89,3 +89,24 @@
        ::speced/nilable true} '({:spec            (cljs.spec.alpha/nilable cljs.core/number?)
                                  :type-annotation number
                                  :was-primitive?  true}))))
+
+(deftest infer-spec-from-symbol
+
+  (testing "clj"
+    (are [input expected] (= expected
+                             (sut/infer-spec-from-symbol true input))
+      'clojure.core/string? {:spec            '(clojure.spec.alpha/and clojure.core/string?
+                                                                       (fn [x] (clojure.core/instance? java.lang.String x))),
+                             :type-annotation java.lang.String,
+                             :was-primitive?  false}
+      'string               nil))
+
+  (testing "cljs"
+    (are [input expected] (= expected
+                             (sut/infer-spec-from-symbol false input))
+      'cljs.core/string? '{:spec            cljs.core/string?,
+                           :type-annotation string,
+                           :was-primitive?  false}
+      'string            '{:spec            cljs.core/string?,
+                           :type-annotation string,
+                           :was-primitive?  true})))

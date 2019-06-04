@@ -18,7 +18,7 @@
                                             (-> x count (< 10)))))
 
        (defn present? [x]
-         some?)
+         (some? x))
 
        (spec/def ::present? present?)
 
