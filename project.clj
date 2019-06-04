@@ -6,17 +6,15 @@
   :license {:name "Eclipse Public License"
             :url  "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :signing {:gpg-key "servicedesk-PEP@nedap.com"}
+  :signing {:gpg-key "releases-staffingsolutions@nedap.com"}
 
   :repositories {"releases" {:url      "https://nedap.jfrog.io/nedap/staffing-solutions/"
                              :username :env/artifactory_user
                              :password :env/artifactory_pass}}
 
-  :deploy-repositories [["releases" {:url "https://nedap.jfrog.io/nedap/staffing-solutions/"}]]
-
-  :repository-auth {#"https://nedap.jfrog\.io/nedap/staffing-solutions/"
-                    {:username :env/artifactory_user
-                     :password :env/artifactory_pass}}
+  :deploy-repositories {"clojars" {:url "https://clojars.org/repo"
+                                   :username :env/clojars_user
+                                   :password :env/clojars_pass}}
 
   :dependencies [[com.nedap.staffing-solutions/utils.test "1.3.0"]
                  [expound "0.7.2"]
