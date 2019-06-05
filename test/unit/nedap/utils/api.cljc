@@ -33,16 +33,3 @@
     {:age "1"}   {:age 1}
     {:age "one"} {:age           "one"
                   ::sut/invalid? true}))
-
-(deftest check-violated?
-  (are [form spec] (check-violated? spec form)
-    (sut/check! string? 123) 'string?
-    (sut/check! ::age "123") ::age)
-
-  (testing "No exception swallowing"
-    #?(:clj
-       (is (thrown? IllegalArgumentException
-                    (throw (IllegalArgumentException. "Wat"))))
-       :cljs
-       (is (thrown? js/Error
-                    (throw (js/Error. "Wat")))))))

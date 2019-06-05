@@ -12,9 +12,10 @@
    [nedap.utils.spec.api :refer [check!]]
    [nedap.utils.spec.impl.def-with-doc]
    [nedap.utils.spec.impl.defn :as impl.defn]
-   [nedap.utils.spec.impl.defprotocol :as impl.defprotocol]
-   [nedap.utils.spec.impl.predicates :as impl]
-   [nedap.utils.spec.impl.satisfies])
+   [nedap.utils.spec.impl.defprotocol]
+   [nedap.utils.spec.impl.satisfies]
+   [nedap.utils.spec.impl.spec-assertion]
+   #?(:clj [clojure.test :as test]))
   #?(:cljs (:require-macros [nedap.utils.speced :refer [def-with-doc]])))
 
 #?(:clj
@@ -96,3 +97,12 @@
   "Can be summed to an existing spec (also passed as metadata),
 for indicating that that spec is nilable."
   any?)
+
+#?(:clj
+   (defmethod test/assert-expr 'spec-assertion-thrown? [msg form]
+     ;; (is (spec-assertion-thrown? s expr))
+     ;; Asserts that evaluating expr throws an ExceptionInfo related to spec-symbol s.
+     ;; Returns the exception thrown.
+     (let [spec-sym (second form)
+           body     (nthnext form 2)]
+       (nedap.utils.spec.impl.spec-assertion/spec-assertion-thrown? msg spec-sym body))))
