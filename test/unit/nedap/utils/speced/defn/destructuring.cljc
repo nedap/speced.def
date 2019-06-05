@@ -11,8 +11,9 @@
 
 (spec/def ::age pos?)
 
-(spec/def ::temperature #?(:clj  double?
-                           :cljs number?))
+(spec/def ::temperature (spec/and #?(:clj  double?
+                                     :cljs number?)
+                                  pos?))
 
 (spec/def ::name (spec/and string? (fn [x]
                                      (-> x count (< 10)))))
@@ -25,57 +26,57 @@
 #?(:clj
    (defmacro the-defns []
      (let [clj? (-> &env :ns nil?)
-           xs {:simple-arity (if clj?
-                               '(sut/defn
-                                  simple-arity
-                                  [{:keys [^::age age
-                                           ^{::sut/spec ::temperature} temperature
-                                           ^long length
-                                           ^String name
-                                           ^boolean? cool?]}]
-                                  [age temperature length name cool?])
+           xs {:arity-1 (if clj?
+                          '(sut/defn
+                             arity-1
+                             [{:keys [^::age age
+                                      ^{::sut/spec ::temperature} temperature
+                                      ^long length
+                                      ^String name
+                                      ^boolean? cool?]}]
+                             [age temperature length name cool?])
 
-                               '(sut/defn
-                                  simple-arity
-                                  [{:keys [^::age age
-                                           ^{::sut/spec ::temperature} temperature
-                                           ^number length
-                                           ^js/String name
-                                           ^boolean? cool?]}]
-                                  [age temperature length name cool?]))
+                          '(sut/defn
+                             arity-1
+                             [{:keys [^::age age
+                                      ^{::sut/spec ::temperature} temperature
+                                      ^number length
+                                      ^js/String name
+                                      ^boolean? cool?]}]
+                             [age temperature length name cool?]))
 
-               :two-arities  (if clj?
-                               '(sut/defn
-                                  two-arities
-                                  ([{:keys [^::age age
-                                            ^{::sut/spec ::temperature} temperature
-                                            ^long length
-                                            ^String name
-                                            ^boolean? cool?]}]
-                                   [age temperature length name cool?])
+               :arity-n (if clj?
+                          '(sut/defn
+                             arity-n
+                             ([{:keys [^::age age
+                                       ^{::sut/spec ::temperature} temperature
+                                       ^long length
+                                       ^String name
+                                       ^boolean? cool?]}]
+                              [age temperature length name cool?])
 
-                                  ([{:keys [^::age age
-                                            ^{::sut/spec ::temperature} temperature]}
-                                    {:keys [^long length
-                                            ^String name
-                                            ^boolean? cool?]}]
-                                   [cool? name length temperature age]))
+                             ([{:keys [^::age age
+                                       ^{::sut/spec ::temperature} temperature]}
+                               {:keys [^long length
+                                       ^String name
+                                       ^boolean? cool?]}]
+                              [cool? name length temperature age]))
 
-                               '(sut/defn
-                                  two-arities
-                                  ([{:keys [^::age age
-                                            ^{::sut/spec ::temperature} temperature
-                                            ^number length
-                                            ^js/String name
-                                            ^boolean? cool?]}]
-                                   [age temperature length name cool?])
+                          '(sut/defn
+                             arity-n
+                             ([{:keys [^::age age
+                                       ^{::sut/spec ::temperature} temperature
+                                       ^number length
+                                       ^js/String name
+                                       ^boolean? cool?]}]
+                              [age temperature length name cool?])
 
-                                  ([{:keys [^::age age
-                                            ^{::sut/spec ::temperature} temperature]}
-                                    {:keys [^number length
-                                            ^js/String name
-                                            ^boolean? cool?]}]
-                                   [cool? name length temperature age])))}]
+                             ([{:keys [^::age age
+                                       ^{::sut/spec ::temperature} temperature]}
+                               {:keys [^number length
+                                       ^js/String name
+                                       ^boolean? cool?]}]
+                              [cool? name length temperature age])))}]
        (cond->> xs
          clj? (map (fn [[k v]]
                      [k (list 'quote v)]))
@@ -95,157 +96,161 @@
    (deftest macroexpansion
      (testing "It macroexpands to known-good (and evidently-good) forms"
        (are [input expected] (= expected input)
-         simple-arity-macroexpansion '(def simple-arity
-                                        (clojure.core/fn
-                                          ([{:keys [age temperature length name cool?]}]
-                                           {:pre  [(nedap.utils.spec.api/check!
+         arity-1-macroexpansion '(def arity-1
+                                   (clojure.core/fn
+                                     ([{:keys [age temperature length name cool?]}]
+                                      {:pre  [(nedap.utils.spec.api/check!
 
-                                                    :unit.nedap.utils.speced.defn.destructuring/age
-                                                    age
+                                               :unit.nedap.utils.speced.defn.destructuring/age
+                                               age
 
-                                                    :unit.nedap.utils.speced.defn.destructuring/temperature
-                                                    temperature
+                                               :unit.nedap.utils.speced.defn.destructuring/temperature
+                                               temperature
 
-                                                    (fn [x]
-                                                      (clojure.core/instance? java.lang.Long x))
-                                                    length
+                                               (fn [x]
+                                                 (clojure.core/instance? java.lang.Long x))
+                                               length
 
-                                                    (fn [x]
-                                                      (clojure.core/instance? String x))
-                                                    name
+                                               (fn [x]
+                                                 (clojure.core/instance? String x))
+                                               name
 
-                                                    (clojure.spec.alpha/and boolean?
-                                                                            (fn [x]
-                                                                              (clojure.core/instance? java.lang.Boolean x)))
-                                                    cool?)],
-                                            :post []}
-                                           [age temperature length name cool?])))
+                                               (clojure.spec.alpha/and boolean?
+                                                                       (fn [x]
+                                                                         (clojure.core/instance? java.lang.Boolean x)))
+                                               cool?)],
+                                       :post []}
+                                      [age temperature length name cool?])))
 
-         two-arities-macroexpansion  '(def two-arities
-                                        (clojure.core/fn
-                                          ([{:keys [age temperature length name cool?]}]
-                                           {:pre  [(nedap.utils.spec.api/check!
+         arity-n-macroexpansion '(def arity-n
+                                   (clojure.core/fn
+                                     ([{:keys [age temperature length name cool?]}]
+                                      {:pre  [(nedap.utils.spec.api/check!
 
-                                                    :unit.nedap.utils.speced.defn.destructuring/age
-                                                    age
+                                               :unit.nedap.utils.speced.defn.destructuring/age
+                                               age
 
-                                                    :unit.nedap.utils.speced.defn.destructuring/temperature
-                                                    temperature
+                                               :unit.nedap.utils.speced.defn.destructuring/temperature
+                                               temperature
 
-                                                    (fn [x]
-                                                      (clojure.core/instance? java.lang.Long x))
-                                                    length
+                                               (fn [x]
+                                                 (clojure.core/instance? java.lang.Long x))
+                                               length
 
-                                                    (fn [x]
-                                                      (clojure.core/instance? String x))
-                                                    name
+                                               (fn [x]
+                                                 (clojure.core/instance? String x))
+                                               name
 
-                                                    (clojure.spec.alpha/and
-                                                     boolean?
+                                               (clojure.spec.alpha/and
+                                                boolean?
 
-                                                     (fn [x]
-                                                       (clojure.core/instance? java.lang.Boolean x)))
-                                                    cool?)],
-                                            :post []}
-                                           [age temperature length name cool?])
+                                                (fn [x]
+                                                  (clojure.core/instance? java.lang.Boolean x)))
+                                               cool?)],
+                                       :post []}
+                                      [age temperature length name cool?])
 
-                                          ([{:keys [age temperature]} {:keys [length name cool?]}]
-                                           {:pre  [(nedap.utils.spec.api/check!
+                                     ([{:keys [age temperature]} {:keys [length name cool?]}]
+                                      {:pre  [(nedap.utils.spec.api/check!
 
-                                                    :unit.nedap.utils.speced.defn.destructuring/age
-                                                    age
+                                               :unit.nedap.utils.speced.defn.destructuring/age
+                                               age
 
-                                                    :unit.nedap.utils.speced.defn.destructuring/temperature
-                                                    temperature
+                                               :unit.nedap.utils.speced.defn.destructuring/temperature
+                                               temperature
 
-                                                    (fn [x]
-                                                      (clojure.core/instance? java.lang.Long x))
-                                                    length
+                                               (fn [x]
+                                                 (clojure.core/instance? java.lang.Long x))
+                                               length
 
-                                                    (fn [x]
-                                                      (clojure.core/instance? String x))
-                                                    name
+                                               (fn [x]
+                                                 (clojure.core/instance? String x))
+                                               name
 
-                                                    (clojure.spec.alpha/and boolean?
-                                                                            (fn [x]
-                                                                              (clojure.core/instance? java.lang.Boolean x)))
-                                                    cool?)],
-                                            :post []}
-                                           [cool? name length temperature age])))))))
+                                               (clojure.spec.alpha/and boolean?
+                                                                       (fn [x]
+                                                                         (clojure.core/instance? java.lang.Boolean x)))
+                                               cool?)],
+                                       :post []}
+                                      [cool? name length temperature age])))))))
 
 (deftest correct-execution
   (testing "Arity 1"
     (are [f] (= [1 1.0 2 "n" false]
                 (f {:age 1 :temperature 1.0 :length 2 :name "n" :cool? false}))
-      simple-arity
-      two-arities))
+      arity-1
+      arity-n))
 
   (testing "Arity 2"
     (are [f] (= [false "n" 2 1.0 1]
                 (f {:age 1 :temperature 1.0 :length 2 :name "n" :cool? false}
                    {:age 1 :temperature 1.0 :length 2 :name "n" :cool? false}))
-      two-arities)))
+      arity-n)))
 
 (def validation-failed #"Validation failed")
 
 (deftest preconditions-are-checked
   (testing "Arity 1"
-    (are [desc args] (testing desc
-                       (is (thrown-with-msg? #?(:clj Exception :cljs js/Error)
-                                             validation-failed
-                                             (with-out-str
-                                               (simple-arity args))))
-                       (is (thrown-with-msg? #?(:clj Exception :cljs js/Error)
-                                             validation-failed
-                                             (with-out-str
-                                               (two-arities args)))))
-      "bad :age"
-      {:age -1, :temperature 1.0, :length 2, :name "n", :cool? false}
+    (let [correct-values {:age 1, :temperature 1.0, :length 2, :name "n", :cool? false}]
+      (are [desc args] (testing desc
+                         (is (thrown-with-msg? #?(:clj Exception :cljs js/Error)
+                                               validation-failed
+                                               (with-out-str
+                                                 (arity-1 args))))
+                         (is (thrown-with-msg? #?(:clj Exception :cljs js/Error)
+                                               validation-failed
+                                               (with-out-str
+                                                 (arity-n args)))))
+        "bad :age"
+        (assoc correct-values :age -1)
 
-      "bad :temperature"
-      {:age -1, :temperature 1.0, :length 2, :name "n", :cool? false}
+        "bad :temperature"
+        (assoc correct-values :temperature -1.0)
 
-      "bad :length"
-      {:age -1, :temperature 1.0, :length 2.0, :name 31, :cool? false}
+        "bad :length"
+        (assoc correct-values :length #?(:clj  2.0
+                                         :cljs "2.0"))
 
-      "bad :name"
-      {:age -1, :temperature 1.0, :length 2, :name 31, :cool? false}
+        "bad :name"
+        (assoc correct-values :name 31)
 
-      "bad :cool?"
-      {:age -1, :temperature 1.0, :length 2, :name 31, :cool? 2}))
+        "bad :cool?"
+        (assoc correct-values :cool? 2))))
 
   (testing "Arity 2"
-    (are [desc arg1 arg2] (testing desc
+    (let [correct-arg1 {:age 1, :temperature 1.0}
+          correct-arg2 {:length 2, :name "n", :cool? false}]
+      (are [desc arg1 arg2] (testing desc
+                              (is (thrown-with-msg? #?(:clj Exception :cljs js/Error)
+                                                    validation-failed
+                                                    (with-out-str
+                                                      (arity-n arg1 arg2)))))
+        "bad :age"
+        (assoc correct-arg1 :age -1)           correct-arg2
 
-                            (is (thrown-with-msg? #?(:clj Exception :cljs js/Error)
-                                                  validation-failed
-                                                  (with-out-str
-                                                    (two-arities arg1 arg2)))))
-      "bad :age"
-      {:age -1, :temperature 1.0}, {:length 2, :name "n", :cool? false}
+        "bad :temperature"
+        (assoc correct-arg1 :temperature -1.0) correct-arg2
 
-      "bad :temperature"
-      {:age -1, :temperature 1.0}, {:length 2, :name "n", :cool? false}
+        "bad :length"
+        correct-arg1                           (assoc correct-arg2 :length #?(:clj  2.0
+                                                                              :cljs "2.0"))
 
-      "bad :length"
-      {:age -1, :temperature 1.0}, {:length 2.0, :name 31, :cool? false}
+        "bad :name"
+        correct-arg1                           (assoc correct-arg2 :name 31)
 
-      "bad :name"
-      {:age -1, :temperature 1.0}, {:length 2, :name 31, :cool? false}
-
-      "bad :cool?"
-      {:age -1, :temperature 1.0}, {:length 2, :name 31, :cool? 2})))
+        "bad :cool?"
+        correct-arg1                           (assoc correct-arg2 :cool? 2)))))
 
 (deftest type-hint-emission
 
   (are [input] (= #?(:clj (list nil nil 'long String Boolean)
                      :cljs '(nil nil number string boolean))
                   (->> input meta :arglists first first :keys (map meta) (map :tag)))
-    #'simple-arity
-    #'two-arities)
+    #'arity-1
+    #'arity-n)
 
   (are [input] (= #?(:clj (list '(nil nil) (list 'long String Boolean))
                      :cljs '((nil nil) (number string boolean)))
                   (->> input meta :arglists second (map (fn [arg]
                                                           (->> arg :keys (map meta) (map :tag))))))
-    #'two-arities))
+    #'arity-n))

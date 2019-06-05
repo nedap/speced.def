@@ -30,7 +30,7 @@ That is achieved via metadata:
 ...the snippet above compiles to something akin to:
 
 ```clojure
-;; note that both preconditions and type hints are emitted, out of the specs
+;; note that both preconditions and type hints are emitted, derived from the specs
 (defn inc-and-serialize ^String [n, ^Boolean b]
   {:pre [(int? n) (boolean? b)]
    :post [(string? %)]}
@@ -39,7 +39,7 @@ That is achieved via metadata:
 
 > [Expound](https://github.com/bhb/expound) is used for error reporting, so the actual emitted code is a bit more substantial.
 
-You can pass specs as part of any destructurings.  
+You can pass specs as part of any nested destructurings.  
 
 ```clojure
 (speced/defn destructuring-example [{:keys [^string? a] :as ^::thing all}]
