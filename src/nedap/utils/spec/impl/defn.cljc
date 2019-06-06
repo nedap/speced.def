@@ -13,14 +13,24 @@
     (->> args
          (remove symbol?) ;; plain args will be analyzed separately
          (walk/postwalk (fn [x]
-                          (when (symbol? x)
-                            (when-let [spec (some-> x
-                                                    meta
-                                                    (extract-specs-from-metadata clj?)
-                                                    (first)
-                                                    (assoc :arg x))]
-                              (swap! result conj spec)))
-                          x)))
+                          (let [is-symbol (symbol? x)]
+                            (when-not is-symbol
+                              (when-let [spec (some-> x
+                                                      meta
+                                                      (extract-specs-from-metadata clj?)
+                                                      (first))]
+                                (assert false (str "Only symbols can be attached spec metadata. Found spec: "
+                                                   (pr-str spec)
+                                                   " in form: "
+                                                   (pr-str x)))))
+                            (when is-symbol
+                              (when-let [spec (some-> x
+                                                      meta
+                                                      (extract-specs-from-metadata clj?)
+                                                      (first)
+                                                      (assoc :arg x))]
+                                (swap! result conj spec)))
+                            x))))
     @result))
 
 (defn maybe-type-hint-destructured-args
@@ -186,20 +196,15 @@
                       (with-meta tail
                         (meta all))))))))))
 
-(defn impl
-  [clj? [name & tail :as args]]
-  {:pre [(check! boolean?          clj?
-                 ::specs/defn-args args)]}
+(defn process-name-and-tails [{:keys [name tail clj?] :as options}]
+  {:pre [(check! (spec/nilable symbol?) name
+                 coll?                  tail
+                 boolean?               clj?)]}
   (let [{ret-spec :spec
-         ret-ann  :type-annotation} (-> name meta (extract-specs-from-metadata clj?) first)
+         name-ann :type-annotation} (-> name meta (extract-specs-from-metadata clj?) first)
         {:keys [tails docstring-and-meta]} (parse name tail)
         tails (add-prepost tails ret-spec clj?)
         tails-ann (ret-ann-from-tails tails clj?)
-        name-ann (-> name
-                     meta
-                     (extract-specs-from-metadata clj?)
-                     first
-                     :type-annotation)
         name-ann (or name-ann tails-ann)
         name-ann (->> ^{:tag name-ann} {}
                       (ensure-proper-type-hint clj?)
@@ -218,4 +223,13 @@
                ;; 'int would become #'int after JVM compilation, that's how the compiler works, for defn names,
                ;; because that's not their expected position. Avoid that:
                (vary-meta dissoc :tag))]
+    {:tails tails, :name name, :docstring-and-meta docstring-and-meta}))
+
+(defn impl
+  [clj? [name & tail :as args]]
+  {:pre [(check! boolean?          clj?
+                 ::specs/defn-args args)]}
+  (let [{:keys [tails name docstring-and-meta]} (process-name-and-tails {:tail tail
+                                                                         :name name
+                                                                         :clj? clj?})]
     (apply list `clojure.core/defn (cons name (concat docstring-and-meta tails)))))
