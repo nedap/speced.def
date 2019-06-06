@@ -4,11 +4,27 @@ Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 
 ## Installation
 
+#### Coordinates
+
 ```clojure
 [com.nedap.staffing-solutions/utils.spec "0.8.0"]
 ```
 
-> Remember to set [`*assert*`](https://github.com/technomancy/leiningen/blob/9981ae9086a352caf13a42bff4a7e43faa850452/sample.project.clj#L286) to `false` in your production environment!
+> Note that self-hosted ClojureScript (e.g. Lumo) is unsupported at the moment.
+
+#### Production setup
+
+* In JVM Clojure, set [`*assert*`](https://github.com/technomancy/leiningen/blob/9981ae9086a352caf13a42bff4a7e43faa850452/sample.project.clj#L286) to `false`.
+
+* In ClojureScript, set [`:elide-asserts`](https://clojurescript.org/reference/compiler-options#elide-asserts) to `true`.
+
+#### `clojure-future-spec` incompatibility
+
+If your project happens to depend (directly or transitively; try e.g. `lein deps :tree`) on [clojure-future-spec](https://github.com/tonsky/clojure-future-spec), this library will fail to load.
+
+You can fix that by adding e.g. `:exclusions [clojure-future-spec]` to whatever dependency was bringing it in.
+
+You also will need to create an empty `clojure.future` ns.
 
 ## Synopsis
 
@@ -79,11 +95,9 @@ You can pass specs as part of any nested destructurings.
 
 * Battle-tested across a variety of projects by now
   * Rough edges polished at this point, each bugfix being thoroughly unit-tested.
+  * ClojureScript support is full (and fully unit-tested), but less battle-tested.
 * Richer features will be added 
-* ClojureScript support is full, but less battle-tested
-  * There's no support for self-hosted ClojureScript at the moment.
-
-Refer to the [issue tracker](https://github.com/nedap/utils.spec/issues) for getting an idea of the current bugs (quite minor) and wishlist.
+  * Refer to the [issue tracker](https://github.com/nedap/utils.spec/issues) for getting an idea of the project's wishlist.
 
 ## ns organisation
 
