@@ -254,3 +254,19 @@
                   (->> input meta :arglists second (map (fn [arg]
                                                           (->> arg :keys (map meta) (map :tag))))))
     #'arity-n))
+
+#?(:clj
+   (deftest wrong-metadata
+     (testing "metadata can only be placed for symbols"
+       (are [input] (try
+                      (eval input)
+                      false
+                      (catch Exception e
+                        (-> e .getCause .getMessage (string/includes? "Only symbols can be attached spec metadata"))))
+         '(nedap.utils.speced/defn wrong-metadata-1 [{:keys ^string? []}])
+
+         '(nedap.utils.speced/defn wrong-metadata-2 [^string? {:keys []}])
+
+         '(nedap.utils.speced/defn wrong-metadata-3 [& ^string? []])
+
+         '(nedap.utils.speced/defn wrong-metadata-4 [[[[[[^string? {:keys []}]]]]]])))))

@@ -47,8 +47,6 @@ You can pass specs as part of any nested destructurings.
   )
 ```
 
-> Refer to the `def-with-doc ::spec-metadata` docstring for a caveat concerned with destructuring.
-
 **utils.spec**'s philosophy is to bypass [instrumentation](https://clojure.org/guides/spec#_instrumentation_and_testing) altogether. Clojure's precondition system is simple and reliable, and can be cleanly [toggled](https://github.com/technomancy/leiningen/blob/18a316e1c116295555a77ce77a0d8f5971bc16f7/sample.project.clj#L286) for dev/prod environments via the `clojure.core/*assert*` variable.
 
 > In a future, we might provide a way to build your own `defn`, tweaking subjective aspects like instrumentation, while preserving all other features at no cost.
