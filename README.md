@@ -14,7 +14,7 @@ Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 
 Despite the name, this is not a library with disparate spec-related functions (maybe, accordingly, it will be renamed to `speced.def`).
 
-Rather, it is focused in 'speced' forms of `defn`, `defprotocol` ([and](https://github.com/nedap/utils.spec/issues/34) soon [others](https://github.com/nedap/utils.spec/issues/25)) using the **same exact syntax** than clojure.core's.
+Rather, it is focused in 'speced' forms of `defn`, `defprotocol`, `fn`, etc. using the **same exact syntax** than clojure.core's.
 
 That is achieved via metadata:
 
@@ -69,7 +69,7 @@ You can pass specs as part of any nested destructurings.
   * e.g. `^string?` will emit a `^String` type hint
   * same for ClojureScript: `^string?` -> `^string`
   * This particularly matters in JVM Clojure. [Refer to the full mapping](https://github.com/nedap/utils.spec/blob/8dac678f498fc3a77ab7cc13e5a1b3d965221735/src/nedap/utils/spec/impl/parsing.cljc#L42).
-* `speced/defprotocol` is also supported
+* `speced/defprotocol`, `speced/fn` are also offered
   * Same syntax and advantages as `speced/defn`
 * Richer Expound integration
   * [This idea](https://github.com/bhb/expound/issues/148) is implemented here inline, as long as the Expound issue remains open.
@@ -91,7 +91,7 @@ Refer to the [issue tracker](https://github.com/nedap/utils.spec/issues) for get
 
 There are exactly 3 namespaces meant for public consumption:
 
-* `nedap.utils.speced`: 'speced' forms of defprotocol, defn, etc.
+* `nedap.utils.speced`: 'speced' forms of defprotocol, defn, fn, etc.
 * `nedap.utils.spec.api`: various utility functions, most notably `check!`.
 * `nedap.utils.spec.predicates`: selected, generic predicates that you might find handy when specing things.
 

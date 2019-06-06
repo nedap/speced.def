@@ -238,7 +238,7 @@
         :comment "Adapted from clojure.core/defn, with modifications."}
   fntails
   [name & fdecl]
-  {:pre [(check! symbol? name)]}
+  {:pre [(check! (spec/nilable symbol?) name)]}
   (let [m (if (string? (first fdecl))
             {:doc (first fdecl)}
             {})
