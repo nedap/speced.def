@@ -3,7 +3,7 @@
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [clojure.string :as string]
    [nedap.utils.spec.impl.check #?(:clj :refer :cljs :refer-macros) [check!]]
-   [nedap.utils.spec.impl.type-hinting :refer [ cljs-checkable-class-mapping cljs-hint-class-mapping cljs-type-map primitive? primitives type-hint?]]
+   [nedap.utils.spec.impl.type-hinting :refer [cljs-checkable-class-mapping cljs-hint-class-mapping cljs-type-map primitive? primitives type-hint?]]
    [nedap.utils.spec.specs :as specs]))
 
 (defn proper-spec-metadata? [metadata-map extracted-specs]
@@ -137,7 +137,7 @@
                     :number-value  'cljs.core/number?})))
 
 (defn infer-spec-from-symbol
-  "For a few selected cases, one can derive a type hint out of symbol metatata."
+  "For a few selected cases, one can derive a type hint out of symbol metadata."
   [clj? s]
   {:post [(if-not %
             true
@@ -152,15 +152,19 @@
                     nil))
         inferred-checkable-class (get checkable-class-mapping s)
         inferred-hint-class (get hint-class-mapping s)]
-    (when (or inferred-checkable-class inferred-hint-class)
-      {:spec            (if-not clj? ;; https://git.io/fjn0t
+    (when (or (and (not clj?)
+                   spec)
+              inferred-checkable-class
+              inferred-hint-class)
+      {:spec            (if (or (not clj?) ;; https://git.io/fjn0t
+                                (not inferred-checkable-class))
                           spec
                           (and-spec clj?
                                     spec
                                     (instance-spec clj? inferred-checkable-class)))
        :type-annotation (cond
                           (primitive? inferred-hint-class clj?) inferred-hint-class
-                          clj?                                  (#?(:clj resolve :cljs fail) inferred-hint-class)
+                          (and clj? inferred-hint-class)        (#?(:clj resolve :cljs fail) inferred-hint-class)
                           true                                  inferred-hint-class)
 
        :was-primitive?  (primitive? s clj?)})))
@@ -168,16 +172,19 @@
 (def forbidden-primitives-message
   "Primitive type hints aren't nilable. That would emit code that would fail opaquely.")
 
-(defn class->symbol [c]
+(defn class->symbol [#?(:clj  ^Class c
+                        :cljs c)]
   {:pre [(#?(:clj  class?
              :cljs (assert false)) c)]}
   (-> c .getName symbol))
 
 (defn extract-specs-from-metadata [metadata-map clj?]
-  {:post [(check! #{0 1}                                       (->> metadata-map
-                                                                    (filter spec-directive?)
-                                                                    (count))
-                  (partial proper-spec-metadata? metadata-map) %)]}
+  {:pre  [(check! (spec/nilable map?) metadata-map
+                  boolean?            clj?
+                  #{0 1}              (->> metadata-map
+                                           (filter spec-directive?)
+                                           (count)))]
+   :post [(check! (partial proper-spec-metadata? metadata-map) %)]}
   (let [metadata-map (cond-> metadata-map
                        (-> metadata-map :tag #?(:clj  class?
                                                 :cljs fail)) (update :tag class->symbol))
@@ -231,7 +238,7 @@
         :comment "Adapted from clojure.core/defn, with modifications."}
   fntails
   [name & fdecl]
-  {:pre [(check! symbol? name)]}
+  {:pre [(check! (spec/nilable symbol?) name)]}
   (let [m (if (string? (first fdecl))
             {:doc (first fdecl)}
             {})

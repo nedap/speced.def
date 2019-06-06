@@ -1,8 +1,7 @@
 (ns nedap.utils.spec.impl.type-hinting
   (:require
    [clojure.string :as string])
-  #?(:clj (:import
-           (clojure.lang IMeta))))
+  #?(:clj (:import (clojure.lang IMeta))))
 
 (def this-ns *ns*)
 
@@ -33,8 +32,8 @@
   {:pre [string-value boolean-value number-value]}
   {'string                string-value
    'string?               string-value
-   'cljs.core.string?     string-value
-   'clojure.core.string?  string-value
+   'cljs.core/string?     string-value
+   'clojure.core/string?  string-value
    'js/String             string-value
 
    'boolean               boolean-value
@@ -50,6 +49,8 @@
    'js/Number             number-value})
 
 (def cljs-checkable-class-mapping
+  "'Checkable' refers to the fact that objects can be _checked_ against e.g. `js/String` in preconditions,
+  as instance predicates."
   (cljs-type-map {:string-value  'js/String
                   :boolean-value 'js/Boolean
                   :number-value  'js/Number}))

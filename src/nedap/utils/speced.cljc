@@ -4,14 +4,16 @@
   Please `:require` this namepace with the `speced` alias: `[nedap.utils.speced :as speced]`.
 
   That way, you will invoke e.g. `speced/defprotocol` which is clean and clear."
-  (:refer-clojure :exclude [defn defprotocol satisfies?])
+  (:refer-clojure :exclude [defn defprotocol fn satisfies?])
   (:require
-   #?(:clj  [clojure.core.specs.alpha :as specs]
-      :cljs [cljs.core.specs.alpha :as specs])
+   #?(:clj [clojure.core.specs.alpha :as specs] :cljs [cljs.core.specs.alpha :as specs])
+   #?(:clj [nedap.utils.spec.impl.fn :as impl.fn] :cljs [nedap.utils.spec.impl.dummy :as impl.fn])
+   [clojure.spec.alpha :as spec]
    [nedap.utils.spec.api :refer [check!]]
    [nedap.utils.spec.impl.def-with-doc]
    [nedap.utils.spec.impl.defn :as impl.defn]
    [nedap.utils.spec.impl.defprotocol :as impl.defprotocol]
+   [nedap.utils.spec.impl.predicates :as impl]
    [nedap.utils.spec.impl.satisfies])
   #?(:cljs (:require-macros [nedap.utils.speced :refer [def-with-doc]])))
 
@@ -60,6 +62,23 @@
      {:pre [(check! ::specs/defn-args args)]}
      (impl.defn/impl (-> &env :ns nil?)
                      args)))
+
+#?(:clj
+   (defmacro fn
+     "Emits a spec-backed fn, which uses `nedap.utils.spec.api/check!` at runtime
+  to verify that specs of return values and arguments satify the (optional) specs passed as metadata.
+
+  Has the exact same signature as `clojure.core/fn`, with full support for all its variations.
+
+  Each return value position, and each argument, observes spec metadata as per the `:nedap.utils.spec.specs/spec-metadata`` spec.
+
+  The implementation is backed by Clojure's `:pre`/`:post`, therefore runtime-checking behavior is controlled with `*assert*``."
+     {:style/indent        :defn
+      :style.cljfmt/indent [[:inner 0]]}
+     [& args]
+     {:pre [(check! ::impl.fn/fn args)]}
+     (impl.fn/impl (-> &env :ns nil?)
+                   args)))
 
 #?(:clj
    (clojure.core/defn satisfies?

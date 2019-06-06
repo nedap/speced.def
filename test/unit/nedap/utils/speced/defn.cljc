@@ -6,13 +6,12 @@
   In practice, that is completely optional and you are free to use 2, 1, or 0 return value hints in any position of your choice."
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
-   [clojure.string :as string]
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
-   [nedap.utils.speced :as sut]
+   [clojure.string :as string]
    [nedap.utils.spec.impl.parsing :as impl.parsing]
+   [nedap.utils.speced :as sut]
    [unit.nedap.test-helpers :refer [every-and-at-least-one?]])
-  #?(:cljs
-     (:require-macros [unit.nedap.utils.speced.defn :refer [the-defns]])))
+  #?(:cljs (:require-macros [unit.nedap.utils.speced.defn :refer [the-defns]])))
 
 (spec/def ::age pos?)
 
@@ -23,7 +22,7 @@
                                      (-> x count (< 10)))))
 
 (defn present? [x]
-  some?)
+  (some? x))
 
 (spec/def ::present? present?)
 
@@ -275,8 +274,7 @@
 
                                                 (^string [^number x, ^number y]
                                                  (when (< 0 x 100)
-                                                   (-> x (* y) str)))))
-               }]
+                                                   (-> x (* y) str)))))}]
        (cond->> xs
          clj? (map (fn [[k v]]
                      [k (list 'quote v)]))
@@ -295,7 +293,7 @@
 #?(:clj
    (deftest macroexpansion
      (testing "It macroexpands to known-good (and evidently-good) forms"
-       (are [x y] (= x y)
+       (are [input expected] (= expected input)
          no-metadata-macroexpansion            '(def no-metadata (clojure.core/fn ([x]
                                                                                    {:pre [], :post []}
                                                                                    (-> x (* x) str))))
@@ -826,6 +824,6 @@
                         (-> e .getCause .getMessage (string/includes? impl.parsing/forbidden-primitives-message))))
          '(nedap.utils.speced/defn nilable-primitive-specs-1 ^:nedap.utils.speced/nilable ^double [])
 
-         '(nedap.utils.speced/defn nilable-primitive-specs-1 [^:nedap.utils.speced/nilable ^double x])
+         '(nedap.utils.speced/defn nilable-primitive-specs-2 [^:nedap.utils.speced/nilable ^double x])
 
-         '(nedap.utils.speced/defn ^:nedap.utils.speced/nilable ^double nilable-primitive-specs-1 [])))))
+         '(nedap.utils.speced/defn ^:nedap.utils.speced/nilable ^double nilable-primitive-specs-3 [])))))
