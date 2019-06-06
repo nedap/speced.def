@@ -1,8 +1,8 @@
 (ns nedap.utils.spec.impl.fn
   (:require
-   #?(:clj [clojure.core.specs.alpha :as specs] :cljs [cljs.core.specs.alpha :as specs])
+   [clojure.core.specs.alpha :as specs]
    [clojure.spec.alpha :as spec]
-   [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]
+   [nedap.utils.spec.api :refer [check!]]
    [nedap.utils.spec.impl.defn :as impl.defn]))
 
 ;; Taken from https://git.io/fjuA8 , which is not offered reusably as of today

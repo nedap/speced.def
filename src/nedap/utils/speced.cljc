@@ -7,12 +7,12 @@
   (:refer-clojure :exclude [defn defprotocol fn satisfies?])
   (:require
    #?(:clj [clojure.core.specs.alpha :as specs] :cljs [cljs.core.specs.alpha :as specs])
+   #?(:clj [nedap.utils.spec.impl.fn :as impl.fn] :cljs [nedap.utils.spec.impl.dummy :as impl.fn])
    [clojure.spec.alpha :as spec]
    [nedap.utils.spec.api :refer [check!]]
    [nedap.utils.spec.impl.def-with-doc]
    [nedap.utils.spec.impl.defn :as impl.defn]
    [nedap.utils.spec.impl.defprotocol :as impl.defprotocol]
-   [nedap.utils.spec.impl.fn :as impl.fn]
    [nedap.utils.spec.impl.predicates :as impl]
    [nedap.utils.spec.impl.satisfies])
   #?(:cljs (:require-macros [nedap.utils.speced :refer [def-with-doc]])))
