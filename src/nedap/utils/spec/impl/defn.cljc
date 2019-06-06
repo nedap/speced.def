@@ -196,6 +196,22 @@
                       (with-meta tail
                         (meta all))))))))))
 
+(defn process-name [name, name-ann, clj?]
+  {:pre [(check! symbol?                                      name
+                 (spec/nilable (fn [x]
+                                 (type-hint? name-ann clj?))) name-ann
+                 boolean?                                     clj?)]}
+  (let [name (cond-> name
+               (type-hint? name-ann clj?) (vary-meta assoc :tag name-ann))
+        name (ensure-proper-type-hint clj? name)
+        name (cond-> name
+               (and clj?
+                    (primitive? name-ann clj?))
+               ;; 'int would become #'int after JVM compilation, that's how the compiler works, for defn names,
+               ;; because that's not their expected position. Avoid that:
+               (vary-meta dissoc :tag))]
+    name))
+
 (defn process-name-and-tails [{:keys [name tail clj?] :as options}]
   {:pre [(check! (spec/nilable symbol?) name
                  coll?                  tail
@@ -214,15 +230,7 @@
                 (maybe-tag-tails name-ann tails))
         _ (assert (consistent-tagging? name-ann tails clj?)
                   "Type hints/specs must have the same type across arities, and between arities and the defn's name metadata.")
-        name (cond-> name
-               (type-hint? name-ann clj?) (vary-meta assoc :tag name-ann))
-        name (ensure-proper-type-hint clj? name)
-        name (cond-> name
-               (and clj?
-                    (primitive? name-ann clj?))
-               ;; 'int would become #'int after JVM compilation, that's how the compiler works, for defn names,
-               ;; because that's not their expected position. Avoid that:
-               (vary-meta dissoc :tag))]
+        name (some-> name (process-name name-ann clj?))]
     {:tails tails, :name name, :docstring-and-meta docstring-and-meta}))
 
 (defn impl

@@ -81,8 +81,12 @@
                                                            x))
 
                :spec-in-argv          '(def spec-in-argv (sut/fn spec-in-argv-xxx
-                                                           ^some? [x]
+                                                           ^string? [x]
                                                            x))
+
+               :spec-in-argv-no-name  '(def spec-in-argv-no-name (sut/fn
+                                                                   ^string? [x]
+                                                                   x))
 
                :spec-in-name-and-argv '(def spec-in-name-and-argv (sut/fn ^string? spec-in-name-and-argv-xxx
                                                                     ^some? [x]
@@ -196,19 +200,31 @@
          spec-in-name-macroexpansion          '(fn* spec-in-name-xxx
                                                     ([x]
                                                      (clojure.core/let [% x]
-                                                       (clojure.core/assert
-                                                        (nedap.utils.spec.api/check!
-                                                         (clojure.spec.alpha/and string?
-                                                                                 (fn [x]
-                                                                                   (clojure.core/instance? java.lang.String x)))
-                                                         %))
+                                                       (clojure.core/assert (nedap.utils.spec.api/check!
+                                                                             (clojure.spec.alpha/and string?
+                                                                                                     (fn [x]
+                                                                                                       (clojure.core/instance? java.lang.String x)))
+                                                                             %))
                                                        %)))
 
          spec-in-argv-macroexpansion          '(fn* spec-in-argv-xxx
                                                     ([x]
                                                      (clojure.core/let [% x]
-                                                       (clojure.core/assert (nedap.utils.spec.api/check! some? %))
+                                                       (clojure.core/assert (nedap.utils.spec.api/check!
+                                                                             (clojure.spec.alpha/and string?
+                                                                                                     (fn [x]
+                                                                                                       (clojure.core/instance? java.lang.String x))) %))
                                                        %)))
+
+         spec-in-argv-no-name-macroexpansion  '(fn*
+                                                ([x]
+                                                 (clojure.core/let [% x]
+                                                   (clojure.core/assert (nedap.utils.spec.api/check!
+                                                                         (clojure.spec.alpha/and string?
+                                                                                                 (fn [x]
+                                                                                                   (clojure.core/instance? java.lang.String x)))
+                                                                         %))
+                                                   %)))
 
          spec-in-name-and-argv-macroexpansion '(fn* spec-in-name-and-argv-xxx
                                                     ([x]
@@ -239,6 +255,7 @@
     (are [f] (is (= "a" (f "a")))
       spec-in-name
       spec-in-argv
+      spec-in-argv-no-name
       spec-in-name-and-argv)))
 
 (def validation-failed #"Validation failed")
@@ -302,4 +319,5 @@
                                    (f nil))))
     spec-in-name
     spec-in-argv
+    spec-in-argv-no-name
     spec-in-name-and-argv))
