@@ -16,7 +16,8 @@
    [unit.nedap.utils.speced.defprotocol.nilable-specs]
    [unit.nedap.utils.speced.defprotocol.type-hinting]
    [unit.nedap.utils.speced.fn]
-   [unit.nedap.utils.speced.predicates]))
+   [unit.nedap.utils.speced.predicates]
+   [unit.nedap.utils.speced.spec-assertion]))
 
 (nodejs/enable-util-print!)
 
@@ -36,6 +37,7 @@
    'unit.nedap.utils.speced.defprotocol.nilable-specs
    'unit.nedap.utils.speced.defprotocol.type-hinting
    'unit.nedap.utils.speced.fn
-   'unit.nedap.utils.speced.predicates))
+   'unit.nedap.utils.speced.predicates
+   'unit.nedap.utils.speced.spec-assertion))
 
 (set! *main-cli-fn* -main)
