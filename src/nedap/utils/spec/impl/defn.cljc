@@ -13,14 +13,24 @@
     (->> args
          (remove symbol?) ;; plain args will be analyzed separately
          (walk/postwalk (fn [x]
-                          (when (symbol? x)
-                            (when-let [spec (some-> x
-                                                    meta
-                                                    (extract-specs-from-metadata clj?)
-                                                    (first)
-                                                    (assoc :arg x))]
-                              (swap! result conj spec)))
-                          x)))
+                          (let [is-symbol (symbol? x)]
+                            (when-not is-symbol
+                              (when-let [spec (some-> x
+                                                      meta
+                                                      (extract-specs-from-metadata clj?)
+                                                      (first))]
+                                (assert false (str "Only symbols can be attached spec metadata. Found spec: "
+                                                   (pr-str spec)
+                                                   " in form: "
+                                                   (pr-str x)))))
+                            (when is-symbol
+                              (when-let [spec (some-> x
+                                                      meta
+                                                      (extract-specs-from-metadata clj?)
+                                                      (first)
+                                                      (assoc :arg x))]
+                                (swap! result conj spec)))
+                            x))))
     @result))
 
 (defn maybe-type-hint-destructured-args
