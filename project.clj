@@ -1,4 +1,4 @@
-(defproject com.nedap.staffing-solutions/utils.spec "0.8.0"
+(defproject com.nedap.staffing-solutions/utils.spec "0.8.1"
   :description "clojure.spec utilities"
 
   :url "https://github.com/nedap/utils.spec"
