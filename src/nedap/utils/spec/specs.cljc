@@ -2,6 +2,7 @@
   "Specs for this library."
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
+   [nedap.utils.spec.doc :refer [doc-registry doc-registry-as-symbols]]
    [nedap.utils.spec.impl.def-with-doc #?(:clj :refer :cljs :refer-macros) [def-with-doc]]
    [nedap.utils.spec.impl.type-hinting :refer [type-hint?]]))
 
@@ -12,7 +13,9 @@
   (spec/and map?
             (partial some (fn [[k v]]
                             (and (qualified-keyword? k)
-                                 (true? v))))))
+                                 (true? v)))))
+  doc-registry
+  doc-registry-as-symbols)
 
 (def-with-doc ::explicit-format
   "Example: ^{::speced/spec ::foo}
@@ -20,7 +23,9 @@
 (i.e. using a :nedap.utils.speced/spec key, with an arbitrary spec as a value)"
   (spec/and map?
             (partial some (fn [[k v]]
-                            (= k :nedap.utils.speced/spec)))))
+                            (= k :nedap.utils.speced/spec))))
+  doc-registry
+  doc-registry-as-symbols)
 
 (def-with-doc ::type-hint
   "Example: ^Integer (class hint), ^double (primitive hint)
@@ -29,7 +34,9 @@
   (spec/and map?
             (partial some (fn [[k v]]
                             (and (= :tag k)
-                                 (type-hint? v))))))
+                                 (type-hint? v)))))
+  doc-registry
+  doc-registry-as-symbols)
 
 (def-with-doc ::inline-function
   "Example: ^boolean?
@@ -42,7 +49,9 @@ Else, the `:tag` metadata will be removed, so as to emit valid Clojure code."
   (spec/and map?
             (partial some (fn [[k v]]
                             (and (= :tag k)
-                                 (not (type-hint? v)))))))
+                                 (not (type-hint? v))))))
+  doc-registry
+  doc-registry-as-symbols)
 
 (def-with-doc ::spec-metadata
   "'Spec metadata' is metadata passed to this namespace's `#'defn` and `#'defprotocol`, in:
@@ -61,4 +70,6 @@ Else, the `:tag` metadata will be removed, so as to emit valid Clojure code."
   (spec/or :concise-format  ::concise-format
            :explicit-format ::explicit-format
            :type-hint       ::type-hint
-           :inline-function ::inline-function))
+           :inline-function ::inline-function)
+  doc-registry
+  doc-registry-as-symbols)

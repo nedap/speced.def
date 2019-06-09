@@ -2,9 +2,9 @@
   (:require
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]
-   [nedap.utils.speced :as speced]))
+   [nedap.utils.speced :as sut]))
 
-(speced/def-with-doc ::email "An email" string?)
+(sut/def-with-doc ::email "An email" string?)
 
 (def validation-failed #"Validation failed")
 
