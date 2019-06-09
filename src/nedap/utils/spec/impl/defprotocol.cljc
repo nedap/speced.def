@@ -21,7 +21,9 @@
 
 (spec/def ::method-name symbol?)
 (spec/def ::docstring string?)
-(spec/def ::args (spec/coll-of symbol? :kind vector :min-count 1))
+(spec/def ::arg (spec/and symbol?
+                          (complement #{'&})))
+(spec/def ::args (spec/coll-of ::arg :kind vector :min-count 1))
 
 (spec/def ::method (spec/and list?
                              (spec/cat :name      ::method-name
