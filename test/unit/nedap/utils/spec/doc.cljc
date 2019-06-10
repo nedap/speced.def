@@ -11,8 +11,8 @@
   (is (= "An email"
          (get @sut/doc-registry ::email))))
 
-(deftest doc-registry-as-symbols
+(deftest rebl-doc-registry
   (is (= "An email"
-         (-> @sut/doc-registry-as-symbols
+         (-> @sut/rebl-doc-registry
              (get `email)
              :docstring))))

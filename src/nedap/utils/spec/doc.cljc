@@ -14,11 +14,10 @@
                                             (let [k (keyword s)]
                                               (get @doc-registry k)))))
 
-(def doc-registry-as-symbols
-  "Like `#'doc-registry`, but keys are symbols instead of keywords.
-  Those symbols will map to REBL-friendly navigable objects.
+(def rebl-doc-registry
+  "Like `#'doc-registry`, but in a format that REBL can be navigate and render better.
 
-  In REBL, you can open `@doc-registry-as-symbols`,
-  and see all registered specs that have declared docstring."
+  In REBL, you can open `@rebl-doc-registry`,
+  and see all registered specs that have declared docstrings."
   (atom {} :validator (fn [x]
                         (check! (spec/map-of ::doc-registry-symbol some?) x))))

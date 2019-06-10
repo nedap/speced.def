@@ -11,7 +11,7 @@
    #?(:clj [nedap.utils.spec.impl.fn :as impl.fn] :cljs [nedap.utils.spec.impl.dummy :as impl.fn])
    [clojure.spec.alpha :as spec]
    [nedap.utils.spec.api :refer [check!]]
-   [nedap.utils.spec.doc :refer [doc-registry doc-registry-as-symbols]]
+   [nedap.utils.spec.doc :refer [doc-registry rebl-doc-registry]]
    [nedap.utils.spec.impl.def-with-doc]
    [nedap.utils.spec.impl.defn :as impl.defn]
    [nedap.utils.spec.impl.defprotocol]
@@ -29,7 +29,7 @@
                     string?            docstring
                     some?              spec)]}
      (let [ref `doc-registry
-           ref2 `doc-registry-as-symbols]
+           ref2 `rebl-doc-registry]
        `(nedap.utils.spec.impl.def-with-doc/def-with-doc ~spec-name ~docstring ~spec ~ref ~ref2))))
 
 (defmacro doc
