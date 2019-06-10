@@ -15,5 +15,4 @@
   (is (= "An email"
          (-> @sut/doc-registry-as-symbols
              (get `email)
-             meta
-             :doc))))
+             :docstring))))

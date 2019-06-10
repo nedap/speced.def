@@ -9,18 +9,16 @@
   (atom {} :validator (fn [x]
                         (check! (spec/map-of qualified-keyword? some?) x))))
 
+(spec/def ::doc-registry-symbol (spec/and qualified-symbol?
+                                          (fn [s]
+                                            (let [k (keyword s)]
+                                              (get @doc-registry k)))))
+
 (def doc-registry-as-symbols
   "Like `#'doc-registry`, but keys are symbols instead of keywords.
-  Those symbols will have `:doc` metadata attached to them.
+  Those symbols will map to REBL-friendly navigable objects.
 
-  Apt for REBL usage: you can open `@doc-registry-as-symbols`,
-  and see all registered specs that have declared docstring.
-
-  Given the REBL orientation, this is a set rather than an atom, so the collection will be rendered in a more compact format
-  (namely: only keys, instead of keys and values)"
-  (atom #{} :validator (fn [x]
-                         (check! (spec/coll-of (and qualified-symbol?
-                                                    (fn [s]
-                                                      (get @doc-registry (keyword s))))
-                                               :kind set?)
-                                 x))))
+  In REBL, you can open `@doc-registry-as-symbols`,
+  and see all registered specs that have declared docstring."
+  (atom {} :validator (fn [x]
+                        (check! (spec/map-of ::doc-registry-symbol some?) x))))
