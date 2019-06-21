@@ -20,7 +20,7 @@
 
   :dependencies [[com.nedap.staffing-solutions/utils.test "1.3.0"]
                  [expound "0.7.2"]
-                 [org.clojure/clojure "1.10.1-beta2"]
+                 [org.clojure/clojure "1.10.1"]
                  [org.clojure/spec.alpha "0.1.143"]
                  [spec-coerce "1.0.0-alpha9"]]
 

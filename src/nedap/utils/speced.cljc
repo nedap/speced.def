@@ -6,27 +6,38 @@
   That way, you will invoke e.g. `speced/defprotocol` which is clean and clear."
   (:refer-clojure :exclude [defn defprotocol fn satisfies?])
   (:require
+   #?(:clj [clojure.test :as test])
    #?(:clj [clojure.core.specs.alpha :as specs] :cljs [cljs.core.specs.alpha :as specs])
    #?(:clj [nedap.utils.spec.impl.fn :as impl.fn] :cljs [nedap.utils.spec.impl.dummy :as impl.fn])
    [clojure.spec.alpha :as spec]
    [nedap.utils.spec.api :refer [check!]]
+   [nedap.utils.spec.doc :refer [doc-registry rebl-doc-registry]]
    [nedap.utils.spec.impl.def-with-doc]
    [nedap.utils.spec.impl.defn :as impl.defn]
    [nedap.utils.spec.impl.defprotocol]
+   [nedap.utils.spec.impl.doc :as impl.doc]
    [nedap.utils.spec.impl.satisfies]
-   [nedap.utils.spec.impl.spec-assertion]
-   #?(:clj [clojure.test :as test]))
+   [nedap.utils.spec.impl.spec-assertion])
   #?(:cljs (:require-macros [nedap.utils.speced :refer [def-with-doc]])))
 
 #?(:clj
    (defmacro def-with-doc
      "Performs a plain `clojure.spec.alpha/def` with the given arguments.
-  The docstring argument is omitted. Its purpose is to show up for both human readers, and tooling."
+  The docstring will be registered to `#'doc-registry`, and will be returned by `#'nedap.utils.speced/doc`."
      [spec-name docstring spec]
      {:pre [(check! qualified-keyword? spec-name
                     string?            docstring
                     some?              spec)]}
-     `(nedap.utils.spec.impl.def-with-doc/def-with-doc ~spec-name ~docstring ~spec)))
+     (let [ref `doc-registry
+           ref2 `rebl-doc-registry]
+       `(nedap.utils.spec.impl.def-with-doc/def-with-doc ~spec-name ~docstring ~spec ~ref ~ref2))))
+
+(defmacro doc
+  "Like `clojure.repl/doc`, but also prints a spec's docstring (as per `#'def-with-doc`) if one existed."
+  [x]
+  (impl.doc/impl x
+                 (-> &env :ns nil?)
+                 doc-registry))
 
 #?(:clj
    (defmacro defprotocol
