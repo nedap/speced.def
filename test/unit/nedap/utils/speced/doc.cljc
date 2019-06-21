@@ -10,7 +10,10 @@
 
 (deftest doc
   (testing "The def-with-doc docstring appears"
-    (is (= (str "-------------------------\n:unit.nedap.utils.speced.doc/email\nSpec\n  string?\n\n"
+    (is (= (str "-------------------------\n"
+                ":unit.nedap.utils.speced.doc/email\n"
+                "Spec\n"
+                "  string?\n\n"
                 ;; the docstring:
                 "An email\n")
            (with-out-str

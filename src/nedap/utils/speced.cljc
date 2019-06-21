@@ -23,7 +23,7 @@
 #?(:clj
    (defmacro def-with-doc
      "Performs a plain `clojure.spec.alpha/def` with the given arguments.
-  The docstring will be registered to `#'doc-registry`, and will be returned by `#'doc`."
+  The docstring will be registered to `#'doc-registry`, and will be returned by `#'nedap.utils.speced/doc`."
      [spec-name docstring spec]
      {:pre [(check! qualified-keyword? spec-name
                     string?            docstring
