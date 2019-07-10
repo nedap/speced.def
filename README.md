@@ -7,7 +7,7 @@ Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 #### Coordinates
 
 ```clojure
-[com.nedap.staffing-solutions/utils.spec "0.8.2"]
+[com.nedap.staffing-solutions/utils.spec "0.9.0"]
 ```
 
 > Note that self-hosted ClojureScript (e.g. Lumo) is unsupported at the moment.
