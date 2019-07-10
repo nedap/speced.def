@@ -64,6 +64,10 @@ jobs:
           command: echo -e "$GPG_KEY_V2" | gpg --import
 
       - run:
+          name: Perform pre-release sanity check
+          command: lein with-profile -dev,+ci run -m nedap.ci.release-workflow.api sanity-check
+
+      - run:
           name: release to JFrog
           command: lein deploy
 
@@ -81,7 +85,7 @@ workflows:
             branches:
               only: /.*/
             tags:
-              only: /^v\d+\.\d+\.\d+(-[A-Z]*)*$/
+              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/ 
 
       - release:
           context: JFrog
@@ -91,4 +95,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^v\d+\.\d+\.\d+(-[A-Z]*)*$/
+              only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/ 
