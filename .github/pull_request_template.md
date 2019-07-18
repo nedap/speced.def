@@ -1,8 +1,14 @@
 ## Brief
 
+<!-- Which issue does this PR fix? Ideally, create an issue if there was none, so the problem in question is well stated. -->
+
 ## QA plan
 
+<!-- Please state a reproducible plan to prove this PR works. Attach screenshots, gifs, etc. if needed. Occasionally, sufficient test coverage removes the need for QAing. -->
+
 ## Author checklist
+
+<!-- Please, before publicizing your PR, open it as a "WIP PR", and then review it using the following. -->
 
 * [ ] I have QAed the functionality
 * [ ] The PR has a reasonably reviewable size and a meaningful commit history
@@ -17,6 +23,7 @@
   * [ ] Documentation
   * [ ] Security
   * [ ] Performance
+  * [ ] Breaking API changes
   * [ ] Cross-compatibility (Clojure/ClojureScript)
 
 ## Reviewer checklist
@@ -32,4 +39,5 @@
   * [ ] Documentation
   * [ ] Security
   * [ ] Performance
+  * [ ] Breaking API changes
   * [ ] Cross-compatibility (Clojure/ClojureScript)
