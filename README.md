@@ -1,4 +1,4 @@
-# nedap.utils.spec [![CircleCI](https://circleci.com/gh/nedap/utils.spec.svg?style=svg&circle-token=5895f9f338cb751d2c2e8a24844d82e21228190e)](https://circleci.com/gh/nedap/utils.spec)
+# nedap.speced.def [![CircleCI](https://circleci.com/gh/nedap/utils.spec.svg?style=svg&circle-token=5895f9f338cb751d2c2e8a24844d82e21228190e)](https://circleci.com/gh/nedap/utils.spec)
 
 Utilities for [clojure.spec](https://github.com/clojure/spec.alpha).
 
@@ -103,10 +103,10 @@ You can pass specs as part of any nested destructurings.
 
 There are exactly 4 namespaces meant for public consumption:
 
-* `nedap.utils.speced`: 'speced' forms of defprotocol, defn, fn, etc.
+* `nedap.speced.def`: 'speced' forms of defprotocol, defn, fn, etc.
 * `nedap.utils.spec.api`: various utility functions, most notably `check!`.
-* `nedap.utils.spec.predicates`: selected, generic predicates that you might find handy when specing things.
-* `nedap.utils.spec.doc`: a public docstring registry for specs. Can be queried from arbitrary tools, and particularly [REBL](https://github.com/cognitect-labs/REBL-distro).
+* `nedap.speced.def.predicates`: selected, generic predicates that you might find handy when specing things.
+* `nedap.speced.def.doc`: a public docstring registry for specs. Can be queried from arbitrary tools, and particularly [REBL](https://github.com/cognitect-labs/REBL-distro).
 
 They are deliberately thin so you can browse them comfortably.
 
