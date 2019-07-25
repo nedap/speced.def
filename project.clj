@@ -41,7 +41,7 @@
   ;; It also interferes with Cloverage.
 
   :cljsbuild {:builds {"test" {:source-paths ["src" "test"]
-                               :compiler     {:main          nedap.utils.spec.test-runner
+                               :compiler     {:main          nedap.speced.def.test-runner
                                               :output-to     "target/out/tests.js"
                                               :output-dir    "target/out"
                                               :target        :nodejs
@@ -62,7 +62,7 @@
                                        [com.taoensso/timbre "4.10.0"]
                                        [criterium "0.4.4"]
                                        [formatting-stack "0.19.3"
-                                        :exclusions [com.nedap.staffing-solutions/utils.spec
+                                        :exclusions [#_ com.nedap.staffing-solutions/utils.spec
                                                      rewrite-clj]]
                                        [lambdaisland/deep-diff "0.0-29"]
                                        [medley "1.1.0"]
@@ -87,4 +87,4 @@
              :ci       {:pedantic?    :abort
                         :jvm-opts     ["-Dclojure.main.report=stderr"]
                         :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.1.0"]]}})
+                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.2.0"]]}})
