@@ -1,7 +1,7 @@
 (ns nedap.speced.def.predicates
   (:require
-   [nedap.speced.def.impl.predicates :as impl]
    [nedap.speced.def :as speced]
+   [nedap.speced.def.impl.predicates :as impl]
    [spec-coerce.core :as spec-coerce]))
 
 (speced/defn ^boolean? neg-integer?

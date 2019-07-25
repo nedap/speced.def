@@ -3,10 +3,7 @@
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[com.nedap.staffing-solutions/utils.spec "1.0.0-alpha2"]
                  [com.nedap.staffing-solutions/utils.test "1.3.0"]
-                 [expound "0.7.2"]
-                 [org.clojure/clojure "1.10.1"]
-                 [org.clojure/spec.alpha "0.2.176"]
-                 [spec-coerce "1.0.0-alpha9"]]
+                 [org.clojure/clojure "1.10.1"]]
 
   :description "clojure.spec utilities"
 
@@ -62,9 +59,8 @@
                                        [com.stuartsierra/component "0.4.0"]
                                        [com.taoensso/timbre "4.10.0"]
                                        [criterium "0.4.4"]
-                                       [formatting-stack "0.19.3"
-                                        :exclusions [#_ com.nedap.staffing-solutions/utils.spec
-                                                     rewrite-clj]]
+                                       [formatting-stack "1.0.0-alpha1"
+                                        :exclusions [rewrite-clj]]
                                        [lambdaisland/deep-diff "0.0-29"]
                                        [medley "1.1.0"]
                                        [org.clojure/core.async "0.4.490"]
@@ -88,6 +84,4 @@
              :ci       {:pedantic?    :abort
                         :jvm-opts     ["-Dclojure.main.report=stderr"]
                         :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.2.0"]
-                                       ;; XXX remove later
-                                       [com.nedap.staffing-solutions/utils.spec "0.9.0"]]}})
+                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.3.0-alpha2"]]}})
