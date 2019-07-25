@@ -101,11 +101,9 @@ You can pass specs as part of any nested destructurings.
 
 ## ns organisation
 
-There are exactly 4 namespaces meant for public consumption:
+There are exactly 2 namespaces meant for public consumption:
 
 * `nedap.speced.def`: 'speced' forms of defprotocol, defn, fn, etc.
-* `nedap.utils.spec.api`: various utility functions, most notably `check!`.
-* `nedap.speced.def.predicates`: selected, generic predicates that you might find handy when specing things.
 * `nedap.speced.def.doc`: a public docstring registry for specs. Can be queried from arbitrary tools, and particularly [REBL](https://github.com/cognitect-labs/REBL-distro).
 
 They are deliberately thin so you can browse them comfortably.
