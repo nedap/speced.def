@@ -88,4 +88,6 @@
              :ci       {:pedantic?    :abort
                         :jvm-opts     ["-Dclojure.main.report=stderr"]
                         :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.2.0"]]}})
+                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.2.0"]
+                                       ;; XXX remove later
+                                       [com.nedap.staffing-solutions/utils.spec "0.9.0"]]}})
