@@ -71,7 +71,7 @@ You can pass specs as part of any nested destructurings.
   * No IDE pains, nothing new to learn, trivial upgradeability from old `defn`s
   * Things like N-arities are supported.
 * Multiple metadata-based 'syntaxes'
-  * [Descriptions/examples](https://github.com/nedap/speced.def/blob/master/src/nedap/speced/def/specs.clj)
+  * [Descriptions/examples](https://github.com/nedap/speced.def/blob/master/src/nedap/speced/def/specs.cljc)
   * All of them clean: no ns pollution, no overly-concise names
 * Type hints become specs
   *  e.g.`^Boolean x` is analog to `^boolean? x`
@@ -90,7 +90,7 @@ You can pass specs as part of any nested destructurings.
     * **speced.def** abstracts over that, allowing you to write them wherever you please.
 * `speced/def-with-doc`: `clojure.spec.alpha/def` with a docstring
   * It will show up in `speced/doc`, along with the spec itself
-  * It also will show up in [REBL](https://github.com/cognitect-labs/REBL-distro)
+  * It also will show up in [REBL](https://github.com/cognitect-labs/REBL-distro).
 
 ## Status and roadmap
 
