@@ -1,15 +1,13 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject com.nedap.staffing-solutions/utils.spec "0.9.0"
+(defproject com.nedap.staffing-solutions/speced.def "1.0.0-alpha5"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[com.nedap.staffing-solutions/utils.test "1.3.0"]
-                 [expound "0.7.2"]
-                 [org.clojure/clojure "1.10.1"]
-                 [org.clojure/spec.alpha "0.2.176"]
-                 [spec-coerce "1.0.0-alpha9"]]
+  :dependencies [[com.nedap.staffing-solutions/utils.spec "1.0.0-alpha2"]
+                 [com.nedap.staffing-solutions/utils.test "1.3.0"]
+                 [org.clojure/clojure "1.10.1"]]
 
-  :description "clojure.spec utilities"
+  :description "spec-backed forms of `defn`, `defprotocol`, `fn`, etc, using the same exact syntax than clojure.core's, aided by metadata."
 
-  :url "https://github.com/nedap/utils.spec"
+  :url "https://github.com/nedap/speced.def"
 
   :min-lein-version "2.0.0"
 
@@ -41,7 +39,7 @@
   ;; It also interferes with Cloverage.
 
   :cljsbuild {:builds {"test" {:source-paths ["src" "test"]
-                               :compiler     {:main          nedap.utils.spec.test-runner
+                               :compiler     {:main          nedap.speced.def.test-runner
                                               :output-to     "target/out/tests.js"
                                               :output-dir    "target/out"
                                               :target        :nodejs
@@ -61,9 +59,8 @@
                                        [com.stuartsierra/component "0.4.0"]
                                        [com.taoensso/timbre "4.10.0"]
                                        [criterium "0.4.4"]
-                                       [formatting-stack "0.19.3"
-                                        :exclusions [com.nedap.staffing-solutions/utils.spec
-                                                     rewrite-clj]]
+                                       [formatting-stack "1.0.0-alpha2"
+                                        :exclusions [rewrite-clj]]
                                        [lambdaisland/deep-diff "0.0-29"]
                                        [medley "1.1.0"]
                                        [org.clojure/core.async "0.4.490"]
@@ -87,4 +84,4 @@
              :ci       {:pedantic?    :abort
                         :jvm-opts     ["-Dclojure.main.report=stderr"]
                         :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.1.0"]]}})
+                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.3.0-alpha2"]]}})

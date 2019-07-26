@@ -1,43 +1,39 @@
-(ns nedap.utils.spec.test-runner
+(ns nedap.speced.def.test-runner
   (:require
    [cljs.nodejs :as nodejs]
    [cljs.test :refer-macros [run-tests]]
-   [unit.nedap.utils.api]
-   [unit.nedap.utils.speced.def-with-doc]
-   [unit.nedap.utils.speced.defn]
-   [unit.nedap.utils.speced.defn.destructuring]
-   [unit.nedap.utils.speced.defn.nilable-specs]
-   [unit.nedap.utils.speced.defn.parsing]
-   [unit.nedap.utils.speced.defn.pre-post]
-   [unit.nedap.utils.speced.defprotocol]
-   [unit.nedap.utils.speced.defprotocol.explicit-specs]
-   [unit.nedap.utils.speced.defprotocol.inline-function-specs]
-   [unit.nedap.utils.speced.defprotocol.multiple-arities]
-   [unit.nedap.utils.speced.defprotocol.nilable-specs]
-   [unit.nedap.utils.speced.defprotocol.type-hinting]
-   [unit.nedap.utils.speced.fn]
-   [unit.nedap.utils.speced.predicates]
-   [unit.nedap.utils.speced.spec-assertion]))
+   [unit.nedap.speced.def.def-with-doc]
+   [unit.nedap.speced.def.defn]
+   [unit.nedap.speced.def.defn.destructuring]
+   [unit.nedap.speced.def.defn.nilable-specs]
+   [unit.nedap.speced.def.defn.parsing]
+   [unit.nedap.speced.def.defn.pre-post]
+   [unit.nedap.speced.def.defprotocol]
+   [unit.nedap.speced.def.defprotocol.explicit-specs]
+   [unit.nedap.speced.def.defprotocol.inline-function-specs]
+   [unit.nedap.speced.def.defprotocol.multiple-arities]
+   [unit.nedap.speced.def.defprotocol.nilable-specs]
+   [unit.nedap.speced.def.defprotocol.type-hinting]
+   [unit.nedap.speced.def.fn]
+   [unit.nedap.speced.def.spec-assertion]))
 
 (nodejs/enable-util-print!)
 
 (defn -main []
   (run-tests
-   'unit.nedap.utils.api
-   'unit.nedap.utils.speced.def-with-doc
-   'unit.nedap.utils.speced.defn
-   'unit.nedap.utils.speced.defn.destructuring
-   'unit.nedap.utils.speced.defn.nilable-specs
-   'unit.nedap.utils.speced.defn.parsing
-   'unit.nedap.utils.speced.defn.pre-post
-   'unit.nedap.utils.speced.defprotocol
-   'unit.nedap.utils.speced.defprotocol.explicit-specs
-   'unit.nedap.utils.speced.defprotocol.inline-function-specs
-   'unit.nedap.utils.speced.defprotocol.multiple-arities
-   'unit.nedap.utils.speced.defprotocol.nilable-specs
-   'unit.nedap.utils.speced.defprotocol.type-hinting
-   'unit.nedap.utils.speced.fn
-   'unit.nedap.utils.speced.predicates
-   'unit.nedap.utils.speced.spec-assertion))
+   'unit.nedap.speced.def.def-with-doc
+   'unit.nedap.speced.def.defn
+   'unit.nedap.speced.def.defn.destructuring
+   'unit.nedap.speced.def.defn.nilable-specs
+   'unit.nedap.speced.def.defn.parsing
+   'unit.nedap.speced.def.defn.pre-post
+   'unit.nedap.speced.def.defprotocol
+   'unit.nedap.speced.def.defprotocol.explicit-specs
+   'unit.nedap.speced.def.defprotocol.inline-function-specs
+   'unit.nedap.speced.def.defprotocol.multiple-arities
+   'unit.nedap.speced.def.defprotocol.nilable-specs
+   'unit.nedap.speced.def.defprotocol.type-hinting
+   'unit.nedap.speced.def.fn
+   'unit.nedap.speced.def.spec-assertion))
 
 (set! *main-cli-fn* -main)
