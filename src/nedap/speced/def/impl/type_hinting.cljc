@@ -83,8 +83,9 @@
 (defn cljs-type-hint? [x]
   (or (and (symbol? x)
            (or (-> x str (string/starts-with? "js/"))
-               (let [c (-> x name first)]
-                 (= c #?(:clj  (-> ^Character c Character/toUpperCase)
+               (let [#?(:clj  ^Character c
+                        :cljs c) (-> x name first)]
+                 (= c #?(:clj  (-> c Character/toUpperCase)
                          :cljs (-> c .toUpperCase))))))
       (#{'boolean 'string 'number} x)))
 
@@ -96,6 +97,7 @@
 
   ([x clj?]
    (assert (not= *ns* this-ns) "For an accurate `resolve` call (see `#'clj-type-hint?`).")
+   (assert (boolean? clj?))
    #?(:clj  (if clj?
               (clj-type-hint? x)
               (cljs-type-hint? x))

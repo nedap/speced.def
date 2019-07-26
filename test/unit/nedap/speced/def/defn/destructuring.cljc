@@ -108,16 +108,22 @@
                                                temperature
 
                                                (fn [x]
-                                                 (clojure.core/instance? java.lang.Long x))
+                                                 (if (clojure.core/class? java.lang.Long)
+                                                   (clojure.core/instance? java.lang.Long x)
+                                                   (clojure.core/satisfies? java.lang.Long x)))
                                                length
 
                                                (fn [x]
-                                                 (clojure.core/instance? String x))
+                                                 (if (clojure.core/class? String)
+                                                   (clojure.core/instance? String x)
+                                                   (clojure.core/satisfies? String x)))
                                                name
 
                                                (clojure.spec.alpha/and boolean?
                                                                        (fn [x]
-                                                                         (clojure.core/instance? java.lang.Boolean x)))
+                                                                         (if (clojure.core/class? java.lang.Boolean)
+                                                                           (clojure.core/instance? java.lang.Boolean x)
+                                                                           (clojure.core/satisfies? java.lang.Boolean x))))
                                                cool?)],
                                        :post []}
                                       [age temperature length name cool?])))
@@ -134,18 +140,24 @@
                                                temperature
 
                                                (fn [x]
-                                                 (clojure.core/instance? java.lang.Long x))
+                                                 (if (clojure.core/class? java.lang.Long)
+                                                   (clojure.core/instance? java.lang.Long x)
+                                                   (clojure.core/satisfies? java.lang.Long x)))
                                                length
 
                                                (fn [x]
-                                                 (clojure.core/instance? String x))
+                                                 (if (clojure.core/class? String)
+                                                   (clojure.core/instance? String x)
+                                                   (clojure.core/satisfies? String x)))
                                                name
 
                                                (clojure.spec.alpha/and
                                                 boolean?
 
                                                 (fn [x]
-                                                  (clojure.core/instance? java.lang.Boolean x)))
+                                                  (if (clojure.core/class? java.lang.Boolean)
+                                                    (clojure.core/instance? java.lang.Boolean x)
+                                                    (clojure.core/satisfies? java.lang.Boolean x))))
                                                cool?)],
                                        :post []}
                                       [age temperature length name cool?])
@@ -160,16 +172,22 @@
                                                temperature
 
                                                (fn [x]
-                                                 (clojure.core/instance? java.lang.Long x))
+                                                 (if (clojure.core/class? java.lang.Long)
+                                                   (clojure.core/instance? java.lang.Long x)
+                                                   (clojure.core/satisfies? java.lang.Long x)))
                                                length
 
                                                (fn [x]
-                                                 (clojure.core/instance? String x))
+                                                 (if (clojure.core/class? String)
+                                                   (clojure.core/instance? String x)
+                                                   (clojure.core/satisfies? String x)))
                                                name
 
                                                (clojure.spec.alpha/and boolean?
                                                                        (fn [x]
-                                                                         (clojure.core/instance? java.lang.Boolean x)))
+                                                                         (if (clojure.core/class? java.lang.Boolean)
+                                                                           (clojure.core/instance? java.lang.Boolean x)
+                                                                           (clojure.core/satisfies? java.lang.Boolean x))))
                                                cool?)],
                                        :post []}
                                       [cool? name length temperature age])))))))

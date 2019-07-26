@@ -20,22 +20,24 @@
                                                    :type-annotation nil
                                                    :arg             'b}]
         '[a & [^String b]]                       [{:spec            '(fn [x]
-                                                                       (clojure.core/instance? String x)),
+                                                                       (if (clojure.core/class? String)
+                                                                         (clojure.core/instance? String x)
+                                                                         (clojure.core/satisfies? String x))),
                                                    :type-annotation java.lang.String
                                                    :arg             'b}]
         '[a {:keys [^string? b]}]                [{:spec            (list 'clojure.spec.alpha/and 'string?
                                                                           (list 'fn ['x]
-                                                                                (list 'clojure.core/instance?
-                                                                                      'java.lang.String
-                                                                                      'x))),
+                                                                                '(if (clojure.core/class? java.lang.String)
+                                                                                   (clojure.core/instance? java.lang.String x)
+                                                                                   (clojure.core/satisfies? java.lang.String x)))),
                                                    :type-annotation java.lang.String,
                                                    :was-primitive?  false
                                                    :arg             'b}]
         '[a & [{{{[e ^string? f g] :d} :c} :b}]] [{:spec            (list 'clojure.spec.alpha/and 'string?
                                                                           (list 'fn ['x]
-                                                                                (list 'clojure.core/instance?
-                                                                                      'java.lang.String
-                                                                                      'x))),
+                                                                                '(if (clojure.core/class? java.lang.String)
+                                                                                   (clojure.core/instance? java.lang.String x)
+                                                                                   (clojure.core/satisfies? java.lang.String x)))),
                                                    :type-annotation java.lang.String,
                                                    :was-primitive?  false
                                                    :arg             'f}]))
@@ -103,3 +105,38 @@
       #{'a} [{:keys [(with-meta 'a {:tag 'cljs.core/string?})]}] [{:keys [(with-meta 'a {:tag 'cljs.core/string?})]}]
 
       #{}   [{:keys [(with-meta 'a {:tag 'cljs.core/string?})]}] [{:keys [(with-meta 'a {:tag 'string})]}])))
+
+(deftest consistent-tagging?
+  (testing "clj"
+    (are [ann tails expected] (binding [sut/*clj?* true]
+                                (= expected
+                                   (sut/consistent-tagging? ann tails true)))
+      String []                             true
+      nil    []                             true
+      String ['([])]                        true
+      nil    ['([])]                        true
+      String ['(^String [])]                true
+      Long   ['(^Long [])]                  true
+      nil    ['(^String [])]                true
+      String ['(^Long [])]                  false
+      String ['(^String []) '(^String [a])] true
+      nil    ['(^String []) '(^String [a])] true
+      nil    ['(^String []) '([a])]         true
+      String ['(^String []) '(^Long [a])]   false))
+
+  (testing "cljs"
+    (are [ann tails expected] (binding [sut/*clj?* false]
+                                (= expected
+                                   (sut/consistent-tagging? ann tails false)))
+      'string []                             true
+      nil     []                             true
+      'string ['([])]                        true
+      nil     ['([])]                        true
+      'string ['(^string [])]                true
+      'long   ['(^string [])]                false
+      nil     ['(^string [])]                true
+      'string ['(^number [])]                false
+      'string ['(^string []) '(^string [a])] true
+      nil     ['(^string []) '(^string [a])] true
+      nil     ['(^string []) '([a])]         true
+      'string ['(^string []) '(^number [a])] false)))

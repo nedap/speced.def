@@ -6,11 +6,17 @@
    [nedap.speced.def.specs :as specs]
    [nedap.utils.spec.impl.check #?(:clj :refer :cljs :refer-macros) [check!]]))
 
-(defn proper-spec-metadata? [metadata-map extracted-specs]
-  (case (-> extracted-specs count)
-    0 true
-    1 (check! ::specs/spec-metadata metadata-map)
-    false))
+(defn proper-spec-metadata? [clj? metadata-map extracted-specs]
+  (binding [specs/*clj?* clj?]
+    (case (-> extracted-specs count)
+      0 true
+      1 (and (check! ::specs/spec-metadata metadata-map)
+             (check! (fn [{:keys [type-annotation]}]
+                       (if clj?
+                         true
+                         (not (-> type-annotation str (string/starts-with? "js/")))))
+                     (first extracted-specs)))
+      false)))
 
 (def nilable :nedap.speced.def/nilable)
 
@@ -31,7 +37,9 @@
   (when-not (primitive? class clj?)
     (if clj?
       (list 'fn ['x]
-            (list 'clojure.core/instance? class 'x))
+            (list 'if (list 'clojure.core/class? class)
+                  (list 'clojure.core/instance? class 'x)
+                  (list 'clojure.core/satisfies? class 'x)))
       ;; Don't use `cljs.core/instance?`! https://dev.clojure.org/jira/browse/CLJS-98
       (list 'cljs.spec.alpha/or
             :class-instance    (list 'fn ['x]
@@ -184,7 +192,7 @@
                   #{0 1}              (->> metadata-map
                                            (filter spec-directive?)
                                            (count)))]
-   :post [(check! (partial proper-spec-metadata? metadata-map) %)]}
+   :post [(check! (partial proper-spec-metadata? clj? metadata-map) %)]}
   (let [metadata-map (cond-> metadata-map
                        (-> metadata-map :tag #?(:clj  class?
                                                 :cljs fail)) (update :tag class->symbol))
@@ -215,7 +223,8 @@
                     {:spec            (instance-spec clj? v)
                      :type-annotation (if clj?
                                         #?(:clj (resolve v) :cljs (assert false))
-                                        v)}
+                                        (or (some->> v (infer-spec-from-symbol clj?) :type-annotation)
+                                            v))}
 
                     (and (#{:tag} k)
                          (not (type-hint? v clj?)))

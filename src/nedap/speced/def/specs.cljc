@@ -6,6 +6,8 @@
    [nedap.speced.def.impl.def-with-doc #?(:clj :refer :cljs :refer-macros) [def-with-doc]]
    [nedap.speced.def.impl.type-hinting :refer [type-hint?]]))
 
+(def ^:dynamic *clj?* nil)
+
 (def-with-doc ::concise-format
   "Example: ^::foo
 
@@ -33,8 +35,9 @@
 (i.e. a regular Clojure/ClojureScript type hint, from which a spec and efficient code will be emitted)"
   (spec/and map?
             (partial some (fn [[k v]]
+                            {:pre [(boolean? *clj?*)]}
                             (and (= :tag k)
-                                 (type-hint? v)))))
+                                 (type-hint? v *clj?*)))))
   doc-registry
   rebl-doc-registry)
 

@@ -1,27 +1,49 @@
 (ns unit.nedap.speced.def.impl.parsing
   (:require
    [clojure.spec.alpha :as spec]
-   [clojure.test :refer [are deftest testing]]
+   [clojure.string :as string]
+   [clojure.test :refer :all]
    [nedap.speced.def :as speced]
    [nedap.speced.def.impl.parsing :as sut]))
+
+(deftest proper-spec-metadata?
+  (with-out-str
+    (testing "clj"
+      (are [metadata-map extracted-specs expected] (= expected
+                                                      (sut/proper-spec-metadata? true metadata-map extracted-specs))
+        {:tag String} (list {:type-annotation String}) true))
+
+    (testing "cljs"
+      (are [metadata-map extracted-specs expected] (try
+                                                     (= expected
+                                                        (sut/proper-spec-metadata? false metadata-map extracted-specs))
+                                                     (catch clojure.lang.ExceptionInfo e
+                                                       (is (-> e .getMessage (string/starts-with? "Validation failed")))
+                                                       (not expected)))
+        {:tag 'js/String} (list {:type-annotation 'string})    true
+        {:tag 'js/String} (list {:type-annotation 'js/String}) false))))
 
 (spec/def ::number number?)
 
 (deftest extract-specs-from-metadata
-
   (testing "clj"
     (are [input expected] (= expected
                              (sut/extract-specs-from-metadata input true))
 
       {:tag Number}           (list {:spec            (list 'fn ['x]
-                                                            (list `instance? 'java.lang.Number 'x))
+                                                            '(if (clojure.core/class? java.lang.Number)
+                                                               (clojure.core/instance? java.lang.Number x)
+                                                               (clojure.core/satisfies? java.lang.Number x)))
+
                                      :type-annotation java.lang.Number})
 
       {:tag             Number
 
        ::speced/nilable true} (list {:spec            (list 'clojure.spec.alpha/nilable
                                                             (list 'fn ['x]
-                                                                  (list `instance? 'java.lang.Number 'x)))
+                                                                  '(if (clojure.core/class? java.lang.Number)
+                                                                     (clojure.core/instance? java.lang.Number x)
+                                                                     (clojure.core/satisfies? java.lang.Number x))))
                                      :type-annotation java.lang.Number})
 
       {:tag ::number}         (list {:spec            ::number
@@ -35,7 +57,9 @@
                                      (list 'clojure.spec.alpha/and
                                            `number?
                                            (list 'fn ['x]
-                                                 (list `instance? 'java.lang.Number 'x)))
+                                                 '(if (clojure.core/class? java.lang.Number)
+                                                    (clojure.core/instance? java.lang.Number x)
+                                                    (clojure.core/satisfies? java.lang.Number x))))
                                      :type-annotation java.lang.Number
                                      :was-primitive?  false})
 
@@ -45,7 +69,9 @@
                                            (list 'clojure.spec.alpha/and
                                                  `number?
                                                  (list 'fn ['x]
-                                                       (list `instance? 'java.lang.Number 'x))))
+                                                       '(if (clojure.core/class? java.lang.Number)
+                                                          (clojure.core/instance? java.lang.Number x)
+                                                          (clojure.core/satisfies? java.lang.Number x)))))
                                      :type-annotation java.lang.Number
                                      :was-primitive?  false})))
 
@@ -60,7 +86,7 @@
                                                    :protocol-instance
                                                    (fn [x]
                                                      (cljs.core/satisfies? js/Number x)))
-                                 :type-annotation js/Number})
+                                 :type-annotation number})
 
       {:tag             'js/Number
        ::speced/nilable true} '({:spec            (cljs.spec.alpha/nilable
@@ -71,7 +97,7 @@
                                                     :protocol-instance
                                                     (fn [x]
                                                       (cljs.core/satisfies? js/Number x))))
-                                 :type-annotation js/Number})
+                                 :type-annotation number})
 
       {:tag ::number}         (list {:spec            ::number
                                      :type-annotation nil})
@@ -96,7 +122,10 @@
     (are [input expected] (= expected
                              (sut/infer-spec-from-symbol true input))
       'clojure.core/string? {:spec            '(clojure.spec.alpha/and clojure.core/string?
-                                                                       (fn [x] (clojure.core/instance? java.lang.String x))),
+                                                                       (fn [x]
+                                                                         (if (clojure.core/class? java.lang.String)
+                                                                           (clojure.core/instance? java.lang.String x)
+                                                                           (clojure.core/satisfies? java.lang.String x)))),
                              :type-annotation java.lang.String,
                              :was-primitive?  false}
       'string               nil))
