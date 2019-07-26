@@ -59,7 +59,7 @@
                                        [com.stuartsierra/component "0.4.0"]
                                        [com.taoensso/timbre "4.10.0"]
                                        [criterium "0.4.4"]
-                                       [formatting-stack "1.0.0-alpha2"
+                                       [formatting-stack "1.0.0-alpha3"
                                         :exclusions [rewrite-clj]]
                                        [lambdaisland/deep-diff "0.0-29"]
                                        [medley "1.1.0"]
@@ -84,4 +84,4 @@
              :ci       {:pedantic?    :abort
                         :jvm-opts     ["-Dclojure.main.report=stderr"]
                         :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.3.0-alpha2"]]}})
+                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.3.0-alpha3"]]}})
