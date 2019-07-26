@@ -1,14 +1,31 @@
 (ns unit.nedap.speced.def.impl.parsing
   (:require
    [clojure.spec.alpha :as spec]
-   [clojure.test :refer [are deftest testing]]
+   [clojure.string :as string]
+   [clojure.test :refer :all]
    [nedap.speced.def :as speced]
    [nedap.speced.def.impl.parsing :as sut]))
+
+(deftest proper-spec-metadata?
+  (with-out-str
+    (testing "clj"
+      (are [metadata-map extracted-specs expected] (= expected
+                                                      (sut/proper-spec-metadata? true metadata-map extracted-specs))
+        {:tag String} (list {:type-annotation String}) true))
+
+    (testing "cljs"
+      (are [metadata-map extracted-specs expected] (try
+                                                     (= expected
+                                                        (sut/proper-spec-metadata? false metadata-map extracted-specs))
+                                                     (catch clojure.lang.ExceptionInfo e
+                                                       (is (-> e .getMessage (string/starts-with? "Validation failed")))
+                                                       (not expected)))
+        {:tag 'js/String} (list {:type-annotation 'string})    true
+        {:tag 'js/String} (list {:type-annotation 'js/String}) false))))
 
 (spec/def ::number number?)
 
 (deftest extract-specs-from-metadata
-
   (testing "clj"
     (are [input expected] (= expected
                              (sut/extract-specs-from-metadata input true))
@@ -69,7 +86,7 @@
                                                    :protocol-instance
                                                    (fn [x]
                                                      (cljs.core/satisfies? js/Number x)))
-                                 :type-annotation js/Number})
+                                 :type-annotation number})
 
       {:tag             'js/Number
        ::speced/nilable true} '({:spec            (cljs.spec.alpha/nilable
@@ -80,7 +97,7 @@
                                                     :protocol-instance
                                                     (fn [x]
                                                       (cljs.core/satisfies? js/Number x))))
-                                 :type-annotation js/Number})
+                                 :type-annotation number})
 
       {:tag ::number}         (list {:spec            ::number
                                      :type-annotation nil})
