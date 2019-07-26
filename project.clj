@@ -5,9 +5,9 @@
                  [com.nedap.staffing-solutions/utils.test "1.3.0"]
                  [org.clojure/clojure "1.10.1"]]
 
-  :description "clojure.spec utilities"
+  :description "spec-backed forms of `defn`, `defprotocol`, `fn`, etc, using the same exact syntax than clojure.core's, aided by metadata."
 
-  :url "https://github.com/nedap/utils.spec"
+  :url "https://github.com/nedap/speced.def"
 
   :min-lein-version "2.0.0"
 
