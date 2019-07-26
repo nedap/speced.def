@@ -20,22 +20,24 @@
                                                    :type-annotation nil
                                                    :arg             'b}]
         '[a & [^String b]]                       [{:spec            '(fn [x]
-                                                                       (clojure.core/instance? String x)),
+                                                                       (if (clojure.core/class? String)
+                                                                         (clojure.core/instance? String x)
+                                                                         (clojure.core/satisfies? String x))),
                                                    :type-annotation java.lang.String
                                                    :arg             'b}]
         '[a {:keys [^string? b]}]                [{:spec            (list 'clojure.spec.alpha/and 'string?
                                                                           (list 'fn ['x]
-                                                                                (list 'clojure.core/instance?
-                                                                                      'java.lang.String
-                                                                                      'x))),
+                                                                                '(if (clojure.core/class? java.lang.String)
+                                                                                   (clojure.core/instance? java.lang.String x)
+                                                                                   (clojure.core/satisfies? java.lang.String x)))),
                                                    :type-annotation java.lang.String,
                                                    :was-primitive?  false
                                                    :arg             'b}]
         '[a & [{{{[e ^string? f g] :d} :c} :b}]] [{:spec            (list 'clojure.spec.alpha/and 'string?
                                                                           (list 'fn ['x]
-                                                                                (list 'clojure.core/instance?
-                                                                                      'java.lang.String
-                                                                                      'x))),
+                                                                                '(if (clojure.core/class? java.lang.String)
+                                                                                   (clojure.core/instance? java.lang.String x)
+                                                                                   (clojure.core/satisfies? java.lang.String x)))),
                                                    :type-annotation java.lang.String,
                                                    :was-primitive?  false
                                                    :arg             'f}]))

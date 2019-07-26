@@ -14,14 +14,19 @@
                              (sut/extract-specs-from-metadata input true))
 
       {:tag Number}           (list {:spec            (list 'fn ['x]
-                                                            (list `instance? 'java.lang.Number 'x))
+                                                            '(if (clojure.core/class? java.lang.Number)
+                                                               (clojure.core/instance? java.lang.Number x)
+                                                               (clojure.core/satisfies? java.lang.Number x)))
+
                                      :type-annotation java.lang.Number})
 
       {:tag             Number
 
        ::speced/nilable true} (list {:spec            (list 'clojure.spec.alpha/nilable
                                                             (list 'fn ['x]
-                                                                  (list `instance? 'java.lang.Number 'x)))
+                                                                  '(if (clojure.core/class? java.lang.Number)
+                                                                     (clojure.core/instance? java.lang.Number x)
+                                                                     (clojure.core/satisfies? java.lang.Number x))))
                                      :type-annotation java.lang.Number})
 
       {:tag ::number}         (list {:spec            ::number
@@ -35,7 +40,9 @@
                                      (list 'clojure.spec.alpha/and
                                            `number?
                                            (list 'fn ['x]
-                                                 (list `instance? 'java.lang.Number 'x)))
+                                                 '(if (clojure.core/class? java.lang.Number)
+                                                    (clojure.core/instance? java.lang.Number x)
+                                                    (clojure.core/satisfies? java.lang.Number x))))
                                      :type-annotation java.lang.Number
                                      :was-primitive?  false})
 
@@ -45,7 +52,9 @@
                                            (list 'clojure.spec.alpha/and
                                                  `number?
                                                  (list 'fn ['x]
-                                                       (list `instance? 'java.lang.Number 'x))))
+                                                       '(if (clojure.core/class? java.lang.Number)
+                                                          (clojure.core/instance? java.lang.Number x)
+                                                          (clojure.core/satisfies? java.lang.Number x)))))
                                      :type-annotation java.lang.Number
                                      :was-primitive?  false})))
 
@@ -96,7 +105,10 @@
     (are [input expected] (= expected
                              (sut/infer-spec-from-symbol true input))
       'clojure.core/string? {:spec            '(clojure.spec.alpha/and clojure.core/string?
-                                                                       (fn [x] (clojure.core/instance? java.lang.String x))),
+                                                                       (fn [x]
+                                                                         (if (clojure.core/class? java.lang.String)
+                                                                           (clojure.core/instance? java.lang.String x)
+                                                                           (clojure.core/satisfies? java.lang.String x)))),
                              :type-annotation java.lang.String,
                              :was-primitive?  false}
       'string               nil))

@@ -124,17 +124,23 @@
                                                      temperature
 
                                                      (fn [x]
-                                                       (clojure.core/instance? java.lang.Long x))
+                                                       (if (clojure.core/class? java.lang.Long)
+                                                         (clojure.core/instance? java.lang.Long x)
+                                                         (clojure.core/satisfies? java.lang.Long x)))
                                                      length
 
                                                      (fn [x]
-                                                       (clojure.core/instance? String x))
+                                                       (if (clojure.core/class? String)
+                                                         (clojure.core/instance? String x)
+                                                         (clojure.core/satisfies? String x)))
                                                      name
 
                                                      (clojure.spec.alpha/and
                                                       boolean?
                                                       (fn [x]
-                                                        (clojure.core/instance? java.lang.Boolean x)))
+                                                        (if (clojure.core/class? java.lang.Boolean)
+                                                          (clojure.core/instance? java.lang.Boolean x)
+                                                          (clojure.core/satisfies? java.lang.Boolean x))))
                                                      cool?))
                                                    (clojure.core/let [% [age temperature length name cool?]]
                                                      %))))
@@ -153,17 +159,23 @@
                                                      temperature
 
                                                      (fn [x]
-                                                       (clojure.core/instance? java.lang.Long x))
+                                                       (if (clojure.core/class? java.lang.Long)
+                                                         (clojure.core/instance? java.lang.Long x)
+                                                         (clojure.core/satisfies? java.lang.Long x)))
                                                      length
 
                                                      (fn [x]
-                                                       (clojure.core/instance? String x))
+                                                       (if (clojure.core/class? String)
+                                                         (clojure.core/instance? String x)
+                                                         (clojure.core/satisfies? String x)))
                                                      name
 
                                                      (clojure.spec.alpha/and
                                                       boolean?
                                                       (fn [x]
-                                                        (clojure.core/instance? java.lang.Boolean x)))
+                                                        (if (clojure.core/class? java.lang.Boolean)
+                                                          (clojure.core/instance? java.lang.Boolean x)
+                                                          (clojure.core/satisfies? java.lang.Boolean x))))
                                                      cool?))
                                                    (clojure.core/let [% [age temperature length name cool?]]
                                                      %)))
@@ -182,17 +194,23 @@
                                                      temperature
 
                                                      (fn [x]
-                                                       (clojure.core/instance? java.lang.Long x))
+                                                       (if (clojure.core/class? java.lang.Long)
+                                                         (clojure.core/instance? java.lang.Long x)
+                                                         (clojure.core/satisfies? java.lang.Long x)))
                                                      length
 
                                                      (fn [x]
-                                                       (clojure.core/instance? String x))
+                                                       (if (clojure.core/class? String)
+                                                         (clojure.core/instance? String x)
+                                                         (clojure.core/satisfies? String x)))
                                                      name
 
                                                      (clojure.spec.alpha/and
                                                       boolean?
                                                       (fn [x]
-                                                        (clojure.core/instance? java.lang.Boolean x)))
+                                                        (if (clojure.core/class? java.lang.Boolean)
+                                                          (clojure.core/instance? java.lang.Boolean x)
+                                                          (clojure.core/satisfies? java.lang.Boolean x))))
                                                      cool?))
                                                    (clojure.core/let [% [cool? name length temperature age]]
                                                      %))))
@@ -203,7 +221,9 @@
                                                        (clojure.core/assert (nedap.utils.spec.api/check!
                                                                              (clojure.spec.alpha/and string?
                                                                                                      (fn [x]
-                                                                                                       (clojure.core/instance? java.lang.String x)))
+                                                                                                       (if (clojure.core/class? java.lang.String)
+                                                                                                         (clojure.core/instance? java.lang.String x)
+                                                                                                         (clojure.core/satisfies? java.lang.String x))))
                                                                              %))
                                                        %)))
 
@@ -213,7 +233,9 @@
                                                        (clojure.core/assert (nedap.utils.spec.api/check!
                                                                              (clojure.spec.alpha/and string?
                                                                                                      (fn [x]
-                                                                                                       (clojure.core/instance? java.lang.String x))) %))
+                                                                                                       (if (clojure.core/class? java.lang.String)
+                                                                                                         (clojure.core/instance? java.lang.String x)
+                                                                                                         (clojure.core/satisfies? java.lang.String x)))) %))
                                                        %)))
 
          spec-in-argv-no-name-macroexpansion  '(fn*
@@ -222,7 +244,9 @@
                                                    (clojure.core/assert (nedap.utils.spec.api/check!
                                                                          (clojure.spec.alpha/and string?
                                                                                                  (fn [x]
-                                                                                                   (clojure.core/instance? java.lang.String x)))
+                                                                                                   (if (clojure.core/class? java.lang.String)
+                                                                                                     (clojure.core/instance? java.lang.String x)
+                                                                                                     (clojure.core/satisfies? java.lang.String x))))
                                                                          %))
                                                    %)))
 
@@ -233,7 +257,9 @@
                                                         (nedap.utils.spec.api/check!
                                                          (clojure.spec.alpha/and string?
                                                                                  (fn [x]
-                                                                                   (clojure.core/instance? java.lang.String x)))
+                                                                                   (if (clojure.core/class? java.lang.String)
+                                                                                     (clojure.core/instance? java.lang.String x)
+                                                                                     (clojure.core/satisfies? java.lang.String x))))
                                                          %))
                                                        (clojure.core/assert (nedap.utils.spec.api/check! some? %))
                                                        %)))))))

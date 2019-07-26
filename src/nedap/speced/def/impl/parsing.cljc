@@ -31,7 +31,9 @@
   (when-not (primitive? class clj?)
     (if clj?
       (list 'fn ['x]
-            (list 'clojure.core/instance? class 'x))
+            (list 'if (list 'clojure.core/class? class)
+                  (list 'clojure.core/instance? class 'x)
+                  (list 'clojure.core/satisfies? class 'x)))
       ;; Don't use `cljs.core/instance?`! https://dev.clojure.org/jira/browse/CLJS-98
       (list 'cljs.spec.alpha/or
             :class-instance    (list 'fn ['x]

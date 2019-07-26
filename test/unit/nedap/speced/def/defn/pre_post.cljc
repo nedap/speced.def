@@ -221,10 +221,18 @@
                                                         ([x]
                                                          {:pre
                                                           [:pre
-                                                           (nedap.utils.spec.api/check! (fn [x] (clojure.core/instance? Double x)) x)],
+                                                           (nedap.utils.spec.api/check! (fn [x]
+                                                                                          (if (clojure.core/class? Double)
+                                                                                            (clojure.core/instance? Double x)
+                                                                                            (clojure.core/satisfies? Double x)))
+                                                                                        x)],
                                                           :post
                                                           [:post
-                                                           (nedap.utils.spec.api/check! (fn [x] (clojure.core/instance? String x)) %)]}
+                                                           (nedap.utils.spec.api/check! (fn [x]
+                                                                                          (if (clojure.core/class? String)
+                                                                                            (clojure.core/instance? String x)
+                                                                                            (clojure.core/satisfies? String x)))
+                                                                                        %)]}
                                                          (when (< 0 x 100)
                                                            (-> x (* x) str)))))
 
@@ -234,12 +242,18 @@
                                                          {:pre
                                                           [:pre
                                                            (nedap.utils.spec.api/check!
-                                                            (fn [x] (clojure.core/instance? Double x))
+                                                            (fn [x]
+                                                              (if (clojure.core/class? Double)
+                                                                (clojure.core/instance? Double x)
+                                                                (clojure.core/satisfies? Double x)))
                                                             x)],
                                                           :post
                                                           [:post
                                                            (nedap.utils.spec.api/check!
-                                                            (fn [x] (clojure.core/instance? String x))
+                                                            (fn [x]
+                                                              (if (clojure.core/class? String)
+                                                                (clojure.core/instance? String x)
+                                                                (clojure.core/satisfies? String x)))
                                                             %)]}
                                                          (when (< 0 x 100)
                                                            (-> x (* x) str)))
@@ -247,14 +261,23 @@
                                                          {:pre
                                                           [:pre
                                                            (nedap.utils.spec.api/check!
-                                                            (fn [x] (clojure.core/instance? Double x))
+                                                            (fn [x]
+                                                              (if (clojure.core/class? Double)
+                                                                (clojure.core/instance? Double x)
+                                                                (clojure.core/satisfies? Double x)))
                                                             x
-                                                            (fn [x] (clojure.core/instance? Double x))
+                                                            (fn [x]
+                                                              (if (clojure.core/class? Double)
+                                                                (clojure.core/instance? Double x)
+                                                                (clojure.core/satisfies? Double x)))
                                                             y)],
                                                           :post
                                                           [:post
                                                            (nedap.utils.spec.api/check!
-                                                            (fn [x] (clojure.core/instance? String x))
+                                                            (fn [x]
+                                                              (if (clojure.core/class? String)
+                                                                (clojure.core/instance? String x)
+                                                                (clojure.core/satisfies? String x)))
                                                             %)]}
                                                          (when (< 0 x 100)
                                                            (-> x (* y) str)))))
@@ -266,7 +289,10 @@
                                                                 (nedap.utils.spec.api/check!
                                                                  (clojure.spec.alpha/and
                                                                   double?
-                                                                  (fn [x] (clojure.core/instance? java.lang.Double x)))
+                                                                  (fn [x]
+                                                                    (if (clojure.core/class? java.lang.Double)
+                                                                      (clojure.core/instance? java.lang.Double x)
+                                                                      (clojure.core/satisfies? java.lang.Double x))))
                                                                  x)],
                                                           :post
                                                           [:post
@@ -274,7 +300,10 @@
                                                            (nedap.utils.spec.api/check!
                                                             (clojure.spec.alpha/and
                                                              string?
-                                                             (fn [x] (clojure.core/instance? java.lang.String x)))
+                                                             (fn [x]
+                                                               (if (clojure.core/class? java.lang.String)
+                                                                 (clojure.core/instance? java.lang.String x)
+                                                                 (clojure.core/satisfies? java.lang.String x))))
                                                             %)]}
                                                          (when (< 0 x 100)
                                                            (-> x (* x) str)))))
@@ -286,7 +315,10 @@
                                                                 (nedap.utils.spec.api/check!
                                                                  (clojure.spec.alpha/and
                                                                   double?
-                                                                  (fn [x] (clojure.core/instance? java.lang.Double x)))
+                                                                  (fn [x]
+                                                                    (if (clojure.core/class? java.lang.Double)
+                                                                      (clojure.core/instance? java.lang.Double x)
+                                                                      (clojure.core/satisfies? java.lang.Double x))))
                                                                  x)],
                                                           :post
                                                           [:post
@@ -294,7 +326,10 @@
                                                            (nedap.utils.spec.api/check!
                                                             (clojure.spec.alpha/and
                                                              string?
-                                                             (fn [x] (clojure.core/instance? java.lang.String x)))
+                                                             (fn [x]
+                                                               (if (clojure.core/class? java.lang.String)
+                                                                 (clojure.core/instance? java.lang.String x)
+                                                                 (clojure.core/satisfies? java.lang.String x))))
                                                             %)]}
                                                          (when (< 0 x 100)
                                                            (-> x (* x) str)))
@@ -303,11 +338,17 @@
                                                                 (nedap.utils.spec.api/check!
                                                                  (clojure.spec.alpha/and
                                                                   double?
-                                                                  (fn [x] (clojure.core/instance? java.lang.Double x)))
+                                                                  (fn [x]
+                                                                    (if (clojure.core/class? java.lang.Double)
+                                                                      (clojure.core/instance? java.lang.Double x)
+                                                                      (clojure.core/satisfies? java.lang.Double x))))
                                                                  x
                                                                  (clojure.spec.alpha/and
                                                                   double?
-                                                                  (fn [x] (clojure.core/instance? java.lang.Double x)))
+                                                                  (fn [x]
+                                                                    (if (clojure.core/class? java.lang.Double)
+                                                                      (clojure.core/instance? java.lang.Double x)
+                                                                      (clojure.core/satisfies? java.lang.Double x))))
                                                                  y)],
                                                           :post
                                                           [:post
@@ -315,7 +356,10 @@
                                                            (nedap.utils.spec.api/check!
                                                             (clojure.spec.alpha/and
                                                              string?
-                                                             (fn [x] (clojure.core/instance? java.lang.String x)))
+                                                             (fn [x]
+                                                               (if (clojure.core/class? java.lang.String)
+                                                                 (clojure.core/instance? java.lang.String x)
+                                                                 (clojure.core/satisfies? java.lang.String x))))
                                                             %)]}
                                                          (when (< 0 x 100)
                                                            (-> x (* y) str))))))))
