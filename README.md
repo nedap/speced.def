@@ -1,4 +1,4 @@
-# speced.def [![CircleCI](https://circleci.com/gh/nedap/utils.spec.svg?style=svg&circle-token=5895f9f338cb751d2c2e8a24844d82e21228190e)](https://circleci.com/gh/nedap/utils.spec)
+# speced.def [![CircleCI](https://circleci.com/gh/nedap/speced.def.svg?style=svg&circle-token=5895f9f338cb751d2c2e8a24844d82e21228190e)](https://circleci.com/gh/nedap/speced.def)
 
 This library provides [spec](https://github.com/clojure/spec.alpha)-backed forms of `defn`, `defprotocol`, `fn`, etc. using the **same exact syntax** than clojure.core's.
 
