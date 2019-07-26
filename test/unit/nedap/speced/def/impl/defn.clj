@@ -103,3 +103,38 @@
       #{'a} [{:keys [(with-meta 'a {:tag 'cljs.core/string?})]}] [{:keys [(with-meta 'a {:tag 'cljs.core/string?})]}]
 
       #{}   [{:keys [(with-meta 'a {:tag 'cljs.core/string?})]}] [{:keys [(with-meta 'a {:tag 'string})]}])))
+
+(deftest consistent-tagging?
+  (testing "clj"
+    (are [ann tails expected] (binding [sut/*clj?* true]
+                                (= expected
+                                   (sut/consistent-tagging? ann tails true)))
+      String []                             true
+      nil    []                             true
+      String ['([])]                        true
+      nil    ['([])]                        true
+      String ['(^String [])]                true
+      Long   ['(^Long [])]                  true
+      nil    ['(^String [])]                true
+      String ['(^Long [])]                  false
+      String ['(^String []) '(^String [a])] true
+      nil    ['(^String []) '(^String [a])] true
+      nil    ['(^String []) '([a])]         true
+      String ['(^String []) '(^Long [a])]   false))
+
+  (testing "cljs"
+    (are [ann tails expected] (binding [sut/*clj?* false]
+                                (= expected
+                                   (sut/consistent-tagging? ann tails false)))
+      'string []                             true
+      nil     []                             true
+      'string ['([])]                        true
+      nil     ['([])]                        true
+      'string ['(^string [])]                true
+      'long   ['(^string [])]                false
+      nil     ['(^string [])]                true
+      'string ['(^number [])]                false
+      'string ['(^string []) '(^string [a])] true
+      nil     ['(^string []) '(^string [a])] true
+      nil     ['(^string []) '([a])]         true
+      'string ['(^string []) '(^number [a])] false)))
