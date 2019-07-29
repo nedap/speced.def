@@ -45,7 +45,7 @@ With `speced.def`, one expresses specs via metadata:
 
 ```clojure
 ;; note that both preconditions and type hints are emitted, derived from the specs
-(defn inc-and-serialize ^String [n, ^Boolean b]
+(defn inc-and-serialize ^String [n, ^boolean b]
   {:pre [(int? n) (boolean? b)]
    :post [(string? %)]}
   (-> n inc str))
@@ -116,6 +116,8 @@ Please browse the public namespaces, which are documented, speced and tested.
 It is part of this library's philosophy to avoid creating external documentation. We believe specs, particularly with our `def-with-doc` helper, can suffice, preventing duplication/drift and non-speced/non-self-documenting code.
 
 That assumes that adopters are willing to jump to the source (particularly to the public parts, and occasionally to the tests which serve as a large corpus of examples), and preferrably have handy tooling that is able to do such jumping.
+
+## [Contributing](https://github.com/nedap/speced.def/blob/master/.github/contributing.md)
 
 ## License
 
