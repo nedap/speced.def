@@ -7,9 +7,9 @@
   {:pre [(check! boolean? clj?)]}
   (let [fnspecs (->> fnspecs
                      (mapv (fn [[fn-name & tail]]
-                             (->> (process-name-and-tails {:name fn-name
-                                                           :tail tail
-                                                           :clj? clj?})
-                                  (:tails)
-                                  (cons fn-name)))))]
+                             (let [{new-name :name
+                                    :keys    [tails]} (process-name-and-tails {:name fn-name
+                                                                               :tail tail
+                                                                               :clj? clj?})]
+                               (cons new-name tails)))))]
     `(letfn ~fnspecs ~@body)))

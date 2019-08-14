@@ -31,7 +31,11 @@
         [a b not-speced]))
 
       (alternative-destructuring [[^string? x]]
-                                 x)]
+                                 x)
+      (^string? hinted-name [a]
+                            a)
+      (hinted-argv ^string? [a]
+                   a)]
     '[(single-signature [^string? a
                          {:keys [^number b]}
                          not-speced]
@@ -49,7 +53,11 @@
          not-speced]
         [a b not-speced]))
       (alternative-destructuring [[^string? x]]
-                                 x)]))
+                                 x)
+      (^string? hinted-name [a]
+                            a)
+      (hinted-argv ^string? [a]
+                   a)]))
 
 #?(:clj
    (defmacro letfn-specimen-1 []
@@ -190,7 +198,33 @@
                                                         (clojure.core/satisfies? java.lang.String x))))
                                                    x)],
                                                  :post []}
-                                                x))]
+                                                x))
+                                             (hinted-name
+                                               ([a]
+                                                {:pre [],
+                                                 :post
+                                                 [(nedap.utils.spec.api/check!
+                                                   (clojure.spec.alpha/and
+                                                    string?
+                                                    (fn [x]
+                                                      (if (clojure.core/class? java.lang.String)
+                                                        (clojure.core/instance? java.lang.String x)
+                                                        (clojure.core/satisfies? java.lang.String x))))
+                                                   %)]}
+                                                a))
+                                             (hinted-argv
+                                               ([a]
+                                                {:pre [],
+                                                 :post
+                                                 [(nedap.utils.spec.api/check!
+                                                   (clojure.spec.alpha/and
+                                                    string?
+                                                    (fn [x]
+                                                      (if (clojure.core/class? java.lang.String)
+                                                        (clojure.core/instance? java.lang.String x)
+                                                        (clojure.core/satisfies? java.lang.String x))))
+                                                   %)]}
+                                                a))]
                           [(single-signature "a" {:b 2} ::anything)
                            (single-signature-wrapped "a" {:b 2} ::anything)
                            (multiple-signatures "a" {:b 2})
@@ -206,9 +240,25 @@
                     (with-meta 'b {:tag 'long})))))
 
      (testing "type hint metadata is inferred (sequential destructuring)"
-       (let [string-hinted (->> specimen-1-macroexpansion second last second ffirst first)]
+       (let [string-hinted (->> specimen-1-macroexpansion
+                                (second)
+                                (filter (comp #{'alternative-destructuring} first))
+                                first
+                                second
+                                ffirst
+                                first)]
          (is (meta= string-hinted
-                    (with-meta 'x {:tag String})))))))
+                    (with-meta 'x {:tag String})))))
+     (testing "type hint metadata is inferred (fn name hinting, argv hinting)"
+       (are [input] (meta= (->> specimen-1-macroexpansion
+                                (second)
+                                (filter (comp #{input} first))
+                                first
+                                second
+                                first)
+                           (with-meta '[a] {:tag String}))
+         'hinted-name
+         'hinted-argv))))
 
 (deftest correct-execution
   (is (= [["a" 2 ::anything]
@@ -217,7 +267,15 @@
           ["a" 2 ::anything]]
          (letfn-specimen-1)))
   (is (= ["a string"]
-         (letfn-specimen-4))))
+         (letfn-specimen-4)))
+  (is (= "Hello"
+         (sut/letfn [(^string? hinted-name [a]
+                       a)]
+           (hinted-name "Hello"))))
+  (is (= "Bye"
+         (sut/letfn [(hinted-argv ^string? [a]
+                       a)]
+           (hinted-argv "Bye")))))
 
 (def validation-failed #"Validation failed")
 
@@ -228,4 +286,12 @@
                                       (specimen)))
     letfn-specimen-2
     letfn-specimen-3
-    letfn-specimen-5))
+    letfn-specimen-5
+    (fn []
+      (sut/letfn [(^string? hinted-name [a]
+                    a)]
+        (hinted-name :not-a-string)))
+    (fn []
+      (sut/letfn [(hinted-argv ^string? [a]
+                    a)]
+        (hinted-argv :not-a-string)))))
