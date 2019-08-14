@@ -45,7 +45,7 @@
 #?(:clj
    (defmacro defprotocol
      "Emits a spec-backed defprotocol, which uses `nedap.utils.spec.api/check!` at runtime
-  to verify that the return values and arguments satify the (optional) specs passed as metadata.
+  to verify that the return values and arguments satisfy the (optional) specs passed as metadata.
 
   Has the exact same signature as `clojure.core/defprotocol`, with the constraint that docstrings are mandatory.
 
@@ -64,7 +64,7 @@
 #?(:clj
    (defmacro defn
      "Emits a spec-backed defn, which uses `nedap.utils.spec.api/check!` at runtime
-  to verify that the return values and arguments satify the (optional) specs passed as metadata.
+  to verify that the return values and arguments satisfy the (optional) specs passed as metadata.
 
   Has the exact same signature as `clojure.core/defn`, with full support for all its variations.
 
@@ -81,7 +81,7 @@
 #?(:clj
    (defmacro fn
      "Emits a spec-backed fn, which uses `nedap.utils.spec.api/check!` at runtime
-  to verify that the return values and arguments satify the (optional) specs passed as metadata.
+  to verify that the return values and arguments satisfy the (optional) specs passed as metadata.
 
   Has the exact same signature as `clojure.core/fn`, with full support for all its variations.
 
