@@ -1,8 +1,8 @@
-(ns unit.nedap.speced.def.impl.defn
+(ns unit.nedap.speced.def.impl.analysis
   (:require
    [clojure.spec.alpha :as spec]
    [clojure.test :refer [are deftest is testing]]
-   [nedap.speced.def.impl.defn :as sut]
+   [nedap.speced.def.impl.analysis :as sut]
    [nedap.utils.test.api :refer [meta=]]))
 
 (spec/def ::string string?)
@@ -16,7 +16,7 @@
         '[a]                                     []
         '[a & [b]]                               []
         '[a & b]                                 []
-        '[[a ^::string b c]]                     [{:spec            :unit.nedap.speced.def.impl.defn/string,
+        '[[a ^::string b c]]                     [{:spec            :unit.nedap.speced.def.impl.analysis/string,
                                                    :type-annotation nil
                                                    :arg             'b}]
         '[a & [^String b]]                       [{:spec            '(fn [x]
@@ -49,7 +49,7 @@
         '[a]                                     []
         '[a & [b]]                               []
         '[a & b]                                 []
-        '[[a ^::string b c]]                     [{:spec            :unit.nedap.speced.def.impl.defn/string,
+        '[[a ^::string b c]]                     [{:spec            :unit.nedap.speced.def.impl.analysis/string,
                                                    :type-annotation nil
                                                    :arg             'b}]
         '[a & [^string b]]                       '[{:spec            cljs.core/string?,
