@@ -81,6 +81,8 @@
                                        [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
                                        [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]]}
 
+             :test     {:dependencies [[com.nedap.staffing-solutions/utils.test "1.5.0"]]}
+
              :ci       {:pedantic?    :abort
                         :jvm-opts     ["-Dclojure.main.report=stderr"]
                         :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions

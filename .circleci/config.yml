@@ -40,11 +40,11 @@ jobs:
 
     - run:
         name: 'Run JVM test suite'
-        command: lein test
+        command: lein with-profile -dev test
 
     - run:
         name: 'Compile ClojureScript test suite'
-        command: lein do clean, cljsbuild once test
+        command: lein with-profile -dev,+test do clean, cljsbuild once test
 
     - run:
         name: 'Run node.js tests'

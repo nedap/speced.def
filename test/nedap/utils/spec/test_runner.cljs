@@ -1,7 +1,7 @@
 (ns nedap.speced.def.test-runner
   (:require
    [cljs.nodejs :as nodejs]
-   [cljs.test :refer-macros [run-tests]]
+   [nedap.utils.test.api :refer-macros [run-tests]]
    [unit.nedap.speced.def.def-with-doc]
    [unit.nedap.speced.def.defn]
    [unit.nedap.speced.def.defn.destructuring]
