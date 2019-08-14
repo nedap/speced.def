@@ -4,11 +4,12 @@
   Please `:require` this namepace with the `speced` alias: `[nedap.speced.def :as speced]`.
 
   That way, you will invoke e.g. `speced/defprotocol` which is clean and clear."
-  (:refer-clojure :exclude [defn defprotocol doc fn let satisfies?])
+  (:refer-clojure :exclude [defn defprotocol doc fn let letfn satisfies?])
   (:require
    #?(:clj [clojure.test :as test])
    #?(:clj [nedap.speced.def.impl.fn :as impl.fn] :cljs [nedap.speced.def.impl.dummy :as impl.fn])
    #?(:clj [clojure.core.specs.alpha :as specs] :cljs [cljs.core.specs.alpha :as specs])
+   #?(:clj [nedap.speced.def.impl.letfn :as impl.letfn])
    #?(:clj [nedap.speced.def.impl.let-impl :as let-impl])
    [clojure.spec.alpha :as spec]
    [nedap.speced.def.doc :refer [doc-registry rebl-doc-registry]]
@@ -109,6 +110,23 @@
      [bindings & body]
      {:pre [(check! ::specs/bindings bindings)]}
      (let-impl/impl (-> &env :ns nil?) bindings body)))
+
+#?(:clj
+   (defmacro letfn
+     "Emits a spec-backed `letfn`, which uses `nedap.utils.spec.api/check!` at runtime
+  to verify that any metadata-annotated symbols satisfy the specs denoted by that metadata.
+
+  Has the exact same signature as `#'clojure.core/letfn`, with full support for arbitrarily nested destructuring and multiple arities.
+
+  Spec metadata follows the `:nedap.speced.def.specs/spec-metadata` 'syntaxes'.
+
+  Runtime-checking behavior is controlled with `#'clojure.core/*assert*`."
+     {:style/indent        [1 [[:defn]] :form]
+      :style.cljfmt/indent [[:block 1] [:inner 2 0]]}
+     [fnspecs & body]
+     (impl.letfn/impl (-> &env :ns nil?)
+                      fnspecs
+                      body)))
 
 #?(:clj
    (clojure.core/defn satisfies?
