@@ -10,7 +10,7 @@
    [nedap.utils.test.api :refer [macroexpansion=]]
    [nedap.utils.test.api :refer [meta=]]
    [unit.nedap.test-helpers :refer [every-and-at-least-one?]])
-  #?(:cljs (:require-macros [unit.nedap.speced.def.let-test :refer [let-specimen-1 let-specimen-2 let-specimen-3]])))
+  #?(:cljs (:require-macros [unit.nedap.speced.def.let-test :refer [let-specimen-1 let-specimen-2 let-specimen-3 let-specimen-4 let-specimen-5]])))
 
 #?(:clj
    (defmacro let-specimen-1 []
@@ -49,8 +49,19 @@
           [a b]))))
 
 #?(:clj
+   (defmacro let-specimen-4 []
+     '(sut/let [[^string? a & tail] ["a" 1 2 3]]
+        [a tail])))
+
+#?(:clj
+   (defmacro let-specimen-5 []
+     '(sut/let [[^string? a & tail] [:a 1 2 3]]
+        [a tail])))
+
+#?(:clj
    (defmacro macroexpansion-specimens []
-     (let [xs {:specimen-1 (macroexpand-1 (macroexpand-1 '(let-specimen-1)))}]
+     (let [xs {:specimen-1 (macroexpand-1 (macroexpand-1 '(let-specimen-1)))
+               :specimen-4 (macroexpand-1 (macroexpand-1 '(let-specimen-4)))}]
        (->> xs
             (map (fn [[k v]]
                    [k (list 'quote v)]))
@@ -85,7 +96,7 @@
                         [a b])]
          (is (macroexpansion= the-let
                               specimen-1-macroexpansion))))
-     (testing "type hint metadata is inferred"
+     (testing "type hint metadata is inferred (simple symbols, associative destructuring)"
        (let [[string-hinted
               _
               {[long-hinted] :keys}] (->> specimen-1-macroexpansion
@@ -95,11 +106,17 @@
          (is (meta= string-hinted
                     (with-meta 'a {:tag `String})))
          (is (meta= long-hinted
-                    (with-meta 'b {:tag 'long})))))))
+                    (with-meta 'b {:tag 'long})))))
+     (testing "type hint metadata is inferred (sequential destructuring)"
+       (let [string-hinted (->> specimen-4-macroexpansion second ffirst)]
+         (is (meta= string-hinted
+                    (with-meta 'a {:tag String})))))))
 
 (deftest correct-execution
   (is (= ["A string" 52]
-         (let-specimen-1))))
+         (let-specimen-1)))
+  (is (= ["a" '(1 2 3)]
+         (let-specimen-4))))
 
 (def validation-failed #"Validation failed")
 
@@ -109,4 +126,5 @@
                                     (with-out-str
                                       (specimen)))
     let-specimen-2
-    let-specimen-3))
+    let-specimen-3
+    let-specimen-5))

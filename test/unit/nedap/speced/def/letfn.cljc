@@ -9,7 +9,7 @@
    [nedap.utils.test.api :refer [macroexpansion=]]
    [nedap.utils.test.api :refer [meta=]]
    [unit.nedap.test-helpers :refer [every-and-at-least-one?]])
-  #?(:cljs (:require-macros [unit.nedap.speced.def.letfn :refer [letfn-specimen-1 let-specimen-2 let-specimen-3]])))
+  #?(:cljs (:require-macros [unit.nedap.speced.def.letfn :refer [letfn-specimen-1 letfn-specimen-2 letfn-specimen-3 letfn-specimen-4 letfn-specimen-5]])))
 
 (defn fnspecs-example [clj?]
   (if clj?
@@ -28,7 +28,10 @@
        ([^string? a
          {:keys [^long b]}
          not-speced]
-        [a b not-speced]))]
+        [a b not-speced]))
+
+      (alternative-destructuring [[^string? x]]
+                                 x)]
     '[(single-signature [^string? a
                          {:keys [^number b]}
                          not-speced]
@@ -44,7 +47,9 @@
        ([^string? a
          {:keys [^number b]}
          not-speced]
-        [a b not-speced]))]))
+        [a b not-speced]))
+      (alternative-destructuring [[^string? x]]
+                                 x)]))
 
 #?(:clj
    (defmacro letfn-specimen-1 []
@@ -57,18 +62,32 @@
                (multiple-signatures "a" {:b 2} ::anything)]))))
 
 #?(:clj
-   (defmacro let-specimen-2 []
+   (defmacro letfn-specimen-2 []
      (let [clj? (-> &env :ns nil?)]
        (list `sut/letfn
              (fnspecs-example clj?)
              '[(single-signature nil {:b 2} ::anything)]))))
 
 #?(:clj
-   (defmacro let-specimen-3 []
+   (defmacro letfn-specimen-3 []
      (let [clj? (-> &env :ns nil?)]
        (list `sut/letfn
              (fnspecs-example clj?)
              '[(single-signature nil {:b nil} ::anything)]))))
+
+#?(:clj
+   (defmacro letfn-specimen-4 []
+     (let [clj? (-> &env :ns nil?)]
+       (list `sut/letfn
+             (fnspecs-example clj?)
+             '[(alternative-destructuring ["a string"])]))))
+
+#?(:clj
+   (defmacro letfn-specimen-5 []
+     (let [clj? (-> &env :ns nil?)]
+       (list `sut/letfn
+             (fnspecs-example clj?)
+             '[(alternative-destructuring [:not-a-string])]))))
 
 #?(:clj
    (defmacro macroexpansion-specimens []
@@ -157,27 +176,48 @@
                                                               (clojure.core/satisfies? java.lang.String x))))
                                                          a)]
                                                  :post []}
-                                                [a b not-speced]))]
+                                                [a b not-speced]))
+                                             (alternative-destructuring
+                                               ([[x]]
+                                                {:pre
+                                                 [(nedap.utils.spec.api/check!
+                                                   (clojure.spec.alpha/and
+                                                    string?
+                                                    (fn
+                                                      [x]
+                                                      (if (clojure.core/class? java.lang.String)
+                                                        (clojure.core/instance? java.lang.String x)
+                                                        (clojure.core/satisfies? java.lang.String x))))
+                                                   x)],
+                                                 :post []}
+                                                x))]
                           [(single-signature "a" {:b 2} ::anything)
                            (single-signature-wrapped "a" {:b 2} ::anything)
                            (multiple-signatures "a" {:b 2})
                            (multiple-signatures "a" {:b 2} ::anything)])]
          (is (macroexpansion= the-letfn
                               specimen-1-macroexpansion))))
-     (testing "type hint metadata is inferred"
+     (testing "type hint metadata is inferred (simple symbols, associative destrucuring)"
        (let [[string-hinted
               {[long-hinted] :keys}] (->> specimen-1-macroexpansion second first second first)]
          (is (meta= string-hinted
                     (with-meta 'a {:tag `String})))
          (is (meta= long-hinted
-                    (with-meta 'b {:tag 'long})))))))
+                    (with-meta 'b {:tag 'long})))))
+
+     (testing "type hint metadata is inferred (sequential destructuring)"
+       (let [string-hinted (->> specimen-1-macroexpansion second last second ffirst first)]
+         (is (meta= string-hinted
+                    (with-meta 'x {:tag String})))))))
 
 (deftest correct-execution
   (is (= [["a" 2 ::anything]
           ["a" 2 ::anything]
           ["a" 2]
           ["a" 2 ::anything]]
-         (letfn-specimen-1))))
+         (letfn-specimen-1)))
+  (is (= ["a string"]
+         (letfn-specimen-4))))
 
 (def validation-failed #"Validation failed")
 
@@ -186,5 +226,6 @@
                                     validation-failed
                                     (with-out-str
                                       (specimen)))
-    let-specimen-2
-    let-specimen-3))
+    letfn-specimen-2
+    letfn-specimen-3
+    letfn-specimen-5))
