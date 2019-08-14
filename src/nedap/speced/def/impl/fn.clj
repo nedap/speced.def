@@ -2,7 +2,7 @@
   (:require
    [clojure.core.specs.alpha :as specs]
    [clojure.spec.alpha :as spec]
-   [nedap.speced.def.impl.defn :as impl.defn]
+   [nedap.speced.def.impl.analysis :refer [process-name-and-tails]]
    [nedap.utils.spec.api :refer [check!]]))
 
 ;; Taken from https://git.io/fjuA8 , which is not offered reusably as of today
@@ -20,9 +20,9 @@
         tail (if maybe-name
                (rest args)
                args)
-        {:keys [tails name docstring-and-meta]} (impl.defn/process-name-and-tails {:tail tail
-                                                                                   :name maybe-name
-                                                                                   :clj? clj?})]
+        {:keys [tails name docstring-and-meta]} (process-name-and-tails {:tail tail
+                                                                         :name maybe-name
+                                                                         :clj? clj?})]
     (cond->> tails
       name (concat [name])
       true (apply list `fn))))
