@@ -1,6 +1,7 @@
 (ns nedap.utils.spec.impl.doc
-  (:require
-   #?(:clj [clojure.repl :refer [doc]]))
+  #?(:clj
+     (:require
+      [clojure.repl :refer [doc]]))
   #?(:cljs (:require-macros [cljs.repl :refer [doc]])))
 
 (defn impl [x clj? doc-registry]
