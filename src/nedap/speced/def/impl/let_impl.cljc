@@ -25,10 +25,9 @@
                                    prepost (-> analysis-result :tails first second)
                                    _ (assert (check! map? prepost))
                                    assertion (-> prepost :pre)]
-                               [left right '_ assertion])))
-                      (map (fn [[left right _ assertion]]
-                             {:pre [(check! some? left
-                                            #{'_} _)]}
+                               [left right assertion])))
+                      (map (fn [[left right assertion]]
+                             {:pre [(check! some? left)]}
                              (add-assertion [left right] assertion)))
                       (apply concat)
                       (vec))]

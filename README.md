@@ -1,6 +1,6 @@
 # speced.def [![CircleCI](https://circleci.com/gh/nedap/speced.def.svg?style=svg&circle-token=5895f9f338cb751d2c2e8a24844d82e21228190e)](https://circleci.com/gh/nedap/speced.def)
 
-This library provides [spec](https://github.com/clojure/spec.alpha)-backed forms of `defn`, `defprotocol`, `fn`, `let` etc. using the **same exact syntax** than clojure.core's.
+This library provides [spec](https://github.com/clojure/spec.alpha)-backed forms of `defn`, `defprotocol`, `fn`, `let` etc. using the **same exact syntax** as clojure.core's.
 
 That way, you can strengthen your defns with custom specs (expressed as metadata), while avoiding the hassle of instrumentation, and gaining some extra benefits, such as better performance, error reporting, etc.
 
