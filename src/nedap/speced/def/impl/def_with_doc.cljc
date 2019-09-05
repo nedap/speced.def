@@ -23,9 +23,12 @@
      [spec-name docstring spec doc-registry symbol-doc-registry]
      {:pre [(check! qualified-keyword? spec-name
                     string?            docstring
-                    some?              spec
-                    (spec/and symbol?
-                              resolve) doc-registry)]}
+                    some?              spec)]}
+     (when (-> &env :ns nil?)
+       (check! (spec/and symbol?
+                         resolve) doc-registry
+               (spec/and symbol?
+                         resolve) symbol-doc-registry))
      (list 'do
            (list `swap! doc-registry `assoc spec-name docstring)
            (list `swap! symbol-doc-registry `assoc (list 'quote (symbol spec-name)) (list `map->Docstring {:docstring docstring}))
