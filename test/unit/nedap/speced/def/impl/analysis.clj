@@ -80,11 +80,11 @@
 
       #{'a} [(with-meta 'a {:tag `string?})]           [(with-meta 'a {:tag `string?})]
 
-      #{}   [(with-meta 'a {:tag `string?})]           [(with-meta 'a {:tag String})]
+      #{}   [(with-meta 'a {:tag `string?})]           [(with-meta 'a {:tag `String})]
 
       #{'a} [{:keys [(with-meta 'a {:tag `string?})]}] [{:keys [(with-meta 'a {:tag `string?})]}]
 
-      #{}   [{:keys [(with-meta 'a {:tag `string?})]}] [{:keys [(with-meta 'a {:tag String})]}]))
+      #{}   [{:keys [(with-meta 'a {:tag `string?})]}] [{:keys [(with-meta 'a {:tag `String})]}]))
 
   (testing "cljs"
     (are [non-destructured-args all-args expected] (let [result (sut/maybe-type-hint-destructured-args false
