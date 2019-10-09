@@ -43,6 +43,10 @@ jobs:
         command: lein with-profile -dev test
 
     - run:
+        name: 'Run JVM test suite, failing on reflection warnings'
+        command: lein with-profile -dev,+warn-on-reflection test 2>&1 | grep warning && exit 1 || exit 0
+
+    - run:
         name: 'Compile ClojureScript test suite'
         command: lein with-profile -dev,+test do clean, cljsbuild once test
 

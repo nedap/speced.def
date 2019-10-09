@@ -248,7 +248,7 @@
                                 ffirst
                                 first)]
          (is (meta= string-hinted
-                    (with-meta 'x {:tag String})))))
+                    (with-meta 'x {:tag `String})))))
      (testing "type hint metadata is inferred (fn name hinting, argv hinting)"
        (are [input] (meta= (->> specimen-1-macroexpansion
                                 (second)

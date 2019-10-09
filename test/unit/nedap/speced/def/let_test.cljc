@@ -110,7 +110,7 @@
      (testing "type hint metadata is inferred (sequential destructuring)"
        (let [string-hinted (->> specimen-4-macroexpansion second ffirst)]
          (is (meta= string-hinted
-                    (with-meta 'a {:tag String})))))))
+                    (with-meta 'a {:tag `String})))))))
 
 (deftest correct-execution
   (is (= ["A string" 52]

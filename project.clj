@@ -54,36 +54,38 @@
   ;;   * e.g. criterium, deep-diff, clj-java-decompiler
 
   ;; NOTE: deps marked with #_"transitive" are there to satisfy the `:pedantic?` option.
-  :profiles {:dev      {:dependencies [[cider/cider-nrepl "0.16.0" #_"formatting-stack needs it"]
-                                       [com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
-                                       [com.stuartsierra/component "0.4.0"]
-                                       [com.taoensso/timbre "4.10.0"]
-                                       [criterium "0.4.4"]
-                                       [formatting-stack "1.0.0-alpha3"
-                                        :exclusions [rewrite-clj]]
-                                       [lambdaisland/deep-diff "0.0-29"]
-                                       [medley "1.1.0"]
-                                       [org.clojure/core.async "0.4.490"]
-                                       [org.clojure/math.combinatorics "0.1.1"]
-                                       [org.clojure/test.check "0.10.0-alpha3"]
-                                       [org.clojure/tools.namespace "0.3.0-alpha4"]
-                                       [org.clojure/tools.reader "1.1.1" #_"transitive"]
-                                       [rewrite-clj "0.6.1" #_"transitive"]]
-                        :plugins      [[lein-cloverage "1.0.13"]]
-                        :source-paths ["dev" "test"]
-                        :repl-options {:init-ns dev}}
+  :profiles {:dev                {:dependencies [[cider/cider-nrepl "0.16.0" #_"formatting-stack needs it"]
+                                                 [com.clojure-goes-fast/clj-java-decompiler "0.2.1"]
+                                                 [com.stuartsierra/component "0.4.0"]
+                                                 [com.taoensso/timbre "4.10.0"]
+                                                 [criterium "0.4.4"]
+                                                 [formatting-stack "1.0.0-alpha3"
+                                                  :exclusions [rewrite-clj]]
+                                                 [lambdaisland/deep-diff "0.0-29"]
+                                                 [medley "1.1.0"]
+                                                 [org.clojure/core.async "0.4.490"]
+                                                 [org.clojure/math.combinatorics "0.1.1"]
+                                                 [org.clojure/test.check "0.10.0-alpha3"]
+                                                 [org.clojure/tools.namespace "0.3.0-alpha4"]
+                                                 [org.clojure/tools.reader "1.1.1" #_"transitive"]
+                                                 [rewrite-clj "0.6.1" #_"transitive"]]
+                                  :plugins      [[lein-cloverage "1.0.13"]]
+                                  :source-paths ["dev" "test"]
+                                  :repl-options {:init-ns dev}}
 
-             :provided {:dependencies [[org.clojure/clojurescript "1.10.520"
-                                        :exclusions [com.cognitect/transit-clj
-                                                     com.google.code.findbugs/jsr305
-                                                     com.google.errorprone/error_prone_annotations]]
-                                       [com.cognitect/transit-clj "0.8.313" #_"transitive"]
-                                       [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
-                                       [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]]}
+             :provided           {:dependencies [[org.clojure/clojurescript "1.10.520"
+                                                  :exclusions [com.cognitect/transit-clj
+                                                               com.google.code.findbugs/jsr305
+                                                               com.google.errorprone/error_prone_annotations]]
+                                                 [com.cognitect/transit-clj "0.8.313" #_"transitive"]
+                                                 [com.google.errorprone/error_prone_annotations "2.1.3" #_"transitive"]
+                                                 [com.google.code.findbugs/jsr305 "3.0.2" #_"transitive"]]}
 
-             :test     {:dependencies [[com.nedap.staffing-solutions/utils.test "1.5.0"]]}
+             :test               {:dependencies [[com.nedap.staffing-solutions/utils.test "1.5.0"]]}
 
-             :ci       {:pedantic?    :abort
-                        :jvm-opts     ["-Dclojure.main.report=stderr"]
-                        :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                        :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.3.0-alpha3"]]}})
+             :warn-on-reflection {:global-vars {*warn-on-reflection* true}}
+
+             :ci                 {:pedantic?    :abort
+                                  :jvm-opts     ["-Dclojure.main.report=stderr"]
+                                  :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                                  :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.3.0-alpha3"]]}})
