@@ -4,7 +4,7 @@
    [clojure.spec.alpha :as spec]
    [clojure.walk :as walk]
    [nedap.speced.def.impl.parsing :refer [extract-specs-from-metadata fntails]]
-   [nedap.speced.def.impl.type-hinting :refer [ensure-proper-type-hint ensure-proper-type-hints primitive? type-hint type-hint?]]
+   [nedap.speced.def.impl.type-hinting :refer [ann->symbol ensure-proper-type-hint ensure-proper-type-hints primitive? type-hint type-hint?]]
    [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]))
 
 (defn extract-specs-from-destructurings [clj? args]
@@ -47,10 +47,11 @@
                           true                      (let [metadata-map (meta x)]
                                                       (if-not (seq metadata-map)
                                                         x
-                                                        (->> (if-let [ann (-> metadata-map
-                                                                              (extract-specs-from-metadata clj?)
-                                                                              (first)
-                                                                              (:type-annotation))]
+                                                        (->> (if-let [ann (some-> metadata-map
+                                                                                  (extract-specs-from-metadata clj?)
+                                                                                  first
+                                                                                  :type-annotation
+                                                                                  ann->symbol)]
                                                                (vary-meta x assoc :tag ann)
                                                                (vary-meta x dissoc :tag))
                                                              (ensure-proper-type-hint clj?)))))))))

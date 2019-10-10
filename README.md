@@ -1,6 +1,6 @@
 # speced.def [![CircleCI](https://circleci.com/gh/nedap/speced.def.svg?style=svg&circle-token=5895f9f338cb751d2c2e8a24844d82e21228190e)](https://circleci.com/gh/nedap/speced.def)
 
-This library provides [spec](https://github.com/clojure/spec.alpha)-backed forms of `defn`, `defprotocol`, `fn`, etc. using the **same exact syntax** than clojure.core's.
+This library provides [spec](https://github.com/clojure/spec.alpha)-backed forms of `defn`, `defprotocol`, `fn`, `let` etc. using the **same exact syntax** as clojure.core's.
 
 That way, you can strengthen your defns with custom specs (expressed as metadata), while avoiding the hassle of instrumentation, and gaining some extra benefits, such as better performance, error reporting, etc.
 
@@ -9,7 +9,7 @@ That way, you can strengthen your defns with custom specs (expressed as metadata
 #### Coordinates
 
 ```clojure
-[com.nedap.staffing-solutions/speced.def "1.0.1"]
+[com.nedap.staffing-solutions/speced.def "1.1.0-alpha4"]
 ```
 
 > Note that self-hosted ClojureScript (e.g. Lumo) is unsupported at the moment.
@@ -81,7 +81,7 @@ You can pass specs as part of any nested destructurings.
   * e.g. `^string?` will emit a `^String` type hint
   * same for ClojureScript: `^string?` -> `^string`
   * This particularly matters in JVM Clojure. [Refer to the full mapping](https://github.com/nedap/speced.def/blob/8dac678f498fc3a77ab7cc13e5a1b3d965221735/src/nedap/utils/spec/impl/parsing.cljc#L42).
-* `speced/defprotocol`, `speced/fn` are also offered
+* `speced/defprotocol`, `speced/fn`, `speced/let`, `speced/letfn` are also offered
   * Same syntax and advantages as `speced/defn`
 * Richer Expound integration
   * [This idea](https://github.com/bhb/expound/issues/148) is implemented here inline, as long as the Expound issue remains open.
@@ -104,7 +104,7 @@ You can pass specs as part of any nested destructurings.
 
 There are exactly 2 namespaces meant for public consumption:
 
-* `nedap.speced.def`: 'speced' forms of defprotocol, defn, fn, etc.
+* `nedap.speced.def`: 'speced' forms of defprotocol, defn, fn, let, letfn, etc.
 * `nedap.speced.def.doc`: a public docstring registry for specs. Can be queried from arbitrary tools, and particularly [REBL](https://github.com/cognitect-labs/REBL-distro).
 
 They are deliberately thin so you can browse them comfortably.

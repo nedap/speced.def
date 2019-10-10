@@ -261,13 +261,13 @@
 
 (deftest type-hint-emission
 
-  (are [input] (= #?(:clj (list nil nil 'long String Boolean)
+  (are [input] (= #?(:clj (list nil nil 'long `String `Boolean)
                      :cljs '(nil nil number string boolean))
                   (->> input meta :arglists first first :keys (map meta) (map :tag)))
     #'arity-1
     #'arity-n)
 
-  (are [input] (= #?(:clj (list '(nil nil) (list 'long String Boolean))
+  (are [input] (= #?(:clj (list '(nil nil) (list 'long `String `Boolean))
                      :cljs '((nil nil) (number string boolean)))
                   (->> input meta :arglists second (map (fn [arg]
                                                           (->> arg :keys (map meta) (map :tag))))))
