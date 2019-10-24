@@ -3,9 +3,7 @@
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
-   [clojure.string :as string]
    [nedap.speced.def :as sut]
-   [nedap.speced.def.impl.parsing :as impl.parsing]
    [nedap.utils.spec.api :refer [check!]]
    [nedap.utils.test.api :refer [macroexpansion=]]
    [nedap.utils.test.api :refer [meta=]]
@@ -96,6 +94,14 @@
                         [a b])]
          (is (macroexpansion= the-let
                               specimen-1-macroexpansion))))
+     (testing "It expands without checks if `#'*assert*` is false"
+       (binding [*assert* false]
+         (let [the-let '(sut/let [a "A string"
+                                  {:keys [b]} {:b 52}
+                                  not-speced :anything]
+                          [a b])]
+           (is (macroexpansion= the-let
+                                (macroexpand-1 `(let-specimen-1)))))))
      (testing "type hint metadata is inferred (simple symbols, associative destructuring)"
        (let [[string-hinted
               _
