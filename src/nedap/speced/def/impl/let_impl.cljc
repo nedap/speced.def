@@ -8,7 +8,8 @@
   {:pre [(check! #{0 1} (count assertion))]}
   (cond-> binding
     (seq assertion)
-    (conj (gensym) (first assertion))))
+    (conj (gensym) (->> (first assertion)
+                        (list 'clojure.core/assert)))))
 
 (defn impl [clj? bindings body]
   {:pre [(check! boolean? clj?)]}

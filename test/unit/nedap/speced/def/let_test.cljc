@@ -3,9 +3,7 @@
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
-   [clojure.string :as string]
    [nedap.speced.def :as sut]
-   [nedap.speced.def.impl.parsing :as impl.parsing]
    [nedap.utils.spec.api :refer [check!]]
    [nedap.utils.test.api :refer [macroexpansion=]]
    [nedap.utils.test.api :refer [meta=]]
@@ -79,19 +77,21 @@
    (deftest macroexpansions
      (testing "It expands to a known-good, reasonable-looking form"
        (let [the-let '(clojure.core/let [a "A string"
-                                         G__440105 (nedap.utils.spec.api/check! (clojure.spec.alpha/and
-                                                                                 string?
-                                                                                 (fn [x]
-                                                                                   (if (clojure.core/class? java.lang.String)
-                                                                                     (clojure.core/instance? java.lang.String x)
-                                                                                     (clojure.core/satisfies? java.lang.String x))))
-                                                                                a)
+                                         G__440105 (clojure.core/assert
+                                                    (nedap.utils.spec.api/check! (clojure.spec.alpha/and
+                                                                                  string?
+                                                                                  (fn [x]
+                                                                                    (if (clojure.core/class? java.lang.String)
+                                                                                      (clojure.core/instance? java.lang.String x)
+                                                                                      (clojure.core/satisfies? java.lang.String x))))
+                                                                                 a))
                                          {:keys [b]} {:b 52}
-                                         G__440105 (nedap.utils.spec.api/check! (fn [x]
-                                                                                  (if (clojure.core/class? java.lang.Long)
-                                                                                    (clojure.core/instance? java.lang.Long x)
-                                                                                    (clojure.core/satisfies? java.lang.Long x)))
-                                                                                b)
+                                         G__440105 (clojure.core/assert
+                                                    (nedap.utils.spec.api/check! (fn [x]
+                                                                                   (if (clojure.core/class? java.lang.Long)
+                                                                                     (clojure.core/instance? java.lang.Long x)
+                                                                                     (clojure.core/satisfies? java.lang.Long x)))
+                                                                                 b))
                                          not-speced :anything]
                         [a b])]
          (is (macroexpansion= the-let
