@@ -8,27 +8,28 @@
   {:pre [(check! #{0 1} (count assertion))]}
   (cond-> binding
     (seq assertion)
-    (conj (gensym) (first assertion))))
+    (conj (gensym) (->> (first assertion)
+                        (list 'clojure.core/assert)))))
 
 (defn impl [clj? bindings body]
   {:pre [(check! boolean? clj?)]}
-  (let [bindings (cond-> bindings
-                   *assert* (->> (partition 2)
-                                 (map (fn [[left right]]
-                                        (let [analysis-result (process-name-and-tails {:tail (list [left])
-                                                                                       :name nil
-                                                                                       :clj? clj?})
-                                              argv (-> analysis-result :tails ffirst)
-                                              _ (assert (check! vector? argv
-                                                                #{1}    (count argv)))
-                                              left (first argv)
-                                              prepost (-> analysis-result :tails first second)
-                                              _ (assert (check! map? prepost))
-                                              assertion (-> prepost :pre)]
-                                          [left right assertion])))
-                                 (map (fn [[left right assertion]]
-                                        {:pre [(check! some? left)]}
-                                        (add-assertion [left right] assertion)))
-                                 (apply concat)
-                                 (vec)))]
+  (let [bindings (->> bindings
+                      (partition 2)
+                      (map (fn [[left right]]
+                             (let [analysis-result (process-name-and-tails {:tail (list [left])
+                                                                            :name nil
+                                                                            :clj? clj?})
+                                   argv (-> analysis-result :tails ffirst)
+                                   _ (assert (check! vector? argv
+                                                     #{1}    (count argv)))
+                                   left (first argv)
+                                   prepost (-> analysis-result :tails first second)
+                                   _ (assert (check! map? prepost))
+                                   assertion (-> prepost :pre)]
+                               [left right assertion])))
+                      (map (fn [[left right assertion]]
+                             {:pre [(check! some? left)]}
+                             (add-assertion [left right] assertion)))
+                      (apply concat)
+                      (vec))]
     `(let ~bindings ~@body)))

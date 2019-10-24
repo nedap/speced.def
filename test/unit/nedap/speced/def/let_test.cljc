@@ -77,31 +77,25 @@
    (deftest macroexpansions
      (testing "It expands to a known-good, reasonable-looking form"
        (let [the-let '(clojure.core/let [a "A string"
-                                         G__440105 (nedap.utils.spec.api/check! (clojure.spec.alpha/and
-                                                                                 string?
-                                                                                 (fn [x]
-                                                                                   (if (clojure.core/class? java.lang.String)
-                                                                                     (clojure.core/instance? java.lang.String x)
-                                                                                     (clojure.core/satisfies? java.lang.String x))))
-                                                                                a)
+                                         G__440105 (clojure.core/assert
+                                                    (nedap.utils.spec.api/check! (clojure.spec.alpha/and
+                                                                                  string?
+                                                                                  (fn [x]
+                                                                                    (if (clojure.core/class? java.lang.String)
+                                                                                      (clojure.core/instance? java.lang.String x)
+                                                                                      (clojure.core/satisfies? java.lang.String x))))
+                                                                                 a))
                                          {:keys [b]} {:b 52}
-                                         G__440105 (nedap.utils.spec.api/check! (fn [x]
-                                                                                  (if (clojure.core/class? java.lang.Long)
-                                                                                    (clojure.core/instance? java.lang.Long x)
-                                                                                    (clojure.core/satisfies? java.lang.Long x)))
-                                                                                b)
+                                         G__440105 (clojure.core/assert
+                                                    (nedap.utils.spec.api/check! (fn [x]
+                                                                                   (if (clojure.core/class? java.lang.Long)
+                                                                                     (clojure.core/instance? java.lang.Long x)
+                                                                                     (clojure.core/satisfies? java.lang.Long x)))
+                                                                                 b))
                                          not-speced :anything]
                         [a b])]
          (is (macroexpansion= the-let
                               specimen-1-macroexpansion))))
-     (testing "It expands without checks if `#'*assert*` is false"
-       (binding [*assert* false]
-         (let [the-let '(sut/let [a "A string"
-                                  {:keys [b]} {:b 52}
-                                  not-speced :anything]
-                          [a b])]
-           (is (macroexpansion= the-let
-                                (macroexpand-1 `(let-specimen-1)))))))
      (testing "type hint metadata is inferred (simple symbols, associative destructuring)"
        (let [[string-hinted
               _
