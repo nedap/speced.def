@@ -5,7 +5,7 @@
    [clojure.walk :as walk]
    [nedap.speced.def.impl.parsing :refer [extract-specs-from-metadata fntails]]
    [nedap.speced.def.impl.type-hinting :refer [ann->symbol ensure-proper-type-hint ensure-proper-type-hints primitive? type-hint type-hint?]]
-   [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check!]]))
+   [nedap.utils.spec.api #?(:clj :refer :cljs :refer-macros) [check! checking]]))
 
 (defn extract-specs-from-destructurings [clj? args]
   {:pre [(check! boolean? clj?)]}
@@ -108,6 +108,78 @@
                               true                             (update :post (comp vec distinct)))
                     args-with-proper-tag-hints (ensure-proper-type-hints clj? args)]
                 (apply list args-with-proper-tag-hints prepost body))))))
+
+(defn add-checking-form [tails ret-spec clj?] ;; deserves a test now
+  (->> tails
+       (map (fn [[args maybe-prepost & maybe-rest-of-body :as tail]]
+              (let [rest-of-body? (-> maybe-rest-of-body seq)
+                    body (if rest-of-body?
+                           (cons maybe-prepost rest-of-body?)
+                           [maybe-prepost])
+                    has-prepost? (and (not= [maybe-prepost] body)
+                                      (map? maybe-prepost))
+                    body (if has-prepost?
+                           (rest body)
+                           body)
+                    specs-from-destructurings (extract-specs-from-destructurings clj? args)
+                    non-destructured-args (->> args (filter symbol?) (set))
+                    args (maybe-type-hint-destructured-args clj? non-destructured-args args)
+                    {inner-ret-spec :spec
+                     ret-type-ann   :type-annotation} (-> args
+                                                          meta
+                                                          (extract-specs-from-metadata clj?)
+                                                          (first))
+                    args-sigs (map (fn [arg arg-meta]
+                                     (merge {:arg arg}
+                                            (-> arg-meta
+                                                (extract-specs-from-metadata clj?)
+                                                (first))))
+                                   args
+                                   (map meta args))
+                    args (cond-> (type-hint args args-sigs)
+                           (type-hint? ret-type-ann clj?) (vary-meta assoc :tag ret-type-ann))
+                    args-check-form (->> args-sigs
+                                         (concat specs-from-destructurings)
+                                         (filter :spec)
+                                         (map (fn [{:keys [spec arg]}]
+                                                {:pre [spec arg]}
+                                                [spec
+                                                 ;; Avoid "Can't type hint a primitive local" error:
+                                                 (vary-meta arg dissoc :tag)]))
+                                         (apply concat)
+                                         (vec))
+                    args-check-form? (-> args-check-form count pos?)
+                    ;; XXX analyze symbols (specs), replace keys (?)
+                    checking-form (when (or args-check-form?)
+                                    (cond-> [`checking {}] ;; XXX options
+                                      args-check-form? (into args-check-form)
+                                      true             seq))
+                    single-expr-body? (-> body count #{1})
+                    body (if-not (or ret-spec
+                                     inner-ret-spec)
+                           (if single-expr-body?
+                             (first body)
+                             (apply list `do body))
+                           (let [ret-val (gensym)
+                                 computed-ret-val (if single-expr-body?
+                                                    (first body)
+                                                    (apply list `do body))]
+                             (list `let [ret-val computed-ret-val]
+                                   (cond-> [`checking {}] ;; XXX options
+                                     ret-spec       (conj ret-spec ret-val)
+                                     inner-ret-spec (conj inner-ret-spec ret-val)
+                                     true           seq)
+                                   ret-val)))
+                    args-with-proper-tag-hints (ensure-proper-type-hints clj? args)]
+                (->> body
+                     (list
+                      args-with-proper-tag-hints
+                      (if has-prepost?
+                        maybe-prepost
+                        ::remove)
+                      (or checking-form
+                          ::remove))
+                     (remove #{::remove})))))))
 
 (defn parse [name tail]
   (let [pred (some-fn string? map?)
@@ -213,14 +285,18 @@
                (vary-meta dissoc :tag))]
     name))
 
-(defn process-name-and-tails [{:keys [name tail clj?] :as options}]
+(defn process-name-and-tails [{:keys [name tail clj? checking?]
+                               :or   {checking? true}
+                               :as   options}]
   {:pre [(check! (spec/nilable symbol?) name
                  coll?                  tail
                  boolean?               clj?)]}
   (let [{ret-spec :spec
          name-ann :type-annotation} (-> name meta (extract-specs-from-metadata clj?) first)
         {:keys [tails docstring-and-meta]} (parse name tail)
-        tails (add-prepost tails ret-spec clj?)
+        tails (if checking?
+                (add-checking-form tails ret-spec clj?)
+                (add-prepost tails ret-spec clj?))
         tails-ann (ret-ann-from-tails tails clj?)
         name-ann (or name-ann tails-ann)
         name-ann (->> ^{:tag name-ann} {}

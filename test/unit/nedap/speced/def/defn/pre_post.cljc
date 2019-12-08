@@ -6,6 +6,7 @@
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.speced.def :as sut]
+   [nedap.utils.test.api :refer [macroexpansion=]]
    [unit.nedap.test-helpers :refer [every-and-at-least-one?]]))
 
 (do
@@ -134,7 +135,7 @@
 
        (deftest macroexpansion
          (testing "It macroexpands to known-good (and evidently-good) forms"
-           (are [x y] (= x y)
+           (are [x y] (macroexpansion= y x)
              no-metadata-macroexpansion            '(def no-metadata (clojure.core/fn ([x]
                                                                                        {:pre  [:pre]
                                                                                         :post [:post]}
@@ -148,221 +149,302 @@
                                                          {:pre [:pre], :post [:post]}
                                                          (-> x (* y) str))))
 
-             concise-metadata-macroexpansion       '(def concise-metadata
+             concise-metadata-macroexpansion       '(def
+                                                      concise-metadata
                                                       (clojure.core/fn
                                                         ([x]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/age x)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/present? %)
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/name %)]}
-                                                         (-> x (* x) str))))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           :unit.nedap.speced.def.defn.pre-post/age
+                                                           x)
+                                                         (clojure.core/let
+                                                          [G__122438 (-> x (* x) str)]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             :unit.nedap.speced.def.defn.pre-post/present?
+                                                             G__122438
+                                                             :unit.nedap.speced.def.defn.pre-post/name
+                                                             G__122438)
+                                                           G__122438))))
 
-             concise-metadata-n-macroexpansion     '(def concise-metadata-n
+             concise-metadata-n-macroexpansion     '(def
+                                                      concise-metadata-n
                                                       (clojure.core/fn
                                                         ([x]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/age x)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/present? %)
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/name  %)]}
-                                                         (-> x (* x) str))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           :unit.nedap.speced.def.defn.pre-post/age
+                                                           x)
+                                                         (clojure.core/let
+                                                          [G__122104 (-> x (* x) str)]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             :unit.nedap.speced.def.defn.pre-post/present?
+                                                             G__122104
+                                                             :unit.nedap.speced.def.defn.pre-post/name
+                                                             G__122104)
+                                                           G__122104))
                                                         ([x y]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/age x
-                                                                                        :unit.nedap.speced.def.defn.pre-post/temperature y)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/present? %)
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/name  %)]}
-                                                         (-> x (* y) str))))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           :unit.nedap.speced.def.defn.pre-post/age
+                                                           x
+                                                           :unit.nedap.speced.def.defn.pre-post/temperature
+                                                           y)
+                                                         (clojure.core/let
+                                                          [G__122105 (-> x (* y) str)]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             :unit.nedap.speced.def.defn.pre-post/present?
+                                                             G__122105
+                                                             :unit.nedap.speced.def.defn.pre-post/name
+                                                             G__122105)
+                                                           G__122105))))
 
-             explicit-metadata-macroexpansion      '(def explicit-metadata
+             explicit-metadata-macroexpansion      '(def
+                                                      explicit-metadata
                                                       (clojure.core/fn
                                                         ([x]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/age x)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/present? %)
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/name %)]}
-                                                         (-> x (* x) str))))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           :unit.nedap.speced.def.defn.pre-post/age
+                                                           x)
+                                                         (clojure.core/let
+                                                          [G__122363 (-> x (* x) str)]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             :unit.nedap.speced.def.defn.pre-post/present?
+                                                             G__122363
+                                                             :unit.nedap.speced.def.defn.pre-post/name
+                                                             G__122363)
+                                                           G__122363))))
 
-             explicit-metadata-n-macroexpansion    '(def explicit-metadata-n
+             explicit-metadata-n-macroexpansion    '(def
+                                                      explicit-metadata-n
                                                       (clojure.core/fn
                                                         ([x]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/age x)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/present? %)
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/name  %)]}
-                                                         (-> x (* x) str))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           :unit.nedap.speced.def.defn.pre-post/age
+                                                           x)
+                                                         (clojure.core/let
+                                                          [G__122610 (-> x (* x) str)]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             :unit.nedap.speced.def.defn.pre-post/present?
+                                                             G__122610
+                                                             :unit.nedap.speced.def.defn.pre-post/name
+                                                             G__122610)
+                                                           G__122610))
                                                         ([x y]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/age x
-                                                                                        :unit.nedap.speced.def.defn.pre-post/temperature y)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/present? %)
-                                                           (nedap.utils.spec.api/check! :unit.nedap.speced.def.defn.pre-post/name  %)]}
-                                                         (-> x (* y) str))))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           :unit.nedap.speced.def.defn.pre-post/age
+                                                           x
+                                                           :unit.nedap.speced.def.defn.pre-post/temperature
+                                                           y)
+                                                         (clojure.core/let
+                                                          [G__122611 (-> x (* y) str)]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             :unit.nedap.speced.def.defn.pre-post/present?
+                                                             G__122611
+                                                             :unit.nedap.speced.def.defn.pre-post/name
+                                                             G__122611)
+                                                           G__122611))))
 
-             type-hinted-metadata-macroexpansion   '(def type-hinted-metadata
+             type-hinted-metadata-macroexpansion   '(def
+                                                      type-hinted-metadata
                                                       (clojure.core/fn
                                                         ([x]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check! (fn [x]
-                                                                                          (if (clojure.core/class? Double)
-                                                                                            (clojure.core/instance? Double x)
-                                                                                            (clojure.core/satisfies? Double x)))
-                                                                                        x)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! (fn [x]
-                                                                                          (if (clojure.core/class? String)
-                                                                                            (clojure.core/instance? String x)
-                                                                                            (clojure.core/satisfies? String x)))
-                                                                                        %)]}
-                                                         (when (< 0 x 100)
-                                                           (-> x (* x) str)))))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           (fn
+                                                             [x]
+                                                             (if
+                                                              (clojure.core/class? Double)
+                                                               (clojure.core/instance? Double x)
+                                                               (clojure.core/satisfies? Double x)))
+                                                           x)
+                                                         (clojure.core/let
+                                                          [G__122668 (when (< 0 x 100) (-> x (* x) str))]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             (fn
+                                                               [x]
+                                                               (if
+                                                                (clojure.core/class? String)
+                                                                 (clojure.core/instance? String x)
+                                                                 (clojure.core/satisfies? String x)))
+                                                             G__122668)
+                                                           G__122668))))
 
-             type-hinted-metadata-n-macroexpansion '(def type-hinted-metadata-n
+             type-hinted-metadata-n-macroexpansion '(def
+                                                      type-hinted-metadata-n
                                                       (clojure.core/fn
                                                         ([x]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check!
-                                                            (fn [x]
-                                                              (if (clojure.core/class? Double)
-                                                                (clojure.core/instance? Double x)
-                                                                (clojure.core/satisfies? Double x)))
-                                                            x)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check!
-                                                            (fn [x]
-                                                              (if (clojure.core/class? String)
-                                                                (clojure.core/instance? String x)
-                                                                (clojure.core/satisfies? String x)))
-                                                            %)]}
-                                                         (when (< 0 x 100)
-                                                           (-> x (* x) str)))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           (fn
+                                                             [x]
+                                                             (if
+                                                              (clojure.core/class? Double)
+                                                               (clojure.core/instance? Double x)
+                                                               (clojure.core/satisfies? Double x)))
+                                                           x)
+                                                         (clojure.core/let
+                                                          [G__122881 (when (< 0 x 100) (-> x (* x) str))]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             (fn
+                                                               [x]
+                                                               (if
+                                                                (clojure.core/class? String)
+                                                                 (clojure.core/instance? String x)
+                                                                 (clojure.core/satisfies? String x)))
+                                                             G__122881)
+                                                           G__122881))
                                                         ([x y]
-                                                         {:pre
-                                                          [:pre
-                                                           (nedap.utils.spec.api/check!
-                                                            (fn [x]
-                                                              (if (clojure.core/class? Double)
-                                                                (clojure.core/instance? Double x)
-                                                                (clojure.core/satisfies? Double x)))
-                                                            x
-                                                            (fn [x]
-                                                              (if (clojure.core/class? Double)
-                                                                (clojure.core/instance? Double x)
-                                                                (clojure.core/satisfies? Double x)))
-                                                            y)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check!
-                                                            (fn [x]
-                                                              (if (clojure.core/class? String)
-                                                                (clojure.core/instance? String x)
-                                                                (clojure.core/satisfies? String x)))
-                                                            %)]}
-                                                         (when (< 0 x 100)
-                                                           (-> x (* y) str)))))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           (fn
+                                                             [x]
+                                                             (if
+                                                              (clojure.core/class? Double)
+                                                               (clojure.core/instance? Double x)
+                                                               (clojure.core/satisfies? Double x)))
+                                                           x
+                                                           (fn
+                                                             [x]
+                                                             (if
+                                                              (clojure.core/class? Double)
+                                                               (clojure.core/instance? Double x)
+                                                               (clojure.core/satisfies? Double x)))
+                                                           y)
+                                                         (clojure.core/let
+                                                          [G__122882 (when (< 0 x 100) (-> x (* y) str))]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             (fn
+                                                               [x]
+                                                               (if
+                                                                (clojure.core/class? String)
+                                                                 (clojure.core/instance? String x)
+                                                                 (clojure.core/satisfies? String x)))
+                                                             G__122882)
+                                                           G__122882))))
 
-             inline-function-macroexpansion        '(def inline-function
+             inline-function-macroexpansion        '(def
+                                                      inline-function
                                                       (clojure.core/fn
                                                         ([x]
-                                                         {:pre [:pre
-                                                                (nedap.utils.spec.api/check!
-                                                                 (clojure.spec.alpha/and
-                                                                  double?
-                                                                  (fn [x]
-                                                                    (if (clojure.core/class? java.lang.Double)
-                                                                      (clojure.core/instance? java.lang.Double x)
-                                                                      (clojure.core/satisfies? java.lang.Double x))))
-                                                                 x)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! present? %)
-                                                           (nedap.utils.spec.api/check!
-                                                            (clojure.spec.alpha/and
-                                                             string?
-                                                             (fn [x]
-                                                               (if (clojure.core/class? java.lang.String)
-                                                                 (clojure.core/instance? java.lang.String x)
-                                                                 (clojure.core/satisfies? java.lang.String x))))
-                                                            %)]}
-                                                         (when (< 0 x 100)
-                                                           (-> x (* x) str)))))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           (clojure.spec.alpha/and
+                                                            double?
+                                                            (fn
+                                                              [x]
+                                                              (if
+                                                               (clojure.core/class? java.lang.Double)
+                                                                (clojure.core/instance? java.lang.Double x)
+                                                                (clojure.core/satisfies? java.lang.Double x))))
+                                                           x)
+                                                         (clojure.core/let
+                                                          [G__122747 (when (< 0 x 100) (-> x (* x) str))]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             present?
+                                                             G__122747
+                                                             (clojure.spec.alpha/and
+                                                              string?
+                                                              (fn
+                                                                [x]
+                                                                (if
+                                                                 (clojure.core/class? java.lang.String)
+                                                                  (clojure.core/instance? java.lang.String x)
+                                                                  (clojure.core/satisfies? java.lang.String x))))
+                                                             G__122747)
+                                                           G__122747))))
              inline-function-n-macroexpansion      '(def
                                                       inline-function-n
                                                       (clojure.core/fn
                                                         ([x]
-                                                         {:pre [:pre
-                                                                (nedap.utils.spec.api/check!
-                                                                 (clojure.spec.alpha/and
-                                                                  double?
-                                                                  (fn [x]
-                                                                    (if (clojure.core/class? java.lang.Double)
-                                                                      (clojure.core/instance? java.lang.Double x)
-                                                                      (clojure.core/satisfies? java.lang.Double x))))
-                                                                 x)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! present? %)
-                                                           (nedap.utils.spec.api/check!
-                                                            (clojure.spec.alpha/and
-                                                             string?
-                                                             (fn [x]
-                                                               (if (clojure.core/class? java.lang.String)
-                                                                 (clojure.core/instance? java.lang.String x)
-                                                                 (clojure.core/satisfies? java.lang.String x))))
-                                                            %)]}
-                                                         (when (< 0 x 100)
-                                                           (-> x (* x) str)))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           (clojure.spec.alpha/and
+                                                            double?
+                                                            (fn
+                                                              [x]
+                                                              (if
+                                                               (clojure.core/class? java.lang.Double)
+                                                                (clojure.core/instance? java.lang.Double x)
+                                                                (clojure.core/satisfies? java.lang.Double x))))
+                                                           x)
+                                                         (clojure.core/let
+                                                          [G__122287 (when (< 0 x 100) (-> x (* x) str))]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             present?
+                                                             G__122287
+                                                             (clojure.spec.alpha/and
+                                                              string?
+                                                              (fn
+                                                                [x]
+                                                                (if
+                                                                 (clojure.core/class? java.lang.String)
+                                                                  (clojure.core/instance? java.lang.String x)
+                                                                  (clojure.core/satisfies? java.lang.String x))))
+                                                             G__122287)
+                                                           G__122287))
                                                         ([x y]
-                                                         {:pre [:pre
-                                                                (nedap.utils.spec.api/check!
-                                                                 (clojure.spec.alpha/and
-                                                                  double?
-                                                                  (fn [x]
-                                                                    (if (clojure.core/class? java.lang.Double)
-                                                                      (clojure.core/instance? java.lang.Double x)
-                                                                      (clojure.core/satisfies? java.lang.Double x))))
-                                                                 x
-                                                                 (clojure.spec.alpha/and
-                                                                  double?
-                                                                  (fn [x]
-                                                                    (if (clojure.core/class? java.lang.Double)
-                                                                      (clojure.core/instance? java.lang.Double x)
-                                                                      (clojure.core/satisfies? java.lang.Double x))))
-                                                                 y)],
-                                                          :post
-                                                          [:post
-                                                           (nedap.utils.spec.api/check! present? %)
-                                                           (nedap.utils.spec.api/check!
-                                                            (clojure.spec.alpha/and
-                                                             string?
-                                                             (fn [x]
-                                                               (if (clojure.core/class? java.lang.String)
-                                                                 (clojure.core/instance? java.lang.String x)
-                                                                 (clojure.core/satisfies? java.lang.String x))))
-                                                            %)]}
-                                                         (when (< 0 x 100)
-                                                           (-> x (* y) str))))))))
+                                                         {:pre [:pre], :post [:post]}
+                                                         (nedap.utils.spec.api/checking
+                                                          {}
+                                                           (clojure.spec.alpha/and
+                                                            double?
+                                                            (fn
+                                                              [x]
+                                                              (if
+                                                               (clojure.core/class? java.lang.Double)
+                                                                (clojure.core/instance? java.lang.Double x)
+                                                                (clojure.core/satisfies? java.lang.Double x))))
+                                                           x
+                                                           (clojure.spec.alpha/and
+                                                            double?
+                                                            (fn
+                                                              [x]
+                                                              (if
+                                                               (clojure.core/class? java.lang.Double)
+                                                                (clojure.core/instance? java.lang.Double x)
+                                                                (clojure.core/satisfies? java.lang.Double x))))
+                                                           y)
+                                                         (clojure.core/let
+                                                          [G__122288 (when (< 0 x 100) (-> x (* y) str))]
+                                                           (nedap.utils.spec.api/checking
+                                                            {}
+                                                             present?
+                                                             G__122288
+                                                             (clojure.spec.alpha/and
+                                                              string?
+                                                              (fn
+                                                                [x]
+                                                                (if
+                                                                 (clojure.core/class? java.lang.String)
+                                                                  (clojure.core/instance? java.lang.String x)
+                                                                  (clojure.core/satisfies? java.lang.String x))))
+                                                             G__122288)
+                                                           G__122288)))))))
 
        (deftest correct-execution
          (testing "Arity 1"

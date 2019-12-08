@@ -10,12 +10,14 @@
   (binding [specs/*clj?* clj?]
     (case (-> extracted-specs count)
       0 true
-      1 (and (check! ::specs/spec-metadata metadata-map)
-             (check! (fn [{:keys [type-annotation]}]
-                       (if clj?
-                         true
-                         (not (-> type-annotation str (string/starts-with? "js/")))))
-                     (first extracted-specs)))
+      1 (and (check! true
+               ::specs/spec-metadata metadata-map)
+             (check! true
+               (fn [{:keys [type-annotation]}]
+                 (if clj?
+                   true
+                   (not (-> type-annotation str (string/starts-with? "js/")))))
+               (first extracted-specs)))
       false)))
 
 (def nilable :nedap.speced.def/nilable)
@@ -187,12 +189,14 @@
   (-> c .getName symbol))
 
 (defn extract-specs-from-metadata [metadata-map clj?]
-  {:pre  [(check! (spec/nilable map?) metadata-map
-                  boolean?            clj?
-                  #{0 1}              (->> metadata-map
-                                           (filter spec-directive?)
-                                           (count)))]
-   :post [(check! (partial proper-spec-metadata? clj? metadata-map) %)]}
+  {:pre  [(check! true
+            (spec/nilable map?) metadata-map
+            boolean?            clj?
+            #{0 1}              (->> metadata-map
+                                     (filter spec-directive?)
+                                     (count)))]
+   :post [(check! true
+            (partial proper-spec-metadata? clj? metadata-map) %)]}
   (let [metadata-map (cond-> metadata-map
                        (-> metadata-map :tag #?(:clj  class?
                                                 :cljs fail)) (update :tag class->symbol))
@@ -227,7 +231,11 @@
                                             v))}
 
                     (and (#{:tag} k)
-                         (not (type-hint? v clj?)))
+                         (do
+                           (when (sequential? v)
+                             (check! true
+                               (complement #{'quote}) (first v)))
+                           (not (type-hint? v clj?))))
                     {:spec            v
                      :type-annotation nil}))))
          (filter some?)
@@ -247,7 +255,8 @@
         :comment "Adapted from clojure.core/defn, with modifications."}
   fntails
   [name & fdecl]
-  {:pre [(check! (spec/nilable symbol?) name)]}
+  {:pre [(check! true
+           (spec/nilable symbol?) name)]}
   (let [m (if (string? (first fdecl))
             {:doc (first fdecl)}
             {})

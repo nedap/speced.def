@@ -3,6 +3,7 @@
   (:require
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    [clojure.walk :as walk]
+   [nedap.speced.def.impl.analysis :refer [process-name-and-tails]]
    [nedap.speced.def.impl.parsing :refer [extract-specs-from-metadata]]
    [nedap.speced.def.impl.type-hinting :refer [ann->symbol ensure-proper-type-hints primitive? type-hint type-hint?]]
    [nedap.utils.spec.impl.check :refer [check!]])
@@ -30,7 +31,8 @@
                                        :docstring ::docstring)))
 
 (defn emit-method [clj? [method-name args docstring :as method]]
-  {:pre [(check! ::method method)]}
+  {:pre [(check! true
+           ::method method)]}
   (assert-not-primitively-hinted! method-name clj?)
   (->> args (walk/postwalk (fn [x]
                              (when (instance? IMeta x)
@@ -46,34 +48,31 @@
                                 (-> arg-meta (extract-specs-from-metadata clj?) first)))
                        args
                        (map meta args))
-        args (type-hint args args-sigs)
-        args-specs (->> args-sigs
-                        (filter :spec)
-                        (map (fn [{:keys [spec arg]}]
-                               [spec arg]))
-                        (apply concat)
-                        (apply list `check!)
-                        (vector))
-        prepost (cond-> {:pre args-specs}
-                  ret-spec (assoc :post [(list `check! ret-spec '%)]))
         tag (if clj?
               (ann->symbol ret-ann)
               ret-ann)
         tag? (some-> tag (type-hint? clj?))
         impl (cond-> (->> method-name (str "--") symbol)
                tag (vary-meta assoc :tag tag))
-        method-name (cond-> method-name
-                      tag?       (vary-meta assoc :tag (list 'quote tag))
-                      (not tag?) (vary-meta dissoc :tag))
-        args-with-proper-tag-hints (ensure-proper-type-hints clj? args)]
-    {:method-name          method-name
+        new-method-name (cond-> method-name
+                          tag?       (vary-meta assoc :tag (list 'quote tag))
+                          (not tag?) (vary-meta dissoc :tag))
+        type-hinted-args (type-hint args args-sigs)
+        args-with-proper-tag-hints (ensure-proper-type-hints clj? type-hinted-args)
+        impl-tail (let [v (process-name-and-tails {:name method-name
+                                                   :tail [args (apply list impl type-hinted-args)]
+                                                   :clj? clj?})]
+                    (assert (-> v :tails count #{1}))
+                    (-> v :tails first vec (assoc 0 args-with-proper-tag-hints) (seq)))]
+    {:method-name          new-method-name
      :protocol-method-name impl
      :docstring            docstring
-     :impl-tail            (list args-with-proper-tag-hints prepost (apply list impl args))
+     :impl-tail            impl-tail
      :proto-tail           args-with-proper-tag-hints}))
 
 (defn extract-signatures [method]
-  {:pre [(check! ::method method)]}
+  {:pre [(check! true
+           ::method method)]}
   (let [name (first method)
         docstring (last method)
         argvs (remove #{name docstring} method)]
@@ -108,10 +107,11 @@
 
 #?(:clj
    (defmacro defprotocol [name docstring & methods]
-     {:pre [(check! symbol? name
-                    string? docstring
-                    ;; (`methods` are already checked in emit-method)
-                    )]}
+     {:pre [(check! true
+              symbol? name
+              string? docstring
+              ;; (`methods` are already checked in emit-method)
+              )]}
      (let [clj? (-> &env :ns nil?)
            impl (fn [name docstring methods]
                   (let [{:keys [impls methods] :as x} (->> methods

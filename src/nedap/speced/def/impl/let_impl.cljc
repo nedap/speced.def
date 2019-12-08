@@ -16,9 +16,10 @@
   (let [bindings (->> bindings
                       (partition 2)
                       (map (fn [[left right]]
-                             (let [analysis-result (process-name-and-tails {:tail (list [left])
-                                                                            :name nil
-                                                                            :clj? clj?})
+                             (let [analysis-result (process-name-and-tails {:tail      (list [left])
+                                                                            :name      nil
+                                                                            :checking? false
+                                                                            :clj?      clj?})
                                    argv (-> analysis-result :tails ffirst)
                                    _ (assert (check! vector? argv
                                                      #{1}    (count argv)))

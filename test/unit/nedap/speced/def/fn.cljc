@@ -111,11 +111,10 @@
      (testing "It macroexpands to known-good (and evidently-good) forms"
        (are [input expected] (macroexpansion= expected input)
          arity-1-macroexpansion               '(fn*
-                                                ([p__196417]
-                                                 (clojure.core/let
-                                                  [{:keys [age temperature length name cool?]} p__196417]
-                                                   (clojure.core/assert
-                                                    (nedap.utils.spec.api/check!
+                                                ([p__297751]
+                                                 (clojure.core/let [{:keys [age temperature length name cool?]} p__297751]
+                                                   (nedap.utils.spec.api/checking
+                                                    {}
 
                                                      :unit.nedap.speced.def.fn/age
                                                      age
@@ -141,16 +140,15 @@
                                                         (if (clojure.core/class? java.lang.Boolean)
                                                           (clojure.core/instance? java.lang.Boolean x)
                                                           (clojure.core/satisfies? java.lang.Boolean x))))
-                                                     cool?))
-                                                   (clojure.core/let [% [age temperature length name cool?]]
-                                                     %))))
+                                                     cool?)
+
+                                                   [age temperature length name cool?])))
 
          arity-n-macroexpansion               '(fn*
-                                                ([p__196485]
-                                                 (clojure.core/let
-                                                  [{:keys [age temperature length name cool?]} p__196485]
-                                                   (clojure.core/assert
-                                                    (nedap.utils.spec.api/check!
+                                                ([p__298812]
+                                                 (clojure.core/let [{:keys [age temperature length name cool?]} p__298812]
+                                                   (nedap.utils.spec.api/checking
+                                                    {}
 
                                                      :unit.nedap.speced.def.fn/age
                                                      age
@@ -176,16 +174,17 @@
                                                         (if (clojure.core/class? java.lang.Boolean)
                                                           (clojure.core/instance? java.lang.Boolean x)
                                                           (clojure.core/satisfies? java.lang.Boolean x))))
-                                                     cool?))
-                                                   (clojure.core/let [% [age temperature length name cool?]]
-                                                     %)))
+                                                     cool?)
 
-                                                ([p__196486 p__196487]
-                                                 (clojure.core/let
-                                                  [{:keys [age temperature]} p__196486
-                                                   {:keys [length name cool?]} p__196487]
-                                                   (clojure.core/assert
-                                                    (nedap.utils.spec.api/check!
+                                                   [age temperature length name cool?]))
+
+                                                ([p__298813 p__298814]
+                                                 (clojure.core/let [{:keys [age temperature]}
+                                                                    p__298813
+                                                                    {:keys [length name cool?]}
+                                                                    p__298814]
+                                                   (nedap.utils.spec.api/checking
+                                                    {}
 
                                                      :unit.nedap.speced.def.fn/age
                                                      age
@@ -211,58 +210,69 @@
                                                         (if (clojure.core/class? java.lang.Boolean)
                                                           (clojure.core/instance? java.lang.Boolean x)
                                                           (clojure.core/satisfies? java.lang.Boolean x))))
-                                                     cool?))
-                                                   (clojure.core/let [% [cool? name length temperature age]]
-                                                     %))))
+                                                     cool?)
+
+                                                   [cool? name length temperature age])))
 
          spec-in-name-macroexpansion          '(fn* spec-in-name-xxx
                                                     ([x]
-                                                     (clojure.core/let [% x]
-                                                       (clojure.core/assert (nedap.utils.spec.api/check!
-                                                                             (clojure.spec.alpha/and string?
-                                                                                                     (fn [x]
-                                                                                                       (if (clojure.core/class? java.lang.String)
-                                                                                                         (clojure.core/instance? java.lang.String x)
-                                                                                                         (clojure.core/satisfies? java.lang.String x))))
-                                                                             %))
-                                                       %)))
+                                                     (clojure.core/let [G__298844 x]
+                                                       (nedap.utils.spec.api/checking
+                                                        {}
+                                                         (clojure.spec.alpha/and
+                                                          string?
+                                                          (fn [x]
+                                                            (if (clojure.core/class? java.lang.String)
+                                                              (clojure.core/instance? java.lang.String x)
+                                                              (clojure.core/satisfies? java.lang.String x))))
+                                                         G__298844)
+                                                       G__298844)))
 
          spec-in-argv-macroexpansion          '(fn* spec-in-argv-xxx
                                                     ([x]
-                                                     (clojure.core/let [% x]
-                                                       (clojure.core/assert (nedap.utils.spec.api/check!
-                                                                             (clojure.spec.alpha/and string?
-                                                                                                     (fn [x]
-                                                                                                       (if (clojure.core/class? java.lang.String)
-                                                                                                         (clojure.core/instance? java.lang.String x)
-                                                                                                         (clojure.core/satisfies? java.lang.String x)))) %))
-                                                       %)))
+                                                     (clojure.core/let [G__298874 x]
+                                                       (nedap.utils.spec.api/checking
+                                                        {}
+                                                         (clojure.spec.alpha/and
+                                                          string?
+                                                          (fn [x]
+                                                            (if (clojure.core/class? java.lang.String)
+                                                              (clojure.core/instance? java.lang.String x)
+                                                              (clojure.core/satisfies? java.lang.String x))))
+                                                         G__298874)
+                                                       G__298874)))
 
          spec-in-argv-no-name-macroexpansion  '(fn*
                                                 ([x]
-                                                 (clojure.core/let [% x]
-                                                   (clojure.core/assert (nedap.utils.spec.api/check!
-                                                                         (clojure.spec.alpha/and string?
-                                                                                                 (fn [x]
-                                                                                                   (if (clojure.core/class? java.lang.String)
-                                                                                                     (clojure.core/instance? java.lang.String x)
-                                                                                                     (clojure.core/satisfies? java.lang.String x))))
-                                                                         %))
-                                                   %)))
+                                                 (clojure.core/let [G__298903 x]
+                                                   (nedap.utils.spec.api/checking
+                                                    {}
+                                                     (clojure.spec.alpha/and
+                                                      string?
+                                                      (fn [x]
+                                                        (if (clojure.core/class? java.lang.String)
+                                                          (clojure.core/instance? java.lang.String x)
+                                                          (clojure.core/satisfies? java.lang.String x))))
+                                                     G__298903)
+                                                   G__298903)))
 
          spec-in-name-and-argv-macroexpansion '(fn* spec-in-name-and-argv-xxx
                                                     ([x]
-                                                     (clojure.core/let [% x]
-                                                       (clojure.core/assert
-                                                        (nedap.utils.spec.api/check!
-                                                         (clojure.spec.alpha/and string?
-                                                                                 (fn [x]
-                                                                                   (if (clojure.core/class? java.lang.String)
-                                                                                     (clojure.core/instance? java.lang.String x)
-                                                                                     (clojure.core/satisfies? java.lang.String x))))
-                                                         %))
-                                                       (clojure.core/assert (nedap.utils.spec.api/check! some? %))
-                                                       %)))))))
+                                                     (clojure.core/let [G__298957 x]
+                                                       (nedap.utils.spec.api/checking
+                                                        {}
+                                                         (clojure.spec.alpha/and
+                                                          string?
+                                                          (fn [x]
+                                                            (if (clojure.core/class? java.lang.String)
+                                                              (clojure.core/instance? java.lang.String x)
+                                                              (clojure.core/satisfies? java.lang.String x))))
+                                                         G__298957
+
+                                                         some?
+                                                         G__298957)
+
+                                                       G__298957)))))))
 
 (deftest correct-execution
   (testing "fns that exercise preconditions. Arity 1"

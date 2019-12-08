@@ -99,97 +99,77 @@
          arity-1-macroexpansion '(def arity-1
                                    (clojure.core/fn
                                      ([{:keys [age temperature length name cool?]}]
-                                      {:pre  [(nedap.utils.spec.api/check!
-
-                                               :unit.nedap.speced.def.defn.destructuring/age
-                                               age
-
-                                               :unit.nedap.speced.def.defn.destructuring/temperature
-                                               temperature
-
-                                               (fn [x]
-                                                 (if (clojure.core/class? java.lang.Long)
-                                                   (clojure.core/instance? java.lang.Long x)
-                                                   (clojure.core/satisfies? java.lang.Long x)))
-                                               length
-
-                                               (fn [x]
-                                                 (if (clojure.core/class? String)
-                                                   (clojure.core/instance? String x)
-                                                   (clojure.core/satisfies? String x)))
-                                               name
-
-                                               (clojure.spec.alpha/and boolean?
-                                                                       (fn [x]
-                                                                         (if (clojure.core/class? java.lang.Boolean)
-                                                                           (clojure.core/instance? java.lang.Boolean x)
-                                                                           (clojure.core/satisfies? java.lang.Boolean x))))
-                                               cool?)],
-                                       :post []}
+                                      (nedap.utils.spec.api/checking {}
+                                        :unit.nedap.speced.def.defn.destructuring/age
+                                        age
+                                        :unit.nedap.speced.def.defn.destructuring/temperature
+                                        temperature
+                                        (fn [x]
+                                          (if (clojure.core/class? java.lang.Long)
+                                            (clojure.core/instance? java.lang.Long x)
+                                            (clojure.core/satisfies? java.lang.Long x)))
+                                        length
+                                        (fn [x]
+                                          (if (clojure.core/class? String)
+                                            (clojure.core/instance? String x)
+                                            (clojure.core/satisfies? String x)))
+                                        name
+                                        (clojure.spec.alpha/and boolean?
+                                                                (fn [x]
+                                                                  (if (clojure.core/class? java.lang.Boolean)
+                                                                    (clojure.core/instance? java.lang.Boolean x)
+                                                                    (clojure.core/satisfies? java.lang.Boolean x))))
+                                        cool?)
                                       [age temperature length name cool?])))
 
          arity-n-macroexpansion '(def arity-n
                                    (clojure.core/fn
                                      ([{:keys [age temperature length name cool?]}]
-                                      {:pre  [(nedap.utils.spec.api/check!
-
-                                               :unit.nedap.speced.def.defn.destructuring/age
-                                               age
-
-                                               :unit.nedap.speced.def.defn.destructuring/temperature
-                                               temperature
-
-                                               (fn [x]
-                                                 (if (clojure.core/class? java.lang.Long)
-                                                   (clojure.core/instance? java.lang.Long x)
-                                                   (clojure.core/satisfies? java.lang.Long x)))
-                                               length
-
-                                               (fn [x]
-                                                 (if (clojure.core/class? String)
-                                                   (clojure.core/instance? String x)
-                                                   (clojure.core/satisfies? String x)))
-                                               name
-
-                                               (clojure.spec.alpha/and
-                                                boolean?
-
-                                                (fn [x]
-                                                  (if (clojure.core/class? java.lang.Boolean)
-                                                    (clojure.core/instance? java.lang.Boolean x)
-                                                    (clojure.core/satisfies? java.lang.Boolean x))))
-                                               cool?)],
-                                       :post []}
+                                      (nedap.utils.spec.api/checking {}
+                                        :unit.nedap.speced.def.defn.destructuring/age
+                                        age
+                                        :unit.nedap.speced.def.defn.destructuring/temperature
+                                        temperature
+                                        (fn [x]
+                                          (if (clojure.core/class? java.lang.Long)
+                                            (clojure.core/instance? java.lang.Long x)
+                                            (clojure.core/satisfies? java.lang.Long x)))
+                                        length
+                                        (fn [x]
+                                          (if (clojure.core/class? String)
+                                            (clojure.core/instance? String x)
+                                            (clojure.core/satisfies? String x)))
+                                        name
+                                        (clojure.spec.alpha/and boolean?
+                                                                (fn [x]
+                                                                  (if (clojure.core/class? java.lang.Boolean)
+                                                                    (clojure.core/instance? java.lang.Boolean x)
+                                                                    (clojure.core/satisfies? java.lang.Boolean x))))
+                                        cool?)
                                       [age temperature length name cool?])
 
                                      ([{:keys [age temperature]} {:keys [length name cool?]}]
-                                      {:pre  [(nedap.utils.spec.api/check!
-
-                                               :unit.nedap.speced.def.defn.destructuring/age
-                                               age
-
-                                               :unit.nedap.speced.def.defn.destructuring/temperature
-                                               temperature
-
-                                               (fn [x]
-                                                 (if (clojure.core/class? java.lang.Long)
-                                                   (clojure.core/instance? java.lang.Long x)
-                                                   (clojure.core/satisfies? java.lang.Long x)))
-                                               length
-
-                                               (fn [x]
-                                                 (if (clojure.core/class? String)
-                                                   (clojure.core/instance? String x)
-                                                   (clojure.core/satisfies? String x)))
-                                               name
-
-                                               (clojure.spec.alpha/and boolean?
-                                                                       (fn [x]
-                                                                         (if (clojure.core/class? java.lang.Boolean)
-                                                                           (clojure.core/instance? java.lang.Boolean x)
-                                                                           (clojure.core/satisfies? java.lang.Boolean x))))
-                                               cool?)],
-                                       :post []}
+                                      (nedap.utils.spec.api/checking {}
+                                        :unit.nedap.speced.def.defn.destructuring/age
+                                        age
+                                        :unit.nedap.speced.def.defn.destructuring/temperature
+                                        temperature
+                                        (fn [x]
+                                          (if (clojure.core/class? java.lang.Long)
+                                            (clojure.core/instance? java.lang.Long x)
+                                            (clojure.core/satisfies? java.lang.Long x)))
+                                        length
+                                        (fn [x]
+                                          (if (clojure.core/class? String)
+                                            (clojure.core/instance? String x)
+                                            (clojure.core/satisfies? String x)))
+                                        name
+                                        (clojure.spec.alpha/and boolean?
+                                                                (fn [x]
+                                                                  (if (clojure.core/class? java.lang.Boolean)
+                                                                    (clojure.core/instance? java.lang.Boolean x)
+                                                                    (clojure.core/satisfies? java.lang.Boolean x))))
+                                        cool?)
                                       [cool? name length temperature age])))))))
 
 (deftest correct-execution

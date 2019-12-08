@@ -9,6 +9,7 @@
    [nedap.utils.test.api :refer [macroexpansion=]]
    [nedap.utils.test.api :refer [meta=]]
    [unit.nedap.test-helpers :refer [every-and-at-least-one?]])
+  #?(:clj (:import (clojure.lang ExceptionInfo)))
   #?(:cljs (:require-macros [unit.nedap.speced.def.letfn :refer [letfn-specimen-1 letfn-specimen-2 letfn-specimen-3 letfn-specimen-4 letfn-specimen-5]])))
 
 (defn fnspecs-example [clj?]
@@ -34,8 +35,12 @@
                                  x)
       (^string? hinted-name [a]
                             a)
+
       (hinted-argv ^string? [a]
-                   a)]
+                   a)
+
+      (^string? hinted-name-and-arg [^string? a]
+                                    [a a])]
     '[(single-signature [^string? a
                          {:keys [^number b]}
                          not-speced]
@@ -56,8 +61,12 @@
                                  x)
       (^string? hinted-name [a]
                             a)
+
       (hinted-argv ^string? [a]
-                   a)]))
+                   a)
+
+      (^string? hinted-name-and-arg [^string? a]
+                                    [a a])]))
 
 #?(:clj
    (defmacro letfn-specimen-1 []
@@ -116,119 +125,156 @@
 #?(:clj
    (deftest macroexpansions
      (testing "It expands to a known-good, reasonable-looking form"
-       (let [the-letfn '(clojure.core/letfn [(single-signature ([a {:keys [b]} not-speced]
-                                                                {:pre  [(nedap.utils.spec.api/check!
-                                                                         (fn [x]
-                                                                           (if (clojure.core/class? java.lang.Long)
-                                                                             (clojure.core/instance? java.lang.Long x)
-                                                                             (clojure.core/satisfies? java.lang.Long x)))
-                                                                         b
+       (let [the-letfn '(clojure.core/letfn
+                         [(single-signature
+                            ([a {:keys [b]} not-speced]
+                             (nedap.utils.spec.api/checking
+                              {}
+                               (fn [x]
+                                 (if (clojure.core/class? java.lang.Long)
+                                   (clojure.core/instance? java.lang.Long x)
+                                   (clojure.core/satisfies? java.lang.Long x)))
+                               b
 
-                                                                         (clojure.spec.alpha/and
-                                                                          string?
-                                                                          (fn [x]
-                                                                            (if (clojure.core/class? java.lang.String)
-                                                                              (clojure.core/instance? java.lang.String x)
-                                                                              (clojure.core/satisfies? java.lang.String x))))
-                                                                         a)],
-                                                                 :post []}
-                                                                [a b not-speced]))
-                                             (single-signature-wrapped ([a {:keys [b]} not-speced]
-                                                                        {:pre  [(nedap.utils.spec.api/check!
-                                                                                 (fn [x]
-                                                                                   (if (clojure.core/class? java.lang.Long)
-                                                                                     (clojure.core/instance? java.lang.Long x)
-                                                                                     (clojure.core/satisfies? java.lang.Long x)))
-                                                                                 b
+                               (clojure.spec.alpha/and
+                                string?
+                                (fn [x]
+                                  (if (clojure.core/class? java.lang.String)
+                                    (clojure.core/instance? java.lang.String x)
+                                    (clojure.core/satisfies? java.lang.String x))))
+                               a)
+                             [a b not-speced]))
 
-                                                                                 (clojure.spec.alpha/and
-                                                                                  string?
-                                                                                  (fn [x]
-                                                                                    (if (clojure.core/class? java.lang.String)
-                                                                                      (clojure.core/instance? java.lang.String x)
-                                                                                      (clojure.core/satisfies? java.lang.String x))))
-                                                                                 a)]
-                                                                         :post []}
-                                                                        [a b not-speced]))
-                                             (multiple-signatures
-                                               ([a {:keys [b]}]
-                                                {:pre  [(nedap.utils.spec.api/check!
-                                                         (fn [x]
-                                                           (if (clojure.core/class? java.lang.Long)
-                                                             (clojure.core/instance? java.lang.Long x)
-                                                             (clojure.core/satisfies? java.lang.Long x)))
-                                                         b
+                          (single-signature-wrapped
+                            ([a {:keys [b]} not-speced]
+                             (nedap.utils.spec.api/checking
+                              {}
+                               (fn [x]
+                                 (if (clojure.core/class? java.lang.Long)
+                                   (clojure.core/instance? java.lang.Long x)
+                                   (clojure.core/satisfies? java.lang.Long x)))
+                               b
 
-                                                         (clojure.spec.alpha/and
-                                                          string?
-                                                          (fn [x]
-                                                            (if (clojure.core/class? java.lang.String)
-                                                              (clojure.core/instance? java.lang.String x)
-                                                              (clojure.core/satisfies? java.lang.String x))))
-                                                         a)],
-                                                 :post []}
-                                                [a b])
-                                               ([a {:keys [b]} not-speced]
-                                                {:pre  [(nedap.utils.spec.api/check!
-                                                         (fn [x]
-                                                           (if (clojure.core/class? java.lang.Long)
-                                                             (clojure.core/instance? java.lang.Long x)
-                                                             (clojure.core/satisfies? java.lang.Long x)))
-                                                         b
+                               (clojure.spec.alpha/and
+                                string?
+                                (fn [x]
+                                  (if (clojure.core/class? java.lang.String)
+                                    (clojure.core/instance? java.lang.String x)
+                                    (clojure.core/satisfies? java.lang.String x))))
+                               a)
+                             [a b not-speced]))
 
-                                                         (clojure.spec.alpha/and
-                                                          string?
-                                                          (fn [x]
-                                                            (if (clojure.core/class? java.lang.String)
-                                                              (clojure.core/instance? java.lang.String x)
-                                                              (clojure.core/satisfies? java.lang.String x))))
-                                                         a)]
-                                                 :post []}
-                                                [a b not-speced]))
-                                             (alternative-destructuring
-                                               ([[x]]
-                                                {:pre
-                                                 [(nedap.utils.spec.api/check!
-                                                   (clojure.spec.alpha/and
-                                                    string?
-                                                    (fn
-                                                      [x]
-                                                      (if (clojure.core/class? java.lang.String)
-                                                        (clojure.core/instance? java.lang.String x)
-                                                        (clojure.core/satisfies? java.lang.String x))))
-                                                   x)],
-                                                 :post []}
-                                                x))
-                                             (hinted-name
-                                               ([a]
-                                                {:pre [],
-                                                 :post
-                                                 [(nedap.utils.spec.api/check!
-                                                   (clojure.spec.alpha/and
-                                                    string?
-                                                    (fn [x]
-                                                      (if (clojure.core/class? java.lang.String)
-                                                        (clojure.core/instance? java.lang.String x)
-                                                        (clojure.core/satisfies? java.lang.String x))))
-                                                   %)]}
-                                                a))
-                                             (hinted-argv
-                                               ([a]
-                                                {:pre [],
-                                                 :post
-                                                 [(nedap.utils.spec.api/check!
-                                                   (clojure.spec.alpha/and
-                                                    string?
-                                                    (fn [x]
-                                                      (if (clojure.core/class? java.lang.String)
-                                                        (clojure.core/instance? java.lang.String x)
-                                                        (clojure.core/satisfies? java.lang.String x))))
-                                                   %)]}
-                                                a))]
-                          [(single-signature "a" {:b 2} ::anything)
-                           (single-signature-wrapped "a" {:b 2} ::anything)
+                          (multiple-signatures
+                            ([a {:keys [b]}]
+                             (nedap.utils.spec.api/checking
+                              {}
+                               (fn [x]
+                                 (if (clojure.core/class? java.lang.Long)
+                                   (clojure.core/instance? java.lang.Long x)
+                                   (clojure.core/satisfies? java.lang.Long x)))
+                               b
+
+                               (clojure.spec.alpha/and
+                                string?
+                                (fn [x]
+                                  (if (clojure.core/class? java.lang.String)
+                                    (clojure.core/instance? java.lang.String x)
+                                    (clojure.core/satisfies? java.lang.String x))))
+                               a)
+                             [a b])
+
+                            ([a {:keys [b]} not-speced]
+                             (nedap.utils.spec.api/checking
+                              {}
+                               (fn [x]
+                                 (if (clojure.core/class? java.lang.Long)
+                                   (clojure.core/instance? java.lang.Long x)
+                                   (clojure.core/satisfies? java.lang.Long x)))
+                               b
+
+                               (clojure.spec.alpha/and
+                                string?
+                                (fn [x]
+                                  (if (clojure.core/class? java.lang.String)
+                                    (clojure.core/instance? java.lang.String x)
+                                    (clojure.core/satisfies? java.lang.String x))))
+                               a)
+                             [a b not-speced]))
+
+                          (alternative-destructuring
+                            ([[x]]
+                             (nedap.utils.spec.api/checking
+                              {}
+                               (clojure.spec.alpha/and
+                                string?
+                                (fn [x]
+                                  (if (clojure.core/class? java.lang.String)
+                                    (clojure.core/instance? java.lang.String x)
+                                    (clojure.core/satisfies? java.lang.String x))))
+                               x)
+                             x))
+
+                          (hinted-name
+                            ([a]
+                             (clojure.core/let [G__214790 a]
+                               (nedap.utils.spec.api/checking
+                                {}
+                                 (clojure.spec.alpha/and
+                                  string?
+                                  (fn [x]
+                                    (if (clojure.core/class? java.lang.String)
+                                      (clojure.core/instance? java.lang.String x)
+                                      (clojure.core/satisfies? java.lang.String x))))
+                                 G__214790)
+                               G__214790)))
+
+                          (hinted-argv
+                            ([a]
+                             (clojure.core/let [G__214791 a]
+                               (nedap.utils.spec.api/checking
+                                {}
+                                 (clojure.spec.alpha/and
+                                  string?
+                                  (fn [x]
+                                    (if (clojure.core/class? java.lang.String)
+                                      (clojure.core/instance? java.lang.String x)
+                                      (clojure.core/satisfies? java.lang.String x))))
+                                 G__214791)
+                               G__214791)))
+
+                          (hinted-name-and-arg
+                            ([a]
+                             (nedap.utils.spec.api/checking
+                              {}
+                               (clojure.spec.alpha/and
+                                string?
+                                (fn [x]
+                                  (if (clojure.core/class? java.lang.String)
+                                    (clojure.core/instance? java.lang.String x)
+                                    (clojure.core/satisfies? java.lang.String x))))
+                               a)
+                             (clojure.core/let [G__272941 [a a]]
+                               (nedap.utils.spec.api/checking
+                                {}
+                                 (clojure.spec.alpha/and
+                                  string?
+                                  (fn [x]
+                                    (if (clojure.core/class? java.lang.String)
+                                      (clojure.core/instance? java.lang.String x)
+                                      (clojure.core/satisfies? java.lang.String x))))
+                                 G__272941)
+                               G__272941)))]
+
+                          [(single-signature "a" {:b 2} :unit.nedap.speced.def.letfn/anything)
+                           (single-signature-wrapped
+                            "a"
+                            {:b 2}
+                            :unit.nedap.speced.def.letfn/anything)
                            (multiple-signatures "a" {:b 2})
-                           (multiple-signatures "a" {:b 2} ::anything)])]
+                           (multiple-signatures
+                            "a"
+                            {:b 2}
+                            :unit.nedap.speced.def.letfn/anything)])]
          (is (macroexpansion= the-letfn
                               specimen-1-macroexpansion))))
      (testing "type hint metadata is inferred (simple symbols, associative destrucuring)"
@@ -280,7 +326,7 @@
 (def validation-failed #"Validation failed")
 
 (deftest assertions-are-checked
-  (are [specimen] (thrown-with-msg? #?(:clj Exception :cljs js/Error)
+  (are [specimen] (thrown-with-msg? #?(:clj ExceptionInfo :cljs js/Error)
                                     validation-failed
                                     (with-out-str
                                       (specimen)))

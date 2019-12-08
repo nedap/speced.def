@@ -134,8 +134,13 @@
          #'--fn-do-it
          #'--fn-do-it-alt
          #'plain-do-it)
-       (are [x] (-> x meta :arglists first second meta :tag #?(:clj #{'Boolean `Boolean}
-                                                               :cljs #{'js/Boolean}))
+
+       (are [x] (testing x
+                  (let [tag (-> x meta :arglists first second meta :tag)]
+                    (is (contains? #?(:clj  #{'Boolean `Boolean}
+                                      :cljs #{'js/Boolean})
+                                   tag)))
+                  true)
          #'do-it
          #'alt-do-it
          #'fn-do-it
