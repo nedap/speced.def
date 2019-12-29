@@ -117,6 +117,16 @@ It is part of this library's philosophy to avoid creating external documentation
 
 That assumes that adopters are willing to jump to the source (particularly to the public parts, and occasionally to the tests which serve as a large corpus of examples), and preferrably have handy tooling that is able to do such jumping.
 
+## Testing
+
+Occasionally, you might want to test that invoking certain `speced/` functionality throws a certain spec failure.
+
+For that, `clojure.test/is`/`cljs.test/is` are extended with the `spec-assertion-thrown?` assertion. You can find example usages in our `unit.nedap.speced.def.spec-assertion` testing ns. 
+
+> Note that clojure.test cannot be extended with complete cleanliness, so in a way requiring `speced.def` pollutes the global environment with the `spec-assertion-thrown?` assertion.
+>
+> In a future, we might add a way to disable this side-effect.
+
 ## [Contributing](https://github.com/nedap/speced.def/blob/master/.github/contributing.md)
 
 ## License
