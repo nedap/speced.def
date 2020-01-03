@@ -3,7 +3,8 @@
    #?(:clj [clojure.spec.alpha :as spec] :cljs [cljs.spec.alpha :as spec])
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.speced.def :as speced]
-   [nedap.utils.spec.api :refer [check!]]))
+   [nedap.utils.spec.api :refer [check!]])
+  #?(:cljs (:require-macros [unit.nedap.speced.def.spec-assertion :refer [when-not-u-s-1-0-0]])))
 
 (spec/def ::age number?)
 
@@ -58,10 +59,18 @@
   (check! spec x)
   x)
 
+#?(:clj (defmacro when-not-u-s-1-0-0
+          {:style/indent 0}
+          [& body]
+          (when-not (-> "nedap.speced.def.testing.utils-spec-dep" System/getProperty #{"1.0.0"})
+            `(do
+               ~@body))))
+
 (deftest parameterized-specs
-  (testing "defns that receive specs as a parameter"
-    (is (spec-assertion-thrown? ::age (parameterized-defn ::age "1234")))
+  (when-not-u-s-1-0-0
+    (testing "defns that receive specs as a parameter"
+      (is (spec-assertion-thrown? ::age (parameterized-defn ::age "1234")))
 
-    (is (spec-assertion-thrown? #{1 2 3} (parameterized-defn #{1 2 3} "1234")))
+      (is (spec-assertion-thrown? #{1 2 3} (parameterized-defn #{1 2 3} "1234")))
 
-    (is (spec-assertion-thrown? number? (parameterized-defn number? "1234")))))
+      (is (spec-assertion-thrown? number? (parameterized-defn number? "1234"))))))

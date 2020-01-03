@@ -89,6 +89,10 @@
                                   :jvm-opts     ["-Dclojure.core.async.go-checking=true"
                                                  "-Duser.language=en-US"]}
 
+             :utils.spec-1.0.0   {:dependencies [[com.nedap.staffing-solutions/utils.spec "1.0.0"]]
+                                  :jvm-opts     ["-Dnedap.speced.def.testing.utils-spec-dep=1.0.0"]}
+
+
              :warn-on-reflection {:global-vars {*warn-on-reflection* true}}
 
              :ci                 {:pedantic?    :abort
