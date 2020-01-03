@@ -53,3 +53,15 @@
   (is (spec-assertion-thrown? 'number? (returns-number-fn "1234")))
   (is (spec-assertion-thrown? 'string? (accepts-string (->ExampleRecord) 1234)))
   (is (spec-assertion-thrown? 'string? (returns-string (->ExampleRecord) 1234))))
+
+(defn parameterized-defn [spec x]
+  (check! spec x)
+  x)
+
+(deftest parameterized-specs
+  (testing "defns that receive specs as a parameter"
+    (is (spec-assertion-thrown? ::age (parameterized-defn ::age "1234")))
+
+    (is (spec-assertion-thrown? #{1 2 3} (parameterized-defn #{1 2 3} "1234")))
+
+    (is (spec-assertion-thrown? number? (parameterized-defn number? "1234")))))
