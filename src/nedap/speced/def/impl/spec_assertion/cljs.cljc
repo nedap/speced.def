@@ -5,6 +5,6 @@
 
 #?(:clj
    (defmethod test/assert-expr 'spec-assertion-thrown? [_env msg form]
-     (clojure.core/let [spec-sym (second form)
-                        body     (nthnext form 2)]
+     (let [spec-sym (second form)
+           body (nthnext form 2)]
        (impl.spec-assertion/spec-assertion-thrown? false msg spec-sym body))))

@@ -20,7 +20,7 @@
        (catch ~(if clj?
                  `ExceptionInfo
                  'ExceptionInfo) e#
-         (let [spec#          (:spec (ex-data e#))
+         (let [spec# (:spec (ex-data e#))
                inferred-specs# (set (map :spec (extract-specs-from-metadata {:tag ~spec-sym} ~clj?)))]
 
            ;; rethrow if no spec failure is found
