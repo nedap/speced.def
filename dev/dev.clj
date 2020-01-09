@@ -5,7 +5,7 @@
    [clojure.pprint :refer [pprint]]
    [clojure.repl :refer [apropos dir doc find-doc pst source]]
    [clojure.test :refer [run-all-tests run-tests]]
-   [clojure.tools.namespace.repl :refer [refresh set-refresh-dirs]]
+   [clojure.tools.namespace.repl :refer [clear refresh refresh-dirs set-refresh-dirs]]
    [criterium.core :refer [quick-bench]]
    [formatting-stack.branch-formatter :refer [format-and-lint-branch! lint-branch!]]
    [formatting-stack.compilers.test-runner :refer [test!]]

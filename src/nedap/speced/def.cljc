@@ -8,9 +8,11 @@
   (:require
    #?(:clj [clojure.test :as test])
    #?(:clj [nedap.speced.def.impl.fn :as impl.fn] :cljs [nedap.speced.def.impl.dummy :as impl.fn])
+   #?(:clj nedap.speced.def.impl.spec-assertion.jvm)
    #?(:clj [clojure.core.specs.alpha :as specs] :cljs [cljs.core.specs.alpha :as specs])
    #?(:clj [nedap.speced.def.impl.letfn :as impl.letfn])
    #?(:clj [nedap.speced.def.impl.let-impl :as let-impl])
+   #?(:clj [nedap.speced.def.impl.spec-assertion])
    [clojure.spec.alpha :as spec]
    [nedap.speced.def.doc :refer [doc-registry rebl-doc-registry]]
    [nedap.speced.def.impl.def-with-doc]
@@ -18,9 +20,8 @@
    [nedap.speced.def.impl.defprotocol]
    [nedap.speced.def.impl.doc :as impl.doc]
    [nedap.speced.def.impl.satisfies]
-   [nedap.speced.def.impl.spec-assertion]
    [nedap.utils.spec.api :refer [check!]])
-  #?(:cljs (:require-macros [nedap.speced.def :refer [def-with-doc]])))
+  #?(:cljs (:require-macros [nedap.speced.def :refer [def-with-doc]] [nedap.speced.def.impl.spec-assertion.cljs])))
 
 #?(:clj
    (defmacro def-with-doc
@@ -116,7 +117,8 @@
      "Emits a spec-backed `letfn`, which uses `nedap.utils.spec.api/check!` at runtime
   to verify that any metadata-annotated symbols satisfy the specs denoted by that metadata.
 
-  Has the exact same signature as `#'clojure.core/letfn`, with full support for arbitrarily nested destructuring and multiple arities.
+  Has the exact same signature as `#'clojure.core/letfn`,
+  with full support for arbitrarily nested destructuring and multiple arities.
 
   Spec metadata follows the `:nedap.speced.def.specs/spec-metadata` 'syntaxes'.
 
@@ -144,12 +146,3 @@
   "Can be summed to an existing spec (also passed as metadata),
 for indicating that that spec is nilable."
   any?)
-
-#?(:clj
-   (defmethod test/assert-expr 'spec-assertion-thrown? [msg form]
-     ;; (is (spec-assertion-thrown? s expr))
-     ;; Asserts that evaluating expr throws an ExceptionInfo related to spec-symbol s.
-     ;; Returns the exception thrown.
-     (clojure.core/let [spec-sym (second form)
-                        body     (nthnext form 2)]
-       (nedap.speced.def.impl.spec-assertion/spec-assertion-thrown? msg spec-sym body))))

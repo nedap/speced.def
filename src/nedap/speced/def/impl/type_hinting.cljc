@@ -72,6 +72,8 @@
       (contains? s)))
 
 (defn clj-type-hint? [x]
+  (assert (not= *ns* this-ns) (str "For an accurate `resolve` call (see `#'clj-type-hint?`)."
+                                   (pr-str [*ns* this-ns])))
   (or (#?(:clj  class?
           :cljs (assert false)) x)
       (and (symbol? x)
@@ -91,17 +93,17 @@
 
 (defn type-hint?
   ([x]
-   (assert (not= *ns* this-ns) "For an accurate `resolve` call (see `#'clj-type-hint?`).")
    #?(:clj  (clj-type-hint? x)
       :cljs (cljs-type-hint? x)))
 
   ([x clj?]
-   (assert (not= *ns* this-ns) "For an accurate `resolve` call (see `#'clj-type-hint?`).")
    (assert (boolean? clj?))
    #?(:clj  (if clj?
               (clj-type-hint? x)
               (cljs-type-hint? x))
-      :cljs (assert false))))
+      :cljs (do
+              (assert (not clj?))
+              (cljs-type-hint? x)))))
 
 (defn ensure-proper-type-hint
   [clj? imeta]

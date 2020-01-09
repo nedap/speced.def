@@ -194,8 +194,9 @@
                                            (count)))]
    :post [(check! (partial proper-spec-metadata? clj? metadata-map) %)]}
   (let [metadata-map (cond-> metadata-map
-                       (-> metadata-map :tag #?(:clj  class?
-                                                :cljs fail)) (update :tag class->symbol))
+                       (and clj?
+                            (-> metadata-map :tag #?(:clj  class?
+                                                     :cljs fail))), (update :tag class->symbol))
         nilable? (->> metadata-map keys (some #{nilable}))]
     (->> metadata-map
          (remove spec-directive?)
