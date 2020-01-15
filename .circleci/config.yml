@@ -33,8 +33,8 @@ jobs:
           name: 'Run JVM test suite'
           command: lein with-profile -dev test
       - run:
-          name: 'Run JVM test suite, with utils.spec 1.0.0'
-          command: lein with-profile -dev,+utils.spec-1.0.0 test
+          name: 'Run JVM test suite, with utils.spec 1.1.0'
+          command: lein with-profile -dev,+utils.spec-1.1.0 test
       - run:
           name: 'Run JVM test suite, failing on reflection warnings'
           command: lein with-profile -dev,+warn-on-reflection test 2>&1 | grep warning && exit 1 || exit 0      
@@ -48,10 +48,10 @@ jobs:
           name: 'Run node.js tests'
           command: node target/out/tests.js
       - run:
-          name: 'Compile ClojureScript test suite, with utils.spec 1.0.0'
-          command: lein with-profile -dev,+test,+utils.spec-1.0.0 do clean, cljsbuild once test
+          name: 'Compile ClojureScript test suite, with utils.spec 1.1.0'
+          command: lein with-profile -dev,+test,+utils.spec-1.1.0 do clean, cljsbuild once test
       - run:
-          name: 'Run node.js tests, with utils.spec 1.0.0'
+          name: 'Run node.js tests, with utils.spec 1.1.0'
           command: node target/out/tests.js
   deploy:
     executor: lein-executor
