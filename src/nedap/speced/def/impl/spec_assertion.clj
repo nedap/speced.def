@@ -36,13 +36,13 @@
            (when-not spec#
              (throw e#))
 
-           (if (or (if legacy?#
-                     (= ~spec-sym spec#)
-                     (or (= ex-data-quoted-spec# ~spec-sym)
-                         (= ex-data-spec-object# ~spec-sym)))
-                   (contains? inferred-specs# (if legacy?#
-                                                spec#
-                                                ex-data-quoted-spec#)))
+           (if (if legacy?#
+                 (-> #{~spec-sym}
+                     (into inferred-specs#)
+                     (contains? spec#))
+                 (or (= ex-data-quoted-spec# ~spec-sym)
+                     (= ex-data-spec-object# ~spec-sym)
+                     (inferred-specs# ex-data-quoted-spec#)))
              (~reporter {:type :pass, :message ~msg :expected '~spec-sym, :actual nil})
              (~reporter {:type :fail, :message ~msg :expected '~spec-sym, :actual spec#}))
            e#)))))
