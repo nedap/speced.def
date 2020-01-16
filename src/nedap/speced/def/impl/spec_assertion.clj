@@ -44,5 +44,10 @@
                      (= ex-data-spec-object# ~spec-sym)
                      (inferred-specs# ex-data-quoted-spec#)))
              (~reporter {:type :pass, :message ~msg :expected '~spec-sym, :actual nil})
-             (~reporter {:type :fail, :message ~msg :expected '~spec-sym, :actual spec#}))
+             (let [actual# (cond
+                             legacy?#                                     spec#
+                             (and (sequential? ex-data-quoted-spec#)
+                                  (symbol? (first ex-data-quoted-spec#))) ex-data-quoted-spec#
+                             true                                         ex-data-spec-object#)]
+               (~reporter {:type :fail, :message ~msg :expected '~spec-sym, :actual actual#})))
            e#)))))
