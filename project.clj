@@ -1,5 +1,5 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject com.nedap.staffing-solutions/speced.def "2.0.0-alpha1"
+(defproject com.nedap.staffing-solutions/speced.def "2.0.0"
   ;; Please keep the dependencies sorted a-z.
   :dependencies [[com.nedap.staffing-solutions/utils.spec "1.2.0-alpha1"]
                  [com.nedap.staffing-solutions/utils.test "1.6.2"]
