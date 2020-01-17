@@ -1,7 +1,7 @@
 ;; Please don't bump the library version by hand - use ci.release-workflow instead.
-(defproject com.nedap.staffing-solutions/speced.def "1.2.0"
+(defproject com.nedap.staffing-solutions/speced.def "2.0.0-alpha1"
   ;; Please keep the dependencies sorted a-z.
-  :dependencies [[com.nedap.staffing-solutions/utils.spec "1.1.0"]
+  :dependencies [[com.nedap.staffing-solutions/utils.spec "1.2.0-alpha1"]
                  [com.nedap.staffing-solutions/utils.test "1.6.2"]
                  [org.clojure/clojure "1.10.1"]]
 
@@ -88,6 +88,9 @@
              :test               {:dependencies [[com.nedap.staffing-solutions/utils.test "1.6.1"]]
                                   :jvm-opts     ["-Dclojure.core.async.go-checking=true"
                                                  "-Duser.language=en-US"]}
+
+             :utils.spec-1.1.0   {:dependencies [[com.nedap.staffing-solutions/utils.spec "1.1.0"]]
+                                  :jvm-opts     ["-Dnedap.speced.def.testing.utils-spec-dep=1.1.0"]}
 
              :warn-on-reflection {:global-vars {*warn-on-reflection* true}}
 
