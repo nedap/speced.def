@@ -4,8 +4,8 @@
    #?(:clj [clojure.test :refer [deftest testing are is use-fixtures]] :cljs [cljs.test :refer-macros [deftest testing is are] :refer [use-fixtures]])
    [nedap.speced.def :as speced]
    [nedap.speced.def.test :refer [spec-assertion-thrown?]]
-   [nedap.utils.spec.api :refer [check!]]
-  #?(:cljs (:require-macros [unit.nedap.speced.def.spec-assertion :refer [when-not-u-s-1-1-0]]))))
+   [nedap.utils.spec.api :refer [check!]])
+  #?(:cljs (:require-macros [unit.nedap.speced.def.spec-assertion :refer [when-not-u-s-1-1-0]])))
 
 (spec/def ::age number?)
 
