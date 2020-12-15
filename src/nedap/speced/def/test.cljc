@@ -5,6 +5,6 @@
   (:require
    [nedap.speced.def]))
 
-(def ^{:arglists '([spec & body])
+(def ^{:arglists '([spec-symbol & body])
        :doc "Asserts that evaluating expr throws an ExceptionInfo related to `spec-symbol`. Returns the exception thrown."}
   spec-assertion-thrown?)
