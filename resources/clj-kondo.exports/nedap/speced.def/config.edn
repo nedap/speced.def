@@ -4,4 +4,5 @@
            nedap.speced.def/doc          clojure.repl/doc
            nedap.speced.def/fn           clojure.core/fn
            nedap.speced.def/let          clojure.core/let
-           nedap.speced.def/letfn        clojure.core/letfn}}
+           nedap.speced.def/letfn        clojure.core/letfn}
+ :hooks   {:analyze-call {nedap.speced.def/defprotocol hooks.speced.def/defprotocol-hook}}}
