@@ -1,0 +1,7 @@
+{:lint-as {nedap.speced.def/def-with-doc clojure.core/defonce
+           nedap.speced.def/defn         clojure.core/defn
+           nedap.speced.def/defprotocol  clojure.core/defprotocol
+           nedap.speced.def/doc          clojure.repl/doc
+           nedap.speced.def/fn           clojure.core/fn
+           nedap.speced.def/let          clojure.core/let
+           nedap.speced.def/letfn        clojure.core/letfn}}
