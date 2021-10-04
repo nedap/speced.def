@@ -9,7 +9,7 @@ That way, you can strengthen your defns with custom specs (expressed as metadata
 #### Coordinates
 
 ```clojure
-[com.nedap.staffing-solutions/speced.def "2.0.0"]
+[com.nedap.staffing-solutions/speced.def "2.1.0"]
 ```
 
 > Note that self-hosted ClojureScript (e.g. Lumo) is unsupported at the moment.
