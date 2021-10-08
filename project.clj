@@ -97,8 +97,13 @@
                                   :jvm-opts     ["-Dnedap.speced.def.testing.utils-spec-dep=1.1.0"]}
 
              :warn-on-reflection {:global-vars {*warn-on-reflection* true}}
+             
+             :ncrw       {:global-vars    {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
+                          :source-paths   ^:replace []
+                          :test-paths     ^:replace []
+                          :resource-paths ^:replace []
+                          :plugins        ^:replace []
+                          :dependencies   ^:replace [[com.nedap.staffing-solutions/ci.release-workflow "1.13.1"]]}
 
-             :ci                 {:pedantic?    :abort
-                                  :jvm-opts     ["-Dclojure.main.report=stderr"]
-                                  :global-vars  {*assert* true} ;; `ci.release-workflow` relies on runtime assertions
-                                  :dependencies [[com.nedap.staffing-solutions/ci.release-workflow "1.6.0"]]}})
+             :ci         {:pedantic?    :abort
+                          :jvm-opts     ["-Dclojure.main.report=stderr"]}})
