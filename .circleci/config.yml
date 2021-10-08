@@ -37,7 +37,7 @@ jobs:
           command: lein with-profile -dev,+utils.spec-1.1.0 test
       - run:
           name: 'Run JVM test suite, failing on reflection warnings'
-          command: lein with-profile -dev,+warn-on-reflection test 2>&1 | grep warning && exit 1 || exit 0      
+          command: lein with-profile -dev,+warn-on-reflection test 2>&1 | grep warning && exit 1 || exit 0
       - run:
           name: 'Ensure production isolation'
           command: lein with-profile -dev,+check check
@@ -62,7 +62,7 @@ jobs:
           command: echo -e "$GPG_KEY_V2" | gpg --import
       - run:
           name: Perform pre-release sanity check
-          command: lein with-profile -dev,+ci run -m nedap.ci.release-workflow.api sanity-check
+          command: lein with-profile -dev,+ci,+ncrw run -m nedap.ci.release-workflow.api sanity-check
       - run:
           name: release to JFrog
           command: lein deploy
