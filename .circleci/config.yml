@@ -64,10 +64,6 @@ jobs:
           name: Perform pre-release sanity check
           command: lein with-profile -dev,+ci,+ncrw run -m nedap.ci.release-workflow.api sanity-check
       - run:
-          name: release to JFrog
-          command: lein deploy
-
-      - run:
           name: release to Clojars
           command: lein deploy clojars
 
@@ -76,14 +72,16 @@ workflows:
   CircleCI:
     jobs:
       - build:
-          context: JFrog
           filters:
             branches:
               only: /.*/
             tags:
               only: /^v\d+\.\d+\.\d+(-alpha\d+)?$/
       - deploy:
-          context: JFrog
+          context:
+            - Clojars
+            - GPG
+            - Github
           requires:
             - build
           filters:
